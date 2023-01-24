@@ -147,3 +147,24 @@ ORDER BY
         await cur.execute(q, {"doc_id": doc_id})
         result = await cur.fetchall()
     return result
+
+
+async def check_user(conn: Connection, login: str, password_hash: str):
+    q = """
+SELECT
+    s.id
+    , s.login
+    , s.employee_name
+    , s.can_login
+FROM
+    `MySQL-1248`.staff s
+WHERE
+    s.login = %(login)s
+    AND
+    s.password = %(password_hash)s
+    """
+    result = {}
+    async with conn.cursor() as cur:
+        await cur.execute(q, {"login": login, "password_hash": password_hash})
+        result = await cur.fetchone()
+    return result

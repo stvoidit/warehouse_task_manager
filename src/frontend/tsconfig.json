@@ -24,7 +24,7 @@
     ],
     "skipLibCheck": true,
     "noEmit": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "baseUrl": ".",
     "paths": {
       "@/*": [

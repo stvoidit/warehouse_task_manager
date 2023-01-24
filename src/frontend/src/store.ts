@@ -1,32 +1,39 @@
-import { ref, shallowRef } from "vue";
+import { computed, reactive, ref, shallowRef } from "vue";
 
 import ClientAPI from "@/api";
 import { defineStore } from "pinia";
-import qs from "qs";
 
-interface optionsParam {
-    from: string|null;
-    to: string|null;
-    unique?: number;
-    owc?: number
-}
-const qsStringifyOptions: qs.IStringifyOptions = { addQueryPrefix: true, skipNulls: true, arrayFormat: "repeat" };
-const stringifyParams = ({ from, to, ...other }: optionsParam) => qs.stringify({ from, to, ...other }, qsStringifyOptions);
+// import qs from "qs";
+
+// interface optionsParam {
+//     from: string|null;
+//     to: string|null;
+//     unique?: number;
+//     owc?: number
+// }
+// const qsStringifyOptions: qs.IStringifyOptions = { addQueryPrefix: true, skipNulls: true, arrayFormat: "repeat" };
+// const stringifyParams = ({ from, to, ...other }: optionsParam) => qs.stringify({ from, to, ...other }, qsStringifyOptions);
 
 export const useApplicationStore = defineStore("app_store", () => {
     /** http клиент */
-    const api = new ClientAPI();
+    const api = reactive(new ClientAPI());
+    const currentUser = computed(() => api.currentUser);
+    const isAuth = computed(() => currentUser.value?.can_login === 1);
 
     const tasks = shallowRef<Array<frontend.ITaskL>>([]);
     const positions = ref<Array<frontend.ITaskPosition>>([]);
 
+    const doLogin = (payload: frontend.ILoginPayload) => api.doLogin(payload);
     const fetchTasksList = () => api.fetchTasksList().then(body => tasks.value = body);
     const fetchTaskPositions = (taskID: number) => api.fetchTaskPositions(taskID).then(body => positions.value = body);
 
     return {
+        doLogin,
         fetchTasksList,
         fetchTaskPositions,
         tasks,
-        positions
+        positions,
+        isAuth,
+        currentUser
     };
 });

@@ -8,8 +8,12 @@ class DatabaseConfig(TypedDict):
     user: str
     password: str
 
+class ServiceConfig(TypedDict):
+    secret: str
+
 class Config(TypedDict):
     database: DatabaseConfig
+    service: ServiceConfig
 
 def read_config(filename: str) -> Config:
     cnf = Config()

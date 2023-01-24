@@ -13,6 +13,7 @@ specifiers:
   element-plus: ^2.2.28
   eslint: ^8.32.0
   eslint-plugin-vue: ^9.9.0
+  jwt-decode: ^3.1.2
   moment: ^2.29.4
   pinia: ^2.0.29
   qs: ^6.11.0
@@ -29,6 +30,7 @@ dependencies:
   '@vueuse/core': 9.11.1_vue@3.2.45
   dayjs: 1.11.7
   element-plus: 2.2.28_vue@3.2.45
+  jwt-decode: 3.1.2
   moment: 2.29.4
   pinia: 2.0.29_prq2uz4lho2pwp6irk4cfkrxwu
   qs: 6.11.0
@@ -3100,6 +3102,10 @@ packages:
     resolution: {integrity: sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /jwt-decode/3.1.2:
+    resolution: {integrity: sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==}
+    dev: false
 
   /leven/3.1.0:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}

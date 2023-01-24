@@ -6,7 +6,8 @@ from aiomysql import Pool, create_pool, DictCursor
 
 from .db import (
     select_tasks,
-    select_task
+    select_task,
+    check_user
 )
 
 
@@ -27,4 +28,5 @@ async def create_connect_db(user: str, password: str, host: str, port: int, db: 
 __all__ = (
     "select_tasks",
     "select_task",
+    "check_user",
 )

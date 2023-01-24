@@ -1,19 +1,22 @@
 <template>
-    <HeaderApp />
+    <HeaderApp v-if="store.isAuth" />
     <router-view
         v-slot="{ Component }">
         <component :is="Component" />
     </router-view>
 </template>
 <script lang="ts">
-import { ref } from "vue";
 import HeaderApp from "@/components/HeaderApp.vue";
+import { useApplicationStore } from "@/store";
 export default {
     components: {
         HeaderApp
     },
     setup() {
-
+        const store = useApplicationStore();
+        return {
+            store
+        };
     }
 };
 </script>

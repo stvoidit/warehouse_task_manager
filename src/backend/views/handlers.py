@@ -1,14 +1,23 @@
-from aiohttp.web import Request, HTTPBadRequest
+from aiohttp.web import Request, HTTPBadRequest, HTTPForbidden
 
-from db import (select_tasks, select_task)
+from db import (
+    select_tasks,
+    select_task,
+    check_user)
 from utils import jsonify
 
 
-async def login(request: Request):
-    pass
-
-async def logout(request: Request):
-    pass
+async def login_handler(request: Request):
+    body = await request.json()
+    login = body.get("login", "")
+    security = request.app["crypto"]
+    password_hash = security.hash_password(body.get("password", ""))
+    user = None
+    async with request.app["db"].acquire() as conn:
+        user = await check_user(conn, login, password_hash)
+    if user is None:
+        raise HTTPForbidden()
+    return await jsonify(security.create_jwt(user), request)
 
 
 async def get_tasks(request: Request):

@@ -1,36 +1,76 @@
+import jwt_decode from "jwt-decode";
+
 const BASE_URL = "/api";
 const TASKS_LIST = "tasks";
 const TASK_POSITIONS = "task";
+const LOGIN = "login";
 
 
 type user = {
-    canLogin: boolean;
+    can_login: number;
     id: string;
-    name: string;
-    position: string;
-    sessionID: string;
+    employee_name: string;
+    login: string;
 }
 
 class ClientAPI {
     currentUser: user | null = null;
+    token: string | null;
     constructor() {
         this.currentUser = null;
+        this.token = "";
+    }
+
+    decodeToken() {
+        /** декодирование токена */
+        if (this.token) {
+            const decode_token = jwt_decode(this.token);
+            this.currentUser = decode_token ? decode_token["payload"] : null;
+        }
+    }
+
+    checkToken() {
+        /** проверка токена */
+        if (!this.token) {
+            this.token = window.localStorage.getItem("token");
+        }
+        if (!this.token) {
+            location.href = "/login";
+        }
+        this.decodeToken();
     }
 
     async fetchTasksList() {
-        const response = await fetch(`${BASE_URL}/${TASKS_LIST}`);
+        /** получение списка задач */
+        this.checkToken();
+        const response = await fetch(`${BASE_URL}/${TASKS_LIST}`, { headers: this.token ? { token: this.token } : {} });
         const body = await response.json();
         return body;
     }
 
     async fetchTaskPositions(taskID: number) {
-        const response = await fetch(`${BASE_URL}/${TASK_POSITIONS}/${taskID}`);
+        /** получение списка позиций в задаче */
+        this.checkToken();
+        const response = await fetch(`${BASE_URL}/${TASK_POSITIONS}/${taskID}`, { headers: this.token ? { token: this.token } : {} });
         if (response.status !== 200) {
             location.href = "/";
             return;
         }
         const body = await response.json();
         return body;
+    }
+
+    async doLogin(payload: frontend.ILoginPayload) {
+        /** авторизация */
+        const response = await fetch(`${BASE_URL}/${LOGIN}`, { method: "POST", body: JSON.stringify(payload) });
+        if (response.ok === false) {
+            throw "Неправильный логин или пароль";
+        }
+        const token = await response.json();
+        window.localStorage.setItem("token", token);
+        this.decodeToken();
+        location.href = "/";
+        return;
     }
 }
 

@@ -3,7 +3,8 @@ from aiohttp.web import Application, Request, FileResponse
 
 from .handlers import (
     get_tasks,
-    get_task
+    get_task,
+    login_handler
 )
 
 
@@ -25,6 +26,7 @@ async def setup_handlers(app: Application):
         print("static dir not found")
 
     views = [
+        ("POST", "/api/login", login_handler, "login"),
         ("GET", "/api/tasks", get_tasks, "get_tasks"),
         ("GET", "/api/task/{taskID}", get_task, "get_task")
     ]

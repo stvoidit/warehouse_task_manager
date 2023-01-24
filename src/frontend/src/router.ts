@@ -1,5 +1,6 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from "vue-router";
 
+import LoginPage from "@/Pages/LoginPage.vue";
 import TaskPage from "@/Pages/TaskPage.vue";
 import TasksListPage from "@/Pages/TasksListPage.vue";
 
@@ -8,6 +9,11 @@ const routes: Array<RouteRecordRaw> = [
         path: "/",
         name: "TasksListPage",
         component: TasksListPage
+    },
+    {
+        path: "/login",
+        name: "LoginPage",
+        component: LoginPage
     },
     {
         path: "/task/:taskID",

@@ -37,4 +37,8 @@ declare namespace frontend {
         done: boolean
     }
 
+    export type ILoginPayload = {
+        login: str;
+        password: str
+    }
 }

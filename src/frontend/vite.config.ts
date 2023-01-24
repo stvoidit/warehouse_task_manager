@@ -9,7 +9,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
     const env = loadEnv(mode, ".");
     return defineConfig({
         plugins: [
-            vue(),
+            vue()
             // VitePWA({
             //     registerType: "autoUpdate",
             //     includeAssets: [
@@ -50,12 +50,12 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
             https: false,
             proxy: {
                 "/api": {
-                    target: env.VITE_PROXY_TARGET,
+                    target: env.VITE_PROXY_TARGET || "http://localhost:8080",
                     changeOrigin: true
                 }
             },
-            host: env.VITE_HOST,
-            port: parseInt(env.VITE_PORT)
+            host: env.VITE_HOST || "0.0.0.0",
+            port: env.VITE_PORT ? parseInt(env.VITE_PORT) : 3000
         },
         build: {
             target: "modules",

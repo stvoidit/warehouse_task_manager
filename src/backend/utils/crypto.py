@@ -2,12 +2,14 @@ import random
 import hmac
 import hashlib
 import jwt
+import pytz
 from datetime import datetime, date, timedelta
 
 class CyptoPassword():
     secret: bytes
     def __init__(self, secret: str) -> None:
         self.secret = secret.encode()
+        self.tz = pytz.timezone("Europe/Moscow")
 
     def generate_password(self, length=20):
         """ генерация пароля """
@@ -19,17 +21,20 @@ class CyptoPassword():
         return "".join(random.choices(alpha, k=length))
 
     def hash_password( self, password: str):
+        """ хэширование пароля """
         return hmac.new(self.secret, password.encode(), hashlib.sha256).hexdigest()
 
     def create_jwt(self, payload: dict):
+        """ создание jwt токена """
+        exp = datetime.combine(date.today() + timedelta(days=1), datetime.min.time())
         base_message = {
             "iss": "domain.local",
             "sub": "user-token",
-            "exp": datetime.combine(date.today() + timedelta(days=1), datetime.min.time()),
+            "exp": self.tz.localize(exp),
             "payload": payload
         }
-        print(base_message)
         return jwt.encode(base_message, self.secret, algorithm="HS256")
 
     def validate_jwt(self, token: str):
-        print(jwt.decode(token, self.secret, algorithms=["HS256"]))
+        """ валидация jwt токена """
+        print(jwt.decode(token, self.secret, leeway=timedelta(seconds=10), algorithms=["HS256"]))

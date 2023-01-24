@@ -3,6 +3,7 @@
 from aiomysql import Connection
 
 async def select_tasks(conn: Connection, user_id: int):
+    """ получение списка заданий """
     q = """
 SELECT
     m.material
@@ -49,6 +50,7 @@ GROUP BY
 
 
 async def select_task(conn: Connection, doc_id: int):
+    """ получение позиций задания """
     q = """
 SELECT
     m.material
@@ -150,6 +152,7 @@ ORDER BY
 
 
 async def check_user(conn: Connection, login: str, password_hash: str):
+    """ проверка авторизации пользователя """
     q = """
 SELECT
     s.id

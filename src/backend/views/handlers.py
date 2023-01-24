@@ -8,6 +8,7 @@ from utils import jsonify
 
 
 async def login_handler(request: Request):
+    """ хэндлен авторизация """
     body = await request.json()
     login = body.get("login", "")
     security = request.app["crypto"]
@@ -21,6 +22,7 @@ async def login_handler(request: Request):
 
 
 async def get_tasks(request: Request):
+    """ получение списка заданий """
     user_id = 2
     tasks = []
     async with request.app["db"].acquire() as conn:
@@ -29,6 +31,7 @@ async def get_tasks(request: Request):
 
 
 async def get_task(request: Request):
+    """ получение позиций в задании """
     doc_id = request.match_info.get("taskID", None)
     if doc_id is None:
         raise HTTPBadRequest()

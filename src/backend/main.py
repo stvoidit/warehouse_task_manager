@@ -12,16 +12,18 @@ uvinstall()
 
 
 async def _on_shutdown(app: web.Application):
+    """ мягкое завершение работы - отключение от БД """
     print("shutdown")
     app["db"].close()
     await app["db"].wait_closed()
 
 
 async def _on_startup(app: web.Application):
+    """ инициализация соединения с БД """
     app["db"] = await create_connect_db(**app["config"]["database"])
 
 async def init_app() -> web.Application:
-    # middlewares=[middleware1]
+    """ инициализация всего приложения """
     logging.basicConfig(level=logging.INFO)
     app = web.Application()
     cnf = read_config("config.toml")

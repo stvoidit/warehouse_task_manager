@@ -13,8 +13,7 @@ SELECT
     , doc.operation
     , SUM(tare_amount) AS amount
     , SUM(net_weight) AS weight
-    ,
-SUM(tare_amount_fact) AS amount_fact
+    , SUM(tare_amount_fact) AS amount_fact
     , SUM(net_weight_fact) AS weight_fact
 FROM
     production_task

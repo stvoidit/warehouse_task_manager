@@ -1,0 +1,7 @@
+__pycache__
+.mypy_cache
+.venv
+.vscode
+src/frontend/node_modules
+src/frontend/dist
+dev.py

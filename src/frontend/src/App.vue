@@ -33,7 +33,6 @@ export default {
 }
 body {
     background-color: var(--el-fill-color-blank);
-
 }
 .el-table .cell {
     word-break: break-word !important;
@@ -44,5 +43,8 @@ body {
 }
 .el-table__row {
     cursor: pointer;
+}
+.el-table thead {
+    color: black !important;
 }
 </style>

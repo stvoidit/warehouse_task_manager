@@ -26,40 +26,44 @@ export default {
         };
         const columns = [
             {
-                prop: "planned_date",
-                label: "Запланированная дата"
-            },
-            {
                 prop: "material",
-                label: "Материал"
+                label: "material"
             },
             {
-                prop: "place?",
-                label: "Место хранения/Участок (?)"
-            },
-            {
-                prop: "operation",
-                label: "Операция"
+                prop: "doc_id",
+                label: "doc_id"
             },
             {
                 prop: "doc_number",
-                label: "Задание"
+                label: "doc_number"
             },
             {
-                prop: "amount_fact",
-                label: "Выполнено"
+                prop: "planned_date",
+                label: "planned_date"
+            },
+            {
+                prop: "technical_process",
+                label: "technical_process"
+            },
+            {
+                prop: "operation",
+                label: "operation"
             },
             {
                 prop: "amount",
-                label: "Всего заданий (?)"
+                label: "amount"
             },
             {
                 prop: "weight",
-                label: "Вес всего"
+                label: "weight"
+            },
+            {
+                prop: "amount_fact",
+                label: "amount_fact"
             },
             {
                 prop: "weight_fact",
-                label: "Вес выполнено (?)"
+                label: "weight_fact"
             }
         ];
         return {

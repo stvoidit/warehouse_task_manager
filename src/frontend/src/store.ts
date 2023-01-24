@@ -19,6 +19,7 @@ export const useApplicationStore = defineStore("app_store", () => {
     const api = reactive(new ClientAPI());
     const currentUser = computed(() => api.currentUser);
     const isAuth = computed(() => currentUser.value?.can_login === 1);
+    const checkToken = () => api.checkToken();
 
     const tasks = shallowRef<Array<frontend.ITaskL>>([]);
     const positions = ref<Array<frontend.ITaskPosition>>([]);
@@ -34,6 +35,7 @@ export const useApplicationStore = defineStore("app_store", () => {
         tasks,
         positions,
         isAuth,
-        currentUser
+        currentUser,
+        checkToken
     };
 });

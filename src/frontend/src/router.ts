@@ -3,6 +3,7 @@ import { RouteRecordRaw, createRouter, createWebHistory } from "vue-router";
 import LoginPage from "@/Pages/LoginPage.vue";
 import TaskPage from "@/Pages/TaskPage.vue";
 import TasksListPage from "@/Pages/TasksListPage.vue";
+import { useApplicationStore } from "@/store";
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -25,6 +26,10 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
     history: createWebHistory(),
     routes: routes
+});
+router.beforeEach(() => {
+    const store = useApplicationStore();
+    store.checkToken();
 });
 // router.isReady().then(async () => {
 //     const { registerSW } = await import("virtual:pwa-register");

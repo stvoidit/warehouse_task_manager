@@ -31,19 +31,26 @@ class ClientAPI {
 
     checkToken() {
         /** проверка токена */
+        if (location.pathname === "/login") return;
         if (!this.token) {
             this.token = window.localStorage.getItem("token");
         }
         if (!this.token) {
             location.href = "/login";
         }
-        this.decodeToken();
+        if (!this.currentUser) {
+            this.decodeToken();
+        }
+    }
+
+    requestHeaders() {
+        return this.token ? { token: this.token } : {};
     }
 
     async fetchTasksList() {
         /** получение списка задач */
         this.checkToken();
-        const response = await fetch(`${BASE_URL}/${TASKS_LIST}`, { headers: this.token ? { token: this.token } : {} });
+        const response = await fetch(`${BASE_URL}/${TASKS_LIST}`, { headers: this.requestHeaders() });
         if (response.status === 403) {
             window.localStorage.removeItem("token");
             location.href = "/login";
@@ -55,7 +62,7 @@ class ClientAPI {
     async fetchTaskPositions(taskID: number) {
         /** получение списка позиций в задаче */
         this.checkToken();
-        const response = await fetch(`${BASE_URL}/${TASK_POSITIONS}/${taskID}`, { headers: this.token ? { token: this.token } : {} });
+        const response = await fetch(`${BASE_URL}/${TASK_POSITIONS}/${taskID}`, { headers: this.requestHeaders() });
         if (response.status === 403) {
             window.localStorage.removeItem("token");
             location.href = "/login";
@@ -70,7 +77,7 @@ class ClientAPI {
 
     async doLogin(payload: frontend.ILoginPayload) {
         /** авторизация */
-        const response = await fetch(`${BASE_URL}/${LOGIN}`, { method: "POST", body: JSON.stringify(payload) });
+        const response = await fetch(`${BASE_URL}/${LOGIN}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
         if (response.ok === false) {
             throw "Неправильный логин или пароль";
         }

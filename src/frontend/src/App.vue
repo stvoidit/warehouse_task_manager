@@ -2,7 +2,11 @@
     <HeaderApp v-if="store.isAuth" />
     <router-view
         v-slot="{ Component }">
-        <component :is="Component" />
+        <el-container>
+            <el-main>
+                <component :is="Component" />
+            </el-main>
+        </el-container>
     </router-view>
 </template>
 <script lang="ts">

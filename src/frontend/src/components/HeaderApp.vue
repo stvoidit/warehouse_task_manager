@@ -1,12 +1,10 @@
 <template>
     <el-header>
-        <el-page-header
-            title="назад"
-            @back="onBack">
+        <el-page-header>
             <template #content>
                 <el-menu
                     :ellipsis="false"
-                    router
+                    :router="true"
                     mode="horizontal">
                     <el-menu-item
                         route="/">
@@ -58,15 +56,15 @@ import { useApplicationStore } from "@/store";
 export default {
     setup() {
         const store = useApplicationStore();
-        const onBack = () => location.href = "/";
         const handleLogOut = () => {
             window.localStorage.removeItem("token");
             location.href = "/login";
         };
+        const defaultActive = location.pathname;
         return {
             store,
-            onBack,
-            handleLogOut
+            handleLogOut,
+            defaultActive
         };
     }
 };

@@ -1,29 +1,23 @@
 <template>
-    <el-container>
-        <el-main>
-            <!-- <pre>{{ store.tasks }}</pre> -->
-            <el-table
-                :data="store.tasks"
-                :border="true"
-                style="width: 100%"
-                @row-click="handleRowClick">
-                <el-table-column
-                    v-for="col in columns"
-                    :key="col.prop"
-                    :prop="col.prop"
-                    :label="col.label" />
-            </el-table>
-        </el-main>
-    </el-container>
+    <!-- <pre>{{ store.tasks }}</pre> -->
+    <el-table
+        v-if="store.isAuth"
+        :data="store.tasks"
+        :border="true"
+        size="small"
+        style="width: 100%"
+        @row-click="handleRowClick">
+        <el-table-column
+            v-for="col in columns"
+            :key="col.prop"
+            :prop="col.prop"
+            :label="col.label" />
+    </el-table>
 </template>
 <script lang="ts">
 import { onMounted} from "vue";
 import { useApplicationStore } from "@/store";
-
 export default {
-    components: {
-
-    },
     setup() {
         const store = useApplicationStore();
         onMounted(store.fetchTasksList);

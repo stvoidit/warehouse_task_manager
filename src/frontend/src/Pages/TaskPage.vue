@@ -1,34 +1,30 @@
 <template>
-    <el-container>
-        <el-main>
-            <el-row>
-                Задача: №{{ taskID }}
-            </el-row>
-            <br>
-            <!-- <pre>{{ store.positions }}</pre> -->
-            <el-row>
-                <el-table
-                    :data="store.positions"
-                    :border="true"
-                    style="width: 100%"
-                    @row-click="handleClickRow">
-                    <el-table-column
-                        v-for="col in columns"
-                        :key="col.prop"
-                        :prop="col.prop"
-                        :label="col.label" />
-                    <el-table-column label="Operations">
-                        <template #default="scope">
-                            <!-- TODO: обработка клика отдельным хэндлером после подтверждения бэком -->
-                            <el-checkbox
-                                v-model="scope.row.done"
-                                size="large" />
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-row>
-        </el-main>
-    </el-container>
+    <el-row v-if="store.isAuth">
+        <div class="mb">
+            Задача: №{{ taskID }}
+        </div>
+        <!-- <pre>{{ store.positions }}</pre> -->
+        <el-table
+            :data="store.positions"
+            :border="true"
+            size="small"
+            style="width: 100%"
+            @row-click="handleClickRow">
+            <el-table-column
+                v-for="col in columns"
+                :key="col.prop"
+                :prop="col.prop"
+                :label="col.label" />
+            <el-table-column label="Operations">
+                <template #default="scope">
+                    <!-- TODO: обработка клика отдельным хэндлером после подтверждения бэком -->
+                    <el-checkbox
+                        v-model="scope.row.done"
+                        size="large" />
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-row>
 </template>
 
 <script lang="ts">

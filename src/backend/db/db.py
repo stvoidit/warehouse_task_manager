@@ -30,10 +30,8 @@ WHERE
             production_task_executor.doc_id
         FROM
             production_task_executor
-        LEFT JOIN staff ON
-            staff.id = production_task_executor.executor_id
         WHERE
-            staff.id = %(user_id)s
+            production_task_executor.executor_id = %(user_id)s
     )
 GROUP BY
     m.material
@@ -42,6 +40,9 @@ GROUP BY
     , doc.planned_date
     , doc.technical_process
     , doc.operation
+ORDER BY
+    doc.planned_date ASC
+    , doc.id ASC
     """
     result = []
     async with conn.cursor() as cur:
@@ -57,21 +58,14 @@ SELECT
     m.material
     , IFNULL(lab_material_mark, '') AS lab_material_mark
     , IFNULL(lab_material_group, '') AS lab_material_group
-    ,
- arrival.tare_id
+    , arrival.tare_id
     , arrival.tare_mark
     , arrival.tare_type
-    ,
- arrival.tare_amount AS arrival_tare_amount
+    , arrival.tare_amount AS arrival_tare_amount
     , arrival.gross_weight AS arrival_gross_weight
-    ,
- arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0) AS rest_tare_amount
-    ,
- arrival.net_weight - IFNULL(P.net_weight, 0) - IFNULL(S.net_weight, 0) + IFNULL(tare.weight, 0) * (
-        arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0)
-    ) AS rest_gross_weight
-    ,
- task.tare_amount AS task_tare_amount
+    , arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0) AS rest_tare_amount
+    , arrival.net_weight - IFNULL(P.net_weight, 0) - IFNULL(S.net_weight, 0) + IFNULL(tare.weight, 0) * (arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0)) AS rest_gross_weight
+    , task.tare_amount AS task_tare_amount
     , task.net_weight AS task_net_weight
 FROM
     arrival
@@ -84,8 +78,7 @@ LEFT JOIN (
             production_doc.id = production.doc_id
         WHERE
             production_doc.stock = '1'
-    ) P
- ON
+    ) P ON
     P.key_material = arrival.key_material
 LEFT JOIN (
         SELECT
@@ -96,15 +89,13 @@ LEFT JOIN (
             shipment_doc.id = shipment.doc_id
         WHERE
             shipment_doc.stock = '1'
-    ) S
- ON
+    ) S ON
     S.key_material = arrival.key_material
 LEFT JOIN material AS m ON
     m.id = arrival.material
 LEFT JOIN tare ON
     arrival.tare_type = tare.id
-LEFT JOIN
- (
+LEFT JOIN (
         SELECT
             lab.key_material
             ,
@@ -139,8 +130,8 @@ WHERE
     arrival_doc.stock = '1'
     AND
     task.net_weight_fact = 0
-    AND
-    m.material = "22ИШМБ1810"
+--    AND
+--    m.material = "22ИШМБ1810"
 ORDER BY
     m.material
     , arrival.tare_id
@@ -161,8 +152,10 @@ SELECT
     , s.employee_name
     , s.can_login
 FROM
-    `MySQL-1248`.staff s
+    staff s
 WHERE
+    s.can_login IS TRUE
+    AND
     s.login = %(login)s
     AND
     s.password = %(password_hash)s

@@ -10,7 +10,8 @@
                 <el-table
                     :data="store.positions"
                     :border="true"
-                    style="width: 100%">
+                    style="width: 100%"
+                    @row-click="handleClickRow">
                     <el-table-column
                         v-for="col in columns"
                         :key="col.prop"
@@ -18,6 +19,7 @@
                         :label="col.label" />
                     <el-table-column label="Operations">
                         <template #default="scope">
+                            <!-- TODO: обработка клика отдельным хэндлером после подтверждения бэком -->
                             <el-checkbox
                                 v-model="scope.row.done"
                                 size="large" />
@@ -42,6 +44,13 @@ export default defineComponent({
             if (isNaN(props.taskID)) location.href = "/";
             store.fetchTaskPositions(props.taskID);
         });
+        const handleClickRow = (row: frontend.ITaskPosition) => {
+            if (row.done) {
+                row.done = !row.done;
+            } else {
+                row.done = true;
+            }
+        };
         const columns = [
             {
                 prop: "material",
@@ -94,12 +103,9 @@ export default defineComponent({
         ];
         return {
             store,
-            columns
+            columns,
+            handleClickRow
         };
     }
 });
 </script>
-
-<style scoped>
-
-</style>

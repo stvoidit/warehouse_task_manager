@@ -38,4 +38,7 @@ body {
 .text-center {
     text-align: center;
 }
+.el-table__row {
+    cursor: pointer;
+}
 </style>

@@ -10,7 +10,8 @@
                     mode="horizontal">
                     <el-menu-item
                         route="/">
-                        Список задач
+                        <el-icon><MessageBox /></el-icon>
+                        <span>Список задач</span>
                     </el-menu-item>
                 </el-menu>
             </template>
@@ -23,7 +24,10 @@
                         <el-button
                             plain
                             round>
-                            {{ store.currentUser?.employee_name }}
+                            <el-icon style="vertical-align: middle">
+                                <User />
+                            </el-icon>
+                            <span>{{ store.currentUser?.employee_name }}</span>
                         </el-button>
                     </template>
                     <template #default>

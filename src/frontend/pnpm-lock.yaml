@@ -8,7 +8,6 @@ specifiers:
   '@typescript-eslint/parser': ^5.49.0
   '@vitejs/plugin-vue': ^4.0.0
   '@vue/eslint-config-typescript': ^11.0.2
-  '@vueuse/core': ^9.11.1
   dayjs: ^1.11.7
   element-plus: ^2.2.28
   eslint: ^8.32.0
@@ -27,7 +26,6 @@ specifiers:
 
 dependencies:
   '@element-plus/icons-vue': 2.0.10_vue@3.2.45
-  '@vueuse/core': 9.11.1_vue@3.2.45
   dayjs: 1.11.7
   element-plus: 2.2.28_vue@3.2.45
   jwt-decode: 3.1.2

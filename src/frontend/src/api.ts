@@ -43,7 +43,7 @@ class ClientAPI {
         }
     }
 
-    requestHeaders() {
+    requestHeaders(): HeadersInit {
         return this.token ? { token: this.token } : {};
     }
 

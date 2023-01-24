@@ -4,7 +4,7 @@ from aiohttp import web
 from uvloop import install as uvinstall
 
 from db import create_connect_db
-from middlewares import middleware_check_token
+from middlewares import middleware_check_token, middleware_compression
 from utils import CryptoGuard, read_config
 from views import setup_handlers
 
@@ -25,11 +25,10 @@ async def _on_startup(app: web.Application):
 async def init_app() -> web.Application:
     """ инициализация всего приложения """
     logging.basicConfig(level=logging.INFO)
-    app = web.Application()
+    app = web.Application(middlewares=[ middleware_check_token, middleware_compression ])
     cnf = read_config("config.toml")
     app["config"] = cnf
     app["crypto"] = CryptoGuard(cnf["service"]["secret"])
-    app.middlewares.append(middleware_check_token)
     app.on_startup.append(_on_startup)
     app.on_shutdown.append(_on_shutdown)
     await setup_handlers(app)

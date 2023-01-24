@@ -4,7 +4,7 @@ from io import BytesIO
 from typing import Any
 
 import orjson
-from aiohttp.web import ContentCoding, Request, Response
+from aiohttp.web import Request, Response
 
 
 async def jsonify(
@@ -25,9 +25,10 @@ async def jsonify(
         data,
         option=orjson.OPT_OMIT_MICROSECONDS | orjson.OPT_PASSTHROUGH_DATETIME,  # pylint: disable=no-member
         default=serializer)
-    response = Response(text=None, body=body, status=status,
+    response = Response(text=None,
+                        body=body,
+                        status=status,
                         content_type=content_type)
-    response.enable_compression(force=ContentCoding.gzip)
     await response.prepare(request)
     return response
 

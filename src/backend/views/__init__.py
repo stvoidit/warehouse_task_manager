@@ -4,7 +4,6 @@ from aiohttp.web import Application, FileResponse, Request
 
 from .handlers import get_task, get_tasks, login_handler
 
-
 def index_spa(path, filename):
     static_files = [p.name for p in pathlib.Path(path).iterdir() if p.is_dir() is False]
     async def static_view(request: Request):

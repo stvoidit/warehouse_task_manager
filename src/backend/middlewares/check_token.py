@@ -1,10 +1,9 @@
 import jwt
-from aiohttp import web
-from aiohttp.web import middleware
+from aiohttp.web import HTTPForbidden, Request, RequestHandler, middleware
 
 
 @middleware
-async def middleware_check_token(request: web.Request, handler: web.RequestHandler) -> web.RequestHandler:
+async def middleware_check_token(request: Request, handler: RequestHandler) -> RequestHandler:
     """
         Проверка авторизации пользователя, валидация токена.
 
@@ -20,7 +19,7 @@ async def middleware_check_token(request: web.Request, handler: web.RequestHandl
     if request.path != "/api/login" and request.path.startswith("/api"):
         token = request.headers.get("token")
         if token is None:
-            raise web.HTTPForbidden()
+            raise HTTPForbidden()
         security = request.app["crypto"]
         try:
             decoded_token = security.validate_jwt(token)
@@ -28,6 +27,6 @@ async def middleware_check_token(request: web.Request, handler: web.RequestHandl
                 user_id = decoded_token.get("payload").get("id")
                 request.user_id = user_id
         except (jwt.exceptions.ExpiredSignatureError, jwt.exceptions.InvalidSignatureError) as exc:
-            raise web.HTTPForbidden(reason=exc)
+            raise HTTPForbidden(reason=exc) # pylint: disable=raise-missing-from
     resp = await handler(request)
     return resp

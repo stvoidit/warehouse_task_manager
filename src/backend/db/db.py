@@ -2,6 +2,7 @@
 
 from aiomysql import Connection
 
+
 async def select_tasks(conn: Connection, user_id: int):
     """ получение списка заданий """
     q = """

@@ -1,9 +1,6 @@
-from aiohttp.web import Request, HTTPBadRequest, HTTPForbidden
+from aiohttp.web import HTTPBadRequest, HTTPForbidden, Request
 
-from db import (
-    select_tasks,
-    select_task,
-    check_user)
+from db import check_user, select_task, select_tasks
 from utils import jsonify
 
 

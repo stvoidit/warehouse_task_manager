@@ -1,6 +1,7 @@
+import jwt
 from aiohttp import web
 from aiohttp.web import middleware
-import jwt
+
 
 @middleware
 async def middleware_check_token(request: web.Request, handler: web.RequestHandler) -> web.RequestHandler:

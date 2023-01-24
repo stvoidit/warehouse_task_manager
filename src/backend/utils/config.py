@@ -1,5 +1,7 @@
 from typing import TypedDict
+
 import toml
+
 
 class DatabaseConfig(TypedDict):
     host: str

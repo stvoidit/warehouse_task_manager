@@ -1,14 +1,9 @@
 from multiprocessing import cpu_count
 from os import getenv
 
-from aiomysql import Pool, create_pool, DictCursor
+from aiomysql import DictCursor, Pool, create_pool
 
-
-from .db import (
-    select_tasks,
-    select_task,
-    check_user
-)
+from .db import check_user, select_task, select_tasks
 
 
 async def create_connect_db(user: str, password: str, host: str, port: int, db: str) -> Pool:

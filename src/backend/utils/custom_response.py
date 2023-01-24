@@ -1,7 +1,8 @@
 import datetime
+from decimal import Decimal
 from io import BytesIO
 from typing import Any
-from decimal import Decimal
+
 import orjson
 from aiohttp.web import ContentCoding, Request, Response
 

@@ -4,10 +4,10 @@ from aiohttp import web
 from uvloop import install as uvinstall
 
 from db import create_connect_db
-from views import setup_handlers
-from utils import read_config, CyptoPassword
-
 from middlewares import middleware_check_token
+from utils import CyptoPassword, read_config
+from views import setup_handlers
+
 uvinstall()
 
 

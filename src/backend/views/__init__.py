@@ -1,11 +1,8 @@
 import pathlib
-from aiohttp.web import Application, Request, FileResponse
 
-from .handlers import (
-    get_tasks,
-    get_task,
-    login_handler
-)
+from aiohttp.web import Application, FileResponse, Request
+
+from .handlers import get_task, get_tasks, login_handler
 
 
 def index_spa(path, filename):

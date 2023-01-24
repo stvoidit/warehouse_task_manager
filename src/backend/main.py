@@ -5,7 +5,7 @@ from uvloop import install as uvinstall
 
 from db import create_connect_db
 from middlewares import middleware_check_token
-from utils import CyptoPassword, read_config
+from utils import CryptoGuard, read_config
 from views import setup_handlers
 
 uvinstall()
@@ -28,7 +28,7 @@ async def init_app() -> web.Application:
     app = web.Application()
     cnf = read_config("config.toml")
     app["config"] = cnf
-    app["crypto"] = CyptoPassword(cnf["service"]["secret"])
+    app["crypto"] = CryptoGuard(cnf["service"]["secret"])
     app.middlewares.append(middleware_check_token)
     app.on_startup.append(_on_startup)
     app.on_shutdown.append(_on_shutdown)

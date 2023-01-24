@@ -7,7 +7,7 @@ import jwt
 import pytz
 
 
-class CyptoPassword():
+class CryptoGuard():
     secret: bytes
     def __init__(self, secret: str) -> None:
         self.secret = secret.encode()
@@ -27,7 +27,11 @@ class CyptoPassword():
         return hmac.new(self.secret, password.encode(), hashlib.sha256).hexdigest()
 
     def create_jwt(self, payload: dict):
-        """ создание jwt токена """
+        """
+            создание jwt токена
+
+            Токен генерируется сроком до полуночи, после этого он станет не валидным.
+        """
         exp = datetime.combine(date.today() + timedelta(days=1), datetime.min.time())
         base_message = {
             "iss": "domain.local",
@@ -37,6 +41,11 @@ class CyptoPassword():
         }
         return jwt.encode(base_message, self.secret, algorithm="HS256")
 
-    def validate_jwt(self, token: str):
-        """ валидация jwt токена """
-        print(jwt.decode(token, self.secret, leeway=timedelta(seconds=10), algorithms=["HS256"]))
+    def validate_jwt(self, token: str) -> dict[str, any]:
+        """
+            валидация jwt токена
+
+            В случае, если токен просрочен или не проходит проверку подписи, будет поднята ошибка.
+            В случае прохождения валидации возвращается декодированные данные токена.
+        """
+        return jwt.decode(token, self.secret, leeway=timedelta(seconds=10), algorithms=["HS256"])

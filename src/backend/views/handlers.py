@@ -6,9 +6,9 @@ from utils import jsonify
 
 async def login_handler(request: Request):
     """ хэндлен авторизация """
+    security = request.app["crypto"]
     body = await request.json()
     login = body.get("login", "")
-    security = request.app["crypto"]
     password_hash = security.hash_password(body.get("password", ""))
     user = None
     async with request.app["db"].acquire() as conn:
@@ -20,15 +20,15 @@ async def login_handler(request: Request):
 
 async def get_tasks(request: Request):
     """ получение списка заданий """
-    user_id = 2
     tasks = []
     async with request.app["db"].acquire() as conn:
-        tasks = await select_tasks(conn, user_id)
+        tasks = await select_tasks(conn, request.user_id)
     return await jsonify(tasks, request)
 
 
 async def get_task(request: Request):
     """ получение позиций в задании """
+    # TODO: нужна привязка еще и по ID юзера
     doc_id = request.match_info.get("taskID", None)
     if doc_id is None:
         raise HTTPBadRequest()

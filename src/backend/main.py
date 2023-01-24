@@ -7,7 +7,7 @@ from db import create_connect_db
 from views import setup_handlers
 from utils import read_config, CyptoPassword
 
-# from middlewares.mymiddleware import middleware1
+from middlewares import middleware_check_token
 uvinstall()
 
 
@@ -22,11 +22,12 @@ async def _on_startup(app: web.Application):
 
 async def init_app() -> web.Application:
     # middlewares=[middleware1]
+    logging.basicConfig(level=logging.INFO)
     app = web.Application()
     cnf = read_config("config.toml")
     app["config"] = cnf
     app["crypto"] = CyptoPassword(cnf["service"]["secret"])
-    logging.basicConfig(level=logging.INFO)
+    app.middlewares.append(middleware_check_token)
     app.on_startup.append(_on_startup)
     app.on_shutdown.append(_on_shutdown)
     await setup_handlers(app)

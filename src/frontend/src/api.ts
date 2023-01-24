@@ -44,6 +44,10 @@ class ClientAPI {
         /** получение списка задач */
         this.checkToken();
         const response = await fetch(`${BASE_URL}/${TASKS_LIST}`, { headers: this.token ? { token: this.token } : {} });
+        if (response.status === 403) {
+            window.localStorage.removeItem("token");
+            location.href = "/login";
+        }
         const body = await response.json();
         return body;
     }
@@ -52,6 +56,10 @@ class ClientAPI {
         /** получение списка позиций в задаче */
         this.checkToken();
         const response = await fetch(`${BASE_URL}/${TASK_POSITIONS}/${taskID}`, { headers: this.token ? { token: this.token } : {} });
+        if (response.status === 403) {
+            window.localStorage.removeItem("token");
+            location.href = "/login";
+        }
         if (response.status !== 200) {
             location.href = "/";
             return;

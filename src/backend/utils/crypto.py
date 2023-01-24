@@ -2,6 +2,7 @@ import random
 import hmac
 import hashlib
 import jwt
+from datetime import datetime, date, timedelta
 
 class CyptoPassword():
     secret: bytes
@@ -24,7 +25,11 @@ class CyptoPassword():
         base_message = {
             "iss": "domain.local",
             "sub": "user-token",
-            "exp": None,
+            "exp": datetime.combine(date.today() + timedelta(days=1), datetime.min.time()),
             "payload": payload
         }
+        print(base_message)
         return jwt.encode(base_message, self.secret, algorithm="HS256")
+
+    def validate_jwt(self, token: str):
+        print(jwt.decode(token, self.secret, algorithms=["HS256"]))

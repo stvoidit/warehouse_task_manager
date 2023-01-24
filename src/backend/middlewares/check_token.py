@@ -4,7 +4,7 @@ import jwt
 
 @middleware
 async def middleware_check_token(request: web.Request, handler: web.RequestHandler) -> web.RequestHandler:
-    if request.path != "/api/login":
+    if request.path != "/api/login" and request.path.startswith("/api"):
         token = request.headers.get("token")
         if token is None:
             raise web.HTTPForbidden()

@@ -4,6 +4,7 @@ const BASE_URL = "/api";
 const TASKS_LIST = "tasks";
 const TASK_POSITIONS = "task";
 const LOGIN = "login";
+const CHANGE_PASSWORD = "change_password";
 
 
 type user = {
@@ -85,6 +86,14 @@ class ClientAPI {
         window.localStorage.setItem("token", token);
         this.decodeToken();
         location.href = "/";
+        return;
+    }
+
+    async changePasswor(payload: frontend.IChangePassword) {
+        const response = await fetch(`${BASE_URL}/${CHANGE_PASSWORD}`, { method: "POST", headers: { "Content-Type": "application/json", ...this.requestHeaders() }, body: JSON.stringify(payload) });
+        if (response.status !== 201) {
+            throw new Error(await response.text());
+        }
         return;
     }
 }

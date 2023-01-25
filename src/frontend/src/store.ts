@@ -27,6 +27,14 @@ export const useApplicationStore = defineStore("app_store", () => {
     const doLogin = (payload: frontend.ILoginPayload) => api.doLogin(payload);
     const fetchTasksList = () => api.fetchTasksList().then(body => tasks.value = body);
     const fetchTaskPositions = (taskID: number) => api.fetchTaskPositions(taskID).then(body => positions.value = body);
+    const changePassword = (payload: frontend.IChangePassword) => api.changePasswor(payload);
+
+    const logOut = () => {
+        api.currentUser = null;
+        api.token = "";
+        window.localStorage.removeItem("token");
+        location.href = "/login";
+    };
 
     return {
         doLogin,
@@ -36,6 +44,8 @@ export const useApplicationStore = defineStore("app_store", () => {
         positions,
         isAuth,
         currentUser,
-        checkToken
+        checkToken,
+        changePassword,
+        logOut
     };
 });

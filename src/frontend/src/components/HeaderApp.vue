@@ -29,19 +29,26 @@
                         </el-button>
                     </template>
                     <template #default>
-                        <el-row>
-                            <el-col>
+                        <el-row :gutter="0">
+                            <el-col :span="12">
                                 <div><b>ID:</b> {{ store.currentUser?.id }}</div>
+                            </el-col>
+                            <el-col :span="12">
                                 <div><b>Логин:</b> {{ store.currentUser?.login }}</div>
-                                <div class="mt">
-                                    <el-button
-                                        size="small"
-                                        type="danger"
-                                        round
-                                        @click="handleLogOut">
-                                        выход
-                                    </el-button>
-                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row class="mt">
+                            <el-col :span="12">
+                                <el-button
+                                    size="small"
+                                    type="danger"
+                                    round
+                                    @click="handleLogOut">
+                                    выход
+                                </el-button>
+                            </el-col>
+                            <el-col :span="12">
+                                <ChangePasswordDialog />
                             </el-col>
                         </el-row>
                     </template>
@@ -53,18 +60,17 @@
 
 <script lang="ts">
 import { useApplicationStore } from "@/store";
+import ChangePasswordDialog from "./ChangePasswordDialog.vue";
 export default {
+    components: {
+        ChangePasswordDialog
+    },
     setup() {
         const store = useApplicationStore();
-        const handleLogOut = () => {
-            window.localStorage.removeItem("token");
-            location.href = "/login";
-        };
-        const defaultActive = location.pathname;
+        const handleLogOut = () => store.logOut();
         return {
             store,
-            handleLogOut,
-            defaultActive
+            handleLogOut
         };
     }
 };

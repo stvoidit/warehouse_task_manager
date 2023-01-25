@@ -165,3 +165,14 @@ WHERE
         await cur.execute(q, {"login": login, "password_hash": password_hash})
         result = await cur.fetchone()
     return result
+
+async def change_password(conn: Connection, user_id: int, password_hash: str):
+    print(user_id)
+    print(password_hash)
+    q = """
+    UPDATE staff
+    SET password=%(password_hash)s
+    WHERE id = %(user_id)s AND can_login = 1
+    """
+    async with conn.cursor() as cur:
+        await cur.execute(q, {"user_id": user_id, "password_hash": password_hash})

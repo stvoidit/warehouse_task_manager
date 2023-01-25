@@ -38,7 +38,12 @@ declare namespace frontend {
     }
 
     export type ILoginPayload = {
-        login: str;
-        password: str
+        login: string;
+        password: string;
+    }
+
+    export type IChangePassword = {
+        newPassword: string;
+        repetitionPassword: string;
     }
 }

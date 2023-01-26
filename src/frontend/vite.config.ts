@@ -19,6 +19,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
                 ],
                 manifest: {
                     id: "/",
+                    lang: "ru",
                     categories: [
                         "work",
                         "task",

@@ -1,21 +1,22 @@
 <template>
     <el-row
-        style="margin-top: 30vh;"
-        justify="center"
-        align="middle">
+        style="margin-top: 20vh;"
+        justify="center">
         <el-col
             class="grid-content"
-            :span="8">
+            :sm="8"
+            :md="8"
+            :lg="8"
+            :span="18">
             <el-card>
                 <el-form
                     ref="ruleFormRef"
                     label-position="right"
-                    label-width="100px"
                     :model="loginForm"
                     :rules="rules"
-                    status-icon
-                    style="max-width: 460px">
+                    status-icon>
                     <el-form-item
+                        :label-width="60"
                         label="Логин"
                         prop="login">
                         <el-input
@@ -23,6 +24,7 @@
                             type="text" />
                     </el-form-item>
                     <el-form-item
+                        :label-width="60"
                         label="Пароль"
                         prop="password">
                         <el-input
@@ -31,8 +33,10 @@
                     </el-form-item>
                     <el-form-item>
                         <el-button
+                            class="mt"
                             type="success"
-                            @click="handleLogin">
+                            @click="handleLogin"
+                            @keydown.enter="handleLogin">
                             Войти
                         </el-button>
                     </el-form-item>
@@ -43,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from "vue";
+import { defineComponent, reactive, ref, onMounted, onBeforeUnmount } from "vue";
 import { useApplicationStore } from "@/store";
 import { ElMessageBox } from "element-plus";
 export default defineComponent({
@@ -73,12 +77,15 @@ export default defineComponent({
                 });
             });
         };
+
+        const keypressEnter = (event) => { if (event.key === "Enter") handleLogin(); };
+        onMounted(() => document.addEventListener("keypress", keypressEnter));
+        onBeforeUnmount(() => document.removeEventListener("keypress", keypressEnter));
         return {
             loginForm,
             handleLogin,
             ruleFormRef,
             rules
-
         };
     }
 });

@@ -21,7 +21,7 @@ class ClientAPI {
     token: string | null;
     constructor() {
         this.currentUser = null;
-        this.token = "";
+        this.token = null;
     }
 
     decodeToken() {
@@ -34,11 +34,10 @@ class ClientAPI {
 
     checkToken() {
         /** проверка токена */
-        if (location.pathname === "/login") return;
         if (!this.token) {
             this.token = window.localStorage.getItem("token");
         }
-        if (!this.token) {
+        if (!this.token && location.pathname !== "/login") {
             location.href = "/login";
         }
         if (!this.currentUser) {

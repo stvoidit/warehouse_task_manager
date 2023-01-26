@@ -3,7 +3,9 @@
     <el-row
         v-if="store.isAuth"
         justify="center">
-        <el-col :span="10">
+        <el-col
+            :span="24"
+            :sm="10">
             <el-table
                 v-if="store.isAuth"
                 :data="store.stocks"

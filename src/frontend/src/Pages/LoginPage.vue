@@ -50,6 +50,7 @@
 import { defineComponent, reactive, ref, onMounted, onBeforeUnmount } from "vue";
 import { useApplicationStore } from "@/store";
 import { ElMessageBox } from "element-plus";
+import { useRouter } from "vue-router";
 export default defineComponent({
     setup() {
         const ruleFormRef = ref();
@@ -65,6 +66,7 @@ export default defineComponent({
                 required: true, message: 'Поле "пароль" обязательно к заполнению', trigger: "blur"
             }
         };
+        const router = useRouter();
         const store = useApplicationStore();
         const handleLogin = async () => {
             if (!ruleFormRef.value) return;
@@ -79,7 +81,11 @@ export default defineComponent({
         };
 
         const keypressEnter = (event) => { if (event.key === "Enter") handleLogin(); };
-        onMounted(() => document.addEventListener("keypress", keypressEnter));
+        onMounted(() => {
+            store.checkToken();
+            if (store.isAuth) router.push("/");
+            document.addEventListener("keypress", keypressEnter);
+        });
         onBeforeUnmount(() => document.removeEventListener("keypress", keypressEnter));
         return {
             loginForm,

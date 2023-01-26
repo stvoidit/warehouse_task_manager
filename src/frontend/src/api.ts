@@ -60,7 +60,7 @@ class ClientAPI {
         return body;
     }
 
-    async fetchTaskPositions(taskID: number) {
+    async fetchTask(taskID: number): Promise<frontend.ITaskP> {
         /** получение списка позиций в задаче */
         this.checkToken();
         const response = await fetch(`${BASE_URL}/${TASK_POSITIONS}/${taskID}`, { headers: this.requestHeaders() });
@@ -70,9 +70,9 @@ class ClientAPI {
         }
         if (response.status !== 200) {
             location.href = "/";
-            return;
         }
         const body = await response.json();
+        body.jobs.forEach(job => job.done = Boolean(job.done));
         return body;
     }
 

@@ -46,7 +46,7 @@ async def get_task(request: Request):
     doc_id = request.match_info.get("taskID", None)
     if doc_id is None:
         raise HTTPBadRequest()
-    task_positions = []
+    task = {}
     async with request.app["db"].acquire() as conn:
-        task_positions = await select_task(conn, doc_id)
-    return await jsonify(task_positions, request)
+        task = await select_task(conn, doc_id)
+    return await jsonify(task, request)

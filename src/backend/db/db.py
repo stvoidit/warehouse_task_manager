@@ -63,22 +63,57 @@ ORDER BY
     return result
 
 
+async def select_task_meta(conn: Connection, doc_id: int):
+    q = """
+SELECT
+    ptd.id
+    , ptd.doc_number
+    , ptd.doc_date
+    , ptd.planned_date
+    , ptd.stock
+    , ptd.technical_process
+    , ptd.operation
+    , task.material
+FROM
+    production_task_doc ptd
+LEFT JOIN (
+        SELECT
+            DISTINCT
+            pt.doc_id
+            , m.material
+        FROM
+            production_task pt
+        INNER JOIN material AS m ON
+            m.id = pt.material
+    ) AS task ON
+    task.doc_id = ptd.id
+WHERE
+    ptd.id = %(doc_id)s
+    """
+    task = None
+    async with conn.cursor() as cur:
+        await cur.execute(q, {"doc_id": doc_id})
+        task = await cur.fetchone()
+    return task
+
 async def select_task(conn: Connection, doc_id: int):
     """ получение позиций задания """
     q = """
 SELECT
     m.material
-    , IFNULL(lab_material_mark, '') AS lab_material_mark
-    , IFNULL(lab_material_group, '') AS lab_material_group
+    , arrival.material
     , arrival.tare_id
     , arrival.tare_mark
     , arrival.tare_type
-    , arrival.tare_amount AS arrival_tare_amount
-    , arrival.gross_weight AS arrival_gross_weight
     , arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0) AS rest_tare_amount
     , arrival.net_weight - IFNULL(P.net_weight, 0) - IFNULL(S.net_weight, 0) + IFNULL(tare.weight, 0) * (arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0)) AS rest_gross_weight
     , task.tare_amount AS task_tare_amount
     , task.net_weight AS task_net_weight
+    , IF (
+        task.net_weight_fact = task.net_weight
+        , 1
+        , 0
+    ) AS done
 FROM
     arrival
 LEFT JOIN (
@@ -89,7 +124,7 @@ LEFT JOIN (
         LEFT JOIN production_doc ON
             production_doc.id = production.doc_id
         WHERE
-            production_doc.stock = '1'
+            production_doc.stock = %(stock)s
     ) P ON
     P.key_material = arrival.key_material
 LEFT JOIN (
@@ -100,7 +135,7 @@ LEFT JOIN (
         LEFT JOIN shipment_doc ON
             shipment_doc.id = shipment.doc_id
         WHERE
-            shipment_doc.stock = '1'
+            shipment_doc.stock = %(stock)s
     ) S ON
     S.key_material = arrival.key_material
 LEFT JOIN material AS m ON
@@ -110,10 +145,8 @@ LEFT JOIN tare ON
 LEFT JOIN (
         SELECT
             lab.key_material
-            ,
- TRIM(GROUP_CONCAT(lab.material_mark SEPARATOR ' ')) AS lab_material_mark
-            ,
- TRIM(GROUP_CONCAT(lab.material_group SEPARATOR ' ')) AS lab_material_group
+            , TRIM(GROUP_CONCAT(lab.material_mark SEPARATOR ' ')) AS lab_material_mark
+            , TRIM(GROUP_CONCAT(lab.material_group SEPARATOR ' ')) AS lab_material_group
         FROM
             laboratory AS lab
         GROUP BY
@@ -135,24 +168,24 @@ INNER JOIN (
             production_task_doc.id = production_task.doc_id
         WHERE
             production_task_doc.id = %(doc_id)s
-            AND production_task_doc.stock = '1'
+            AND production_task_doc.stock = %(stock)s
     ) AS task ON
     task.key_material = arrival.key_material
 WHERE
-    arrival_doc.stock = '1'
+    arrival_doc.stock = %(stock)s
     AND
-    task.net_weight_fact = 0
---    AND
---    m.material = "22ИШМБ1810"
+    m.material = %(material)s
 ORDER BY
     m.material
     , arrival.tare_id
     """
-    result = []
+    task = await select_task_meta(conn, doc_id)
+    jobs = []
     async with conn.cursor() as cur:
-        await cur.execute(q, {"doc_id": doc_id})
-        result = await cur.fetchall()
-    return result
+        await cur.execute(q, {"doc_id": doc_id, "stock": str(task.get("stock")), "material": task.get("material")})
+        jobs = await cur.fetchall()
+    task["jobs"] = jobs
+    return task
 
 
 async def check_user(conn: Connection, login: str, password_hash: str):
@@ -179,8 +212,6 @@ WHERE
     return result
 
 async def change_password(conn: Connection, user_id: int, password_hash: str):
-    print(user_id)
-    print(password_hash)
     q = """
     UPDATE staff
     SET password=%(password_hash)s

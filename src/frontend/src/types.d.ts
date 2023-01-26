@@ -21,6 +21,7 @@ declare namespace frontend {
         amount_fact: number
         weight_fact: number
     }
+
     export type ITaskPosition = {
         material: string
         lab_material_mark: string
@@ -35,6 +36,18 @@ declare namespace frontend {
         task_tare_amount: number
         task_net_weight: number
         done: boolean
+    }
+
+    export type ITaskP = {
+        id: number
+        doc_number: string
+        doc_date: string
+        planned_date: string
+        stock: number
+        technical_process: string
+        operation: string
+        material: string
+        jobs: Array<ITaskPosition>
     }
 
     export type ILoginPayload = {

@@ -1,6 +1,6 @@
 import { ConfigEnv, UserConfigExport, defineConfig, loadEnv } from "vite";
 
-// import { VitePWA } from "vite-plugin-pwa";
+import { VitePWA } from "vite-plugin-pwa";
 import { resolve } from "path";
 import vue from "@vitejs/plugin-vue";
 
@@ -9,42 +9,46 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
     const env = loadEnv(mode, ".");
     return defineConfig({
         plugins: [
-            vue()
-            // VitePWA({
-            //     registerType: "autoUpdate",
-            //     includeAssets: [
-            //         "favicon.ico",
-            //         "apple-touch-icon.png",
-            //         "masked-icon.svg"
-            //     ],
-            //     manifest: {
-            //         id: "/",
-            //         categories: ["work"],
-            //         name: "ts bot dashboard",
-            //         short_name: "Статистика бота ТС",
-            //         description: "Статистика телеграм бота Торгового Сбора",
-            //         theme_color: "#ffffff",
-            //         start_url: "/",
-            //         icons: [
-            //             {
-            //                 src: "pwa-192x192.png",
-            //                 sizes: "192x192",
-            //                 type: "image/png"
-            //             },
-            //             {
-            //                 src: "pwa-512x512.png",
-            //                 sizes: "512x512",
-            //                 type: "image/png"
-            //             },
-            //             {
-            //                 src: "pwa-512x512.png",
-            //                 sizes: "512x512",
-            //                 type: "image/png",
-            //                 purpose: "any maskable"
-            //             }
-            //         ]
-            //     }
-            // })
+            vue(),
+            VitePWA({
+                registerType: "autoUpdate",
+                includeAssets: [
+                    "favicon.ico",
+                    "apple-touch-icon.png",
+                    "masked-icon.svg"
+                ],
+                manifest: {
+                    id: "/",
+                    categories: [
+                        "work",
+                        "task",
+                        "management"
+                    ],
+                    name: "WTM",
+                    short_name: "warehouse task manager",
+                    description: "warehouse task manager",
+                    theme_color: "#ffffff",
+                    start_url: "/",
+                    icons: [
+                        {
+                            src: "pwa-192x192.png",
+                            sizes: "192x192",
+                            type: "image/png"
+                        },
+                        {
+                            src: "pwa-512x512.png",
+                            sizes: "512x512",
+                            type: "image/png"
+                        },
+                        {
+                            src: "pwa-512x512.png",
+                            sizes: "512x512",
+                            type: "image/png",
+                            purpose: "any maskable"
+                        }
+                    ]
+                }
+            })
         ],
         server: {
             https: false,

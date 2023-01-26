@@ -7,9 +7,14 @@
                     :router="true"
                     mode="horizontal">
                     <el-menu-item
-                        route="/">
-                        <el-icon><MessageBox /></el-icon>
-                        <span>Список задач</span>
+                        v-for="menu in routes"
+                        :key="menu.path"
+                        :route="menu.path">
+                        <el-icon>
+                            <MessageBox v-if="menu.icon === 'MessageBox'" />
+                            <Guide v-if="menu.icon === 'Guide'" />
+                        </el-icon>
+                        <span>{{ menu.label }}</span>
                     </el-menu-item>
                 </el-menu>
             </template>
@@ -61,6 +66,8 @@
 <script lang="ts">
 import { useApplicationStore } from "@/store";
 import ChangePasswordDialog from "./ChangePasswordDialog.vue";
+import { useRoute } from "vue-router";
+import { computed } from "vue";
 export default {
     components: {
         ChangePasswordDialog
@@ -68,9 +75,28 @@ export default {
     setup() {
         const store = useApplicationStore();
         const handleLogOut = () => store.logOut();
+        const route = useRoute();
+        const routes = computed(() => {
+            const menuRoutes = [
+                {
+                    label: "Список складов",
+                    path: "/",
+                    icon: "Guide"
+                }
+            ];
+            if (route.params.stockID) {
+                menuRoutes.push({
+                    label: "Список задач",
+                    path: `/stock/${route.params.stockID}`,
+                    icon: "MessageBox"
+                });
+            }
+            return menuRoutes;
+        });
         return {
             store,
-            handleLogOut
+            handleLogOut,
+            routes
         };
     }
 };

@@ -5,6 +5,8 @@ const TASKS_LIST = "tasks";
 const TASK_POSITIONS = "task";
 const LOGIN = "login";
 const CHANGE_PASSWORD = "change_password";
+const STOCK = "stock";
+const MATERIAL = "material";
 
 
 type user = {
@@ -48,10 +50,9 @@ class ClientAPI {
         return this.token ? { token: this.token } : {};
     }
 
-    async fetchTasksList() {
-        /** получение списка задач */
+    async fetchStocks() {
         this.checkToken();
-        const response = await fetch(`${BASE_URL}/${TASKS_LIST}`, { headers: this.requestHeaders() });
+        const response = await fetch(`${BASE_URL}/stocks`, { headers: this.requestHeaders() });
         if (response.status === 403) {
             window.localStorage.removeItem("token");
             location.href = "/login";
@@ -60,10 +61,22 @@ class ClientAPI {
         return body;
     }
 
-    async fetchTask(taskID: number): Promise<frontend.ITaskP> {
+    async fetchTasksList(stockID: number) {
+        /** получение списка задач */
+        this.checkToken();
+        const response = await fetch(`${BASE_URL}/${STOCK}/${stockID}/${TASKS_LIST}`, { headers: this.requestHeaders() });
+        if (response.status === 403) {
+            window.localStorage.removeItem("token");
+            location.href = "/login";
+        }
+        const body = await response.json();
+        return body;
+    }
+
+    async fetchTask(stockID: number, taskID: number, materialID: number): Promise<frontend.ITaskP> {
         /** получение списка позиций в задаче */
         this.checkToken();
-        const response = await fetch(`${BASE_URL}/${TASK_POSITIONS}/${taskID}`, { headers: this.requestHeaders() });
+        const response = await fetch(`${BASE_URL}/${STOCK}/${stockID}/${TASK_POSITIONS}/${taskID}/${MATERIAL}/${materialID}`, { headers: this.requestHeaders() });
         if (response.status === 403) {
             window.localStorage.removeItem("token");
             location.href = "/login";

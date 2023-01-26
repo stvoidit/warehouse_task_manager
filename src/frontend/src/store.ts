@@ -21,12 +21,14 @@ export const useApplicationStore = defineStore("app_store", () => {
     const isAuth = computed(() => currentUser.value?.can_login === 1);
     const checkToken = () => api.checkToken();
 
+    const stocks = shallowRef<Array<frontend.IStock>>([]);
     const tasks = shallowRef<Array<frontend.ITaskL>>([]);
     const task = ref<frontend.ITaskP|null>(null);
 
     const doLogin = (payload: frontend.ILoginPayload) => api.doLogin(payload);
-    const fetchTasksList = () => api.fetchTasksList().then(body => tasks.value = body);
-    const fetchTask = (taskID: number) => api.fetchTask(taskID).then(body => task.value = body);
+    const fetchStocks = () => api.fetchStocks().then(body => stocks.value = body);
+    const fetchTasksList = (stockID: number) => api.fetchTasksList(stockID).then(body => tasks.value = body);
+    const fetchTask = (stockID: number, taskID: number, materialID: number) => api.fetchTask(stockID, taskID, materialID).then(body => task.value = body);
     const changePassword = (payload: frontend.IChangePassword) => api.changePasswor(payload);
 
     const logOut = () => {
@@ -38,8 +40,10 @@ export const useApplicationStore = defineStore("app_store", () => {
 
     return {
         doLogin,
+        fetchStocks,
         fetchTasksList,
         fetchTask,
+        stocks,
         tasks,
         task,
         isAuth,

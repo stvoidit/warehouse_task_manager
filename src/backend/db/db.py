@@ -3,11 +3,12 @@
 from aiomysql import Connection
 
 
-async def select_tasks(conn: Connection, user_id: int):
+async def select_tasks(conn: Connection, user_id: int, stock_id: int):
     """ получение списка заданий """
     q = """
 SELECT
     m.material
+    , m.id AS material_id
     , doc.id AS doc_id
     , doc.doc_number
     , doc.planned_date
@@ -24,7 +25,7 @@ LEFT JOIN production_task_doc AS doc ON
     doc.id = production_task.doc_id
 LEFT JOIN material AS m ON
     m.id = production_task.material
-LEFT JOIN (
+INNER JOIN (
         SELECT
             tare_type
             , key_material
@@ -33,7 +34,7 @@ LEFT JOIN (
         LEFT JOIN arrival_doc ON
             arrival_doc.id = arrival.doc_id
         WHERE
-            arrival_doc.stock = '1'
+            arrival_doc.stock = %(stock_id)s
     ) AS A ON
     A.key_material = production_task.key_material
 WHERE
@@ -47,6 +48,7 @@ WHERE
     )
 GROUP BY
     m.material
+    , m.id
     , doc.id
     , doc.doc_number
     , doc.planned_date
@@ -58,12 +60,12 @@ ORDER BY
     """
     result = []
     async with conn.cursor() as cur:
-        await cur.execute(q, {"user_id": user_id})
+        await cur.execute(q, { "user_id": user_id, "stock_id": stock_id })
         result = await cur.fetchall()
     return result
 
 
-async def select_task_meta(conn: Connection, doc_id: int):
+async def select_task_meta(conn: Connection, stock_id: int, doc_id: int):
     q = """
 SELECT
     ptd.id
@@ -89,14 +91,16 @@ LEFT JOIN (
     task.doc_id = ptd.id
 WHERE
     ptd.id = %(doc_id)s
+    AND
+    ptd.stock = %(stock_id)s
     """
     task = None
     async with conn.cursor() as cur:
-        await cur.execute(q, {"doc_id": doc_id})
+        await cur.execute(q, {"doc_id": doc_id, "stock_id": stock_id})
         task = await cur.fetchone()
     return task
 
-async def select_task(conn: Connection, doc_id: int):
+async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id: int):
     """ получение позиций задания """
     q = """
 SELECT
@@ -174,15 +178,15 @@ INNER JOIN (
 WHERE
     arrival_doc.stock = %(stock)s
     AND
-    m.material = %(material)s
+    m.id = %(material_id)s
 ORDER BY
     m.material
     , arrival.tare_id
     """
-    task = await select_task_meta(conn, doc_id)
+    task = await select_task_meta(conn, stock_id, doc_id)
     jobs = []
     async with conn.cursor() as cur:
-        await cur.execute(q, {"doc_id": doc_id, "stock": str(task.get("stock")), "material": task.get("material")})
+        await cur.execute(q, {"doc_id": doc_id, "stock": stock_id, "material_id": material_id})
         jobs = await cur.fetchall()
     task["jobs"] = jobs
     return task
@@ -219,3 +223,27 @@ async def change_password(conn: Connection, user_id: int, password_hash: str):
     """
     async with conn.cursor() as cur:
         await cur.execute(q, {"user_id": user_id, "password_hash": password_hash})
+
+
+async def select_stocks(conn: Connection):
+    # TODO: прокинуть ID юзера
+    q = """
+SELECT
+    s.id
+    , s.name
+    , COUNT(ptd.id) tasks_count
+FROM
+    stock s
+LEFT JOIN production_task_doc ptd ON
+    ptd.stock = s.id
+GROUP BY
+    s.id
+    , s.name
+ORDER BY
+    s.name
+    """
+    stocks = []
+    async with conn.cursor() as cur:
+        await cur.execute(q)
+        stocks = await cur.fetchall()
+    return stocks

@@ -9,8 +9,15 @@ declare namespace frontend {
     //     "total": number
     // }
 
+    export type IStock = {
+        id: number
+        name: string
+        tasks_count: number
+    }
+
     export type ITaskL = {
         material: string
+        material_id: number
         doc_id: number
         doc_number: string
         planned_date: string

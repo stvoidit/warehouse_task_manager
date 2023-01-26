@@ -3,7 +3,7 @@
         <el-col>
             <!-- <pre>{{ store.task }}</pre> -->
             <el-row class="mb">
-                Задача: №{{ taskID }}
+                {{ store.task?.doc_number }}
             </el-row>
             <el-row
                 class="mb"
@@ -60,13 +60,15 @@ import { defineComponent, onMounted, computed } from "vue";
 import { useApplicationStore } from "@/store";
 export default defineComponent({
     props: {
-        taskID: { type: Number, required: true }
+        stockID: { type: Number, required: true },
+        taskID: { type: Number, required: true },
+        materialID: { type: Number, required: true }
     },
     setup(props) {
         const store = useApplicationStore();
         onMounted(() => {
             if (isNaN(props.taskID)) location.href = "/";
-            store.fetchTask(props.taskID);
+            store.fetchTask(props.stockID, props.taskID, props.materialID);
         });
         const handleClickRow = (row: frontend.ITaskPosition) => {
             if (row.done) {
@@ -109,14 +111,14 @@ export default defineComponent({
                 prop: "material",
                 label: "Материал"
             },
-            {
-                prop: "lab_material_mark",
-                label: "lab_material_mark"
-            },
-            {
-                prop: "lab_material_group",
-                label: "lab_material_group"
-            },
+            // {
+            //     prop: "lab_material_mark",
+            //     label: "lab_material_mark"
+            // },
+            // {
+            //     prop: "lab_material_group",
+            //     label: "lab_material_group"
+            // },
             {
                 prop: "tare_id",
                 label: "Номер тары"
@@ -129,14 +131,14 @@ export default defineComponent({
                 prop: "tare_type",
                 label: "Тара"
             },
-            {
-                prop: "arrival_tare_amount",
-                label: "arrival_tare_amount"
-            },
-            {
-                prop: "arrival_gross_weight",
-                label: "arrival_gross_weight"
-            },
+            // {
+            //     prop: "arrival_tare_amount",
+            //     label: "arrival_tare_amount"
+            // },
+            // {
+            //     prop: "arrival_gross_weight",
+            //     label: "arrival_gross_weight"
+            // },
             {
                 prop: "rest_tare_amount",
                 label: "Кол-во"

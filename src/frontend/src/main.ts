@@ -1,7 +1,7 @@
 import "dayjs/locale/ru";
 import "element-plus/dist/index.css";
 
-import { MessageBox, User } from "@element-plus/icons-vue";
+import { Guide, MessageBox, User } from "@element-plus/icons-vue";
 
 import App from "./App.vue";
 import ElementPlus from "element-plus";
@@ -14,7 +14,8 @@ const pinia = createPinia();
 const app = createApp(App);
 [
     User,
-    MessageBox
+    MessageBox,
+    Guide
 ].forEach(component => app.component(component.name, component));
 app.use(pinia);
 app.use(router);

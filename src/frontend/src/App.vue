@@ -1,12 +1,12 @@
 <template>
-    <HeaderApp v-if="store.isAuth" />
+    <el-header v-if="store.isAuth">
+        <HeaderApp />
+    </el-header>
     <router-view
         v-slot="{ Component }">
-        <el-container>
-            <el-main>
-                <component :is="Component" />
-            </el-main>
-        </el-container>
+        <el-main>
+            <component :is="Component" />
+        </el-main>
     </router-view>
 </template>
 <script lang="ts">

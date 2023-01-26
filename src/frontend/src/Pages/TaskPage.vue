@@ -8,24 +8,40 @@
             <el-row
                 class="mb"
                 :gutter="20">
-                <el-col :span="4">
+                <el-col
+                    :xs="12"
+                    :sm="12"
+                    :md="12"
+                    :lg="8"
+                    :xl="6">
                     <el-table
                         :data="metaInfo"
                         :border="true"
                         :show-header="false"
                         size="small">
-                        <el-table-column prop="label" />
-                        <el-table-column prop="value" />
+                        <el-table-column
+                            prop="label"
+                            :width="150" />
+                        <el-table-column
+                            prop="value" />
                     </el-table>
                 </el-col>
-                <el-col :span="4">
+                <el-col
+                    :xs="12"
+                    :sm="12"
+                    :md="12"
+                    :lg="8"
+                    :xl="6">
                     <el-table
                         :data="statInfo"
                         :border="true"
                         :show-header="false"
                         size="small">
-                        <el-table-column prop="label" />
-                        <el-table-column prop="value" />
+                        <el-table-column
+                            prop="label"
+                            :width="150" />
+                        <el-table-column
+                            prop="value" />
                     </el-table>
                 </el-col>
             </el-row>

@@ -5,7 +5,6 @@
         :data="store.tasks"
         :border="true"
         size="small"
-        style="width: 100%"
         @row-click="handleRowClick">
         <el-table-column
             v-for="col in columns"

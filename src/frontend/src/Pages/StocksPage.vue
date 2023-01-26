@@ -4,6 +4,7 @@
         v-if="store.isAuth"
         justify="center">
         <el-col
+            v-loading="store.loading"
             :span="24"
             :sm="10">
             <el-table

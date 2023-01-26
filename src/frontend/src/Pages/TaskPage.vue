@@ -1,6 +1,6 @@
 <template>
     <el-row v-if="store.isAuth">
-        <el-col>
+        <el-col v-loading="store.loading">
             <!-- <pre>{{ store.task }}</pre> -->
             <el-row class="mb">
                 {{ store.task?.doc_number }}
@@ -76,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, computed } from "vue";
+import { defineComponent, onMounted, onBeforeUnmount, computed } from "vue";
 import { useApplicationStore } from "@/store";
 import { ElMessage } from "element-plus";
 export default defineComponent({
@@ -91,18 +91,21 @@ export default defineComponent({
             if (isNaN(props.taskID)) location.href = "/";
             store.fetchTask(props.stockID, props.taskID, props.materialID);
         });
+        onBeforeUnmount(() => store.task = null);
         const updateJobStatus = async (tare_id: number, done: boolean, tare_mark: string) => {
-            return store.updateJobStatus(props.taskID, props.materialID, tare_id, done).then(() => {
-                store.fetchTask(props.stockID, props.taskID, props.materialID).then(() => {
-                    const readebleStatus = done === true ? "готово" : "не выполнено";
-                    const message = `Тара с маркировкой "${tare_mark}" (тара ${tare_id}) - статус изменен на "${readebleStatus}"`;
-                    ElMessage({
-                        showClose: false,
-                        message: message,
-                        type: done ? "success" : "warning"
-                    });
+            try {
+                await store.updateJobStatus(props.taskID, props.materialID, tare_id, done);
+                await store.fetchTask(props.stockID, props.taskID, props.materialID);
+                const readebleStatus = done === true ? "готово" : "не выполнено";
+                const message = `Тара с маркировкой "${tare_mark}" (тара ${tare_id}) - статус изменен на "${readebleStatus}"`;
+                ElMessage({
+                    showClose: false,
+                    message: message,
+                    type: done ? "success" : "warning"
                 });
-            });
+            } catch (error) {
+                alert(error);
+            }
         };
         const handleClickRow = (row: frontend.ITaskPosition, column: any) => {
             if (column.no === 8) return;

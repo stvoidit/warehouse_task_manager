@@ -23,15 +23,28 @@ export const useApplicationStore = defineStore("app_store", () => {
 
     const stocks = shallowRef<Array<frontend.IStock>>([]);
     const tasks = shallowRef<Array<frontend.ITaskL>>([]);
-    const task = ref<frontend.ITaskP|null>(null);
+    const task = ref<frontend.ITaskP | null>(null);
+    const loading = ref(false);
 
     const doLogin = (payload: frontend.ILoginPayload) => api.doLogin(payload);
-    const fetchStocks = () => api.fetchStocks().then(body => stocks.value = body);
-    const fetchTasksList = (stockID: number) => api.fetchTasksList(stockID).then(body => tasks.value = body);
-    const fetchTask = (stockID: number, taskID: number, materialID: number) => api.fetchTask(stockID, taskID, materialID).then(body => task.value = body);
-    const changePassword = (payload: frontend.IChangePassword) => api.changePasswor(payload);
-    const updateJobStatus = (taskID: number,materialID: number, taraID: number, done: boolean) => api.updateJobStatus(taskID, materialID, taraID, done);
-
+    const fetchStocks = () => {
+        return api.fetchStocks().then(body => stocks.value = body).finally(() => loading.value = false);
+    };
+    const fetchTasksList = (stockID: number) => {
+        loading.value = true;
+        return api.fetchTasksList(stockID).then(body => tasks.value = body).finally(() => loading.value = false);
+    };
+    const fetchTask = (stockID: number, taskID: number, materialID: number) => {
+        loading.value = true;
+        return api.fetchTask(stockID, taskID, materialID).then(body => task.value = body).finally(() => loading.value = false);
+    };
+    const changePassword = (payload: frontend.IChangePassword) => {
+        loading.value = true;
+        return api.changePasswor(payload).finally(() => loading.value = false);
+    };
+    const updateJobStatus = (taskID: number, materialID: number, taraID: number, done: boolean) => {
+        return api.updateJobStatus(taskID, materialID, taraID, done);
+    };
     const logOut = () => {
         api.currentUser = null;
         api.token = "";
@@ -52,6 +65,7 @@ export const useApplicationStore = defineStore("app_store", () => {
         currentUser,
         checkToken,
         changePassword,
-        logOut
+        logOut,
+        loading
     };
 });

@@ -2,6 +2,7 @@
     <!-- <pre>{{ store.tasks }}</pre> -->
     <el-table
         v-if="store.isAuth"
+        v-loading="store.loading"
         :data="store.tasks"
         :border="true"
         size="small"

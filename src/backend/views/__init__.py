@@ -16,8 +16,8 @@ def index_spa(path, filename):
 
 async def setup_handlers(app: Application):
     try:
-        app.router.add_static("/assets", "/home/stvoid/development/MYSHIT/warehouse_task_manager/src/frontend/dist/assets")
-        app.router.add_get("/{path:(?!api).*}", index_spa("/home/stvoid/development/MYSHIT/warehouse_task_manager/src/frontend/dist", "index.html"))
+        app.router.add_static("/assets", "static/assets")
+        app.router.add_get("/{path:(?!api).*}", index_spa("static", "index.html"))
     except ValueError:
         print("static dir not found")
 

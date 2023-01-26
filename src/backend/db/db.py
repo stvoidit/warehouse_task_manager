@@ -13,6 +13,7 @@ SELECT
     , doc.planned_date
     , doc.technical_process
     , doc.operation
+    , tare_type
     , SUM(tare_amount) AS amount
     , SUM(net_weight) AS weight
     , SUM(tare_amount_fact) AS amount_fact
@@ -23,9 +24,20 @@ LEFT JOIN production_task_doc AS doc ON
     doc.id = production_task.doc_id
 LEFT JOIN material AS m ON
     m.id = production_task.material
+LEFT JOIN (
+        SELECT
+            tare_type
+            , key_material
+        FROM
+            arrival
+        LEFT JOIN arrival_doc ON
+            arrival_doc.id = arrival.doc_id
+        WHERE
+            arrival_doc.stock = '1'
+    ) AS A ON
+    A.key_material = production_task.key_material
 WHERE
-    doc.id IN
-(
+    doc.id IN (
         SELECT
             production_task_executor.doc_id
         FROM
@@ -40,9 +52,9 @@ GROUP BY
     , doc.planned_date
     , doc.technical_process
     , doc.operation
+    , tare_type
 ORDER BY
     doc.planned_date ASC
-    , doc.id ASC
     """
     result = []
     async with conn.cursor() as cur:

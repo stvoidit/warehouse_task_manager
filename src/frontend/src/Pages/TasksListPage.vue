@@ -12,6 +12,16 @@
             :key="col.prop"
             :prop="col.prop"
             :label="col.label" />
+        <el-table-column label="Остаток кол-во">
+            <template #default="scope">
+                {{ scope.row.amount - scope.row.amount_fact }}
+            </template>
+        </el-table-column>
+        <el-table-column label="Остаток вес">
+            <template #default="scope">
+                {{ scope.row.weight - scope.row.weight_fact }}
+            </template>
+        </el-table-column>
     </el-table>
 </template>
 <script lang="ts">
@@ -30,10 +40,6 @@ export default {
                 label: "material"
             },
             {
-                prop: "doc_id",
-                label: "doc_id"
-            },
-            {
                 prop: "doc_number",
                 label: "doc_number"
             },
@@ -48,6 +54,10 @@ export default {
             {
                 prop: "operation",
                 label: "operation"
+            },
+            {
+                prop: "tare_type",
+                label: "tare_type"
             },
             {
                 prop: "amount",

@@ -7,6 +7,7 @@ const LOGIN = "login";
 const CHANGE_PASSWORD = "change_password";
 const STOCK = "stock";
 const MATERIAL = "material";
+const JOB = "job";
 
 
 type user = {
@@ -86,6 +87,25 @@ class ClientAPI {
         const body = await response.json();
         body.jobs.forEach(job => job.done = Boolean(job.done));
         return body;
+    }
+
+    async updateJobStatus(taskID: number, materialID: number, taraID: number, done: boolean) {
+        const url = `${BASE_URL}/${JOB}`;
+        const payload = {
+            taskID,
+            materialID,
+            taraID,
+            done
+        };
+        const headers = {
+            "Content-Type": "application/json",
+            ...this.requestHeaders()
+        };
+        const response = await fetch(url, { method: "PUT", headers, body: JSON.stringify(payload) });
+        if (response.status !== 201) {
+            throw new Error(await response.text());
+        }
+        return;
     }
 
     async doLogin(payload: frontend.ILoginPayload) {

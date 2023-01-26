@@ -113,11 +113,7 @@ SELECT
     , arrival.net_weight - IFNULL(P.net_weight, 0) - IFNULL(S.net_weight, 0) + IFNULL(tare.weight, 0) * (arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0)) AS rest_gross_weight
     , task.tare_amount AS task_tare_amount
     , task.net_weight AS task_net_weight
-    , IF (
-        task.net_weight_fact = task.net_weight
-        , 1
-        , 0
-    ) AS done
+    , task.done
 FROM
     arrival
 LEFT JOIN (
@@ -166,6 +162,7 @@ INNER JOIN (
             , net_weight
             , tare_amount_fact
             , net_weight_fact
+            , production_task.done
         FROM
             production_task
         LEFT JOIN production_task_doc ON
@@ -247,3 +244,21 @@ ORDER BY
         await cur.execute(q)
         stocks = await cur.fetchall()
     return stocks
+
+async def update_job_status(conn: Connection, doc_id: int, material_id: int, tara_id: int, status: bool):
+    q = """
+UPDATE
+    production_task
+SET
+    done = %(status)s
+    , net_weight_fact = CASE WHEN %(status)s IS TRUE THEN net_weight ELSE net_weight_fact = 0 END
+WHERE
+    material = %(material_id)s
+    AND
+    doc_id = %(doc_id)s
+    AND
+    tare_id = %(tara_id)s
+    """
+    async with conn.cursor() as cur:
+        await cur.execute(q, {"doc_id": doc_id, "material_id": material_id, "tara_id": tara_id, "status": status})
+    return

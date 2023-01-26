@@ -2,7 +2,7 @@ import pathlib
 
 from aiohttp.web import Application, FileResponse, Request
 
-from .handlers import get_task, get_tasks, login_handler, change_password_handler, get_stocks
+from .handlers import get_task, get_tasks, login_handler, change_password_handler, get_stocks, update_job_status_handler
 
 def index_spa(path, filename):
     static_files = [p.name for p in pathlib.Path(path).iterdir() if p.is_dir() is False]
@@ -24,6 +24,7 @@ async def setup_handlers(app: Application):
     views = [
         ("POST", "/api/login", login_handler, "login"),
         ("POST", "/api/change_password", change_password_handler, "change_password"),
+        ("PUT", "/api/job", update_job_status_handler, "update_job_status"),
         ("GET", "/api/stocks", get_stocks, "get_stocks"),
         ("GET", "/api/stock/{stockID}/tasks", get_tasks, "get_tasks"),
         ("GET", "/api/stock/{stockID}/task/{taskID}/material/{materialID}", get_task, "get_task")

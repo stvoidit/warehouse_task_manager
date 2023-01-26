@@ -1,6 +1,6 @@
 from aiohttp.web import HTTPBadRequest, HTTPForbidden, HTTPCreated, Request
 
-from db import check_user, select_task, select_tasks, change_password, select_stocks
+from db import check_user, select_task, select_tasks, change_password, select_stocks, update_job_status
 from utils import jsonify
 
 
@@ -62,3 +62,18 @@ async def get_task(request: Request):
     async with request.app["db"].acquire() as conn:
         task = await select_task(conn, stock_id, doc_id, material_id)
     return await jsonify(task, request)
+
+async def update_job_status_handler(request: Request):
+    job = await request.json()
+    doc_id = job.get("taskID", None)
+    material_id =job.get("materialID", None)
+    tara_id =job.get("taraID", None)
+    status = job.get("done", None)
+    if doc_id is None or material_id is None or tara_id is None or status is None:
+        raise HTTPBadRequest()
+    async with request.app["db"].acquire() as conn:
+        try:
+            await update_job_status(conn, doc_id, material_id, tara_id, status)
+        except Exception as exc:
+            raise HTTPBadRequest(body=str(exc)) # pylint: disable=raise-missing-from
+    return HTTPCreated()

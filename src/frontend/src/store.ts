@@ -30,6 +30,7 @@ export const useApplicationStore = defineStore("app_store", () => {
     const fetchTasksList = (stockID: number) => api.fetchTasksList(stockID).then(body => tasks.value = body);
     const fetchTask = (stockID: number, taskID: number, materialID: number) => api.fetchTask(stockID, taskID, materialID).then(body => task.value = body);
     const changePassword = (payload: frontend.IChangePassword) => api.changePasswor(payload);
+    const updateJobStatus = (taskID: number,materialID: number, taraID: number, done: boolean) => api.updateJobStatus(taskID, materialID, taraID, done);
 
     const logOut = () => {
         api.currentUser = null;
@@ -43,6 +44,7 @@ export const useApplicationStore = defineStore("app_store", () => {
         fetchStocks,
         fetchTasksList,
         fetchTask,
+        updateJobStatus,
         stocks,
         tasks,
         task,

@@ -57,12 +57,16 @@
                         :key="col.prop"
                         :prop="col.prop"
                         :label="col.label" />
-                    <el-table-column label="Выполнено">
+                    <el-table-column
+                        width="100"
+                        label="Выполнено">
                         <template #default="scope">
-                            <!-- TODO: обработка клика отдельным хэндлером после подтверждения бэком -->
-                            <el-checkbox
-                                v-model="scope.row.done"
-                                size="large" />
+                            <div style="text-align: center;">
+                                <el-checkbox
+                                    v-model="scope.row.done"
+                                    size="large"
+                                    @change="updateJobStatus(scope.row.tare_id, scope.row.done, scope.row.tare_mark)" />
+                            </div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -74,6 +78,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, computed } from "vue";
 import { useApplicationStore } from "@/store";
+import { ElMessage } from "element-plus";
 export default defineComponent({
     props: {
         stockID: { type: Number, required: true },
@@ -86,12 +91,22 @@ export default defineComponent({
             if (isNaN(props.taskID)) location.href = "/";
             store.fetchTask(props.stockID, props.taskID, props.materialID);
         });
-        const handleClickRow = (row: frontend.ITaskPosition) => {
-            if (row.done) {
-                row.done = !row.done;
-            } else {
-                row.done = true;
-            }
+        const updateJobStatus = async (tare_id: number, done: boolean, tare_mark: string) => {
+            return store.updateJobStatus(props.taskID, props.materialID, tare_id, done).then(() => {
+                store.fetchTask(props.stockID, props.taskID, props.materialID).then(() => {
+                    const readebleStatus = done === true ? "готово" : "не выполнено";
+                    const message = `Тара с маркировкой "${tare_mark}" (тара ${tare_id}) - статус изменен на "${readebleStatus}"`;
+                    ElMessage({
+                        showClose: false,
+                        message: message,
+                        type: done ? "success" : "warning"
+                    });
+                });
+            });
+        };
+        const handleClickRow = (row: frontend.ITaskPosition, column: any) => {
+            if (column.no === 8) return;
+            updateJobStatus(row.tare_id, !row.done, row.tare_mark);
         };
         const sumJobsStatus = (jobs: Array<frontend.ITaskPosition>, status: boolean) => jobs.reduce((prev, job) => prev = job.done === status ? prev+1 : prev, 0);
         const metaInfo = computed(() => ([
@@ -176,6 +191,7 @@ export default defineComponent({
             store,
             columns,
             handleClickRow,
+            updateJobStatus,
             metaInfo,
             statInfo
         };

@@ -40,10 +40,12 @@ const router = createRouter({
     history: createWebHistory(),
     routes: routes
 });
+/** проверка токена перед каждым переходом на страницу */
 router.beforeEach(() => {
     const store = useApplicationStore();
     store.checkToken();
 });
+/** обертка для PWA */
 router.isReady().then(async () => {
     const { registerSW } = await import("virtual:pwa-register");
     registerSW({ immediate: true });

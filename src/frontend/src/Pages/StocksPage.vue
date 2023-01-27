@@ -32,8 +32,11 @@ export default defineComponent({
     setup() {
         const router = useRouter();
         const store = useApplicationStore();
+        /** Получение данных от API со списком складов */
         onMounted(store.fetchStocks);
+        /** Обработчик нажатия строки таблицы - переход на список заданий на складе */
         const handleRowClick = (row: frontend.IStock) => router.push(`/stock/${row.id}`);
+        /** Список столбцов для таблицы */
         const columns = [
             {
                 label: "Название",
@@ -52,7 +55,3 @@ export default defineComponent({
     }
 });
 </script>
-
-<style scoped>
-
-</style>

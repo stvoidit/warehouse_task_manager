@@ -77,21 +77,38 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, onBeforeUnmount, computed } from "vue";
+import { useRouter } from "vue-router";
 import { useApplicationStore } from "@/store";
 import { ElMessage } from "element-plus";
 export default defineComponent({
     props: {
+        /** ID склада */
         stockID: { type: Number, required: true },
+        /** ID задачи */
         taskID: { type: Number, required: true },
+        /** ID материала */
         materialID: { type: Number, required: true }
     },
     setup(props) {
+        const router = useRouter();
         const store = useApplicationStore();
+        /**
+         * 1) Получение данных задачи
+         * 2) Запуск автообновления
+         */
         onMounted(() => {
-            if (isNaN(props.taskID)) location.href = "/";
+            if (isNaN(props.taskID)) router.push("/");
             store.fetchTask(props.stockID, props.taskID, props.materialID);
+            store.doAutofetch(props.stockID, props.taskID, props.materialID);
         });
-        onBeforeUnmount(() => store.task = null);
+        /**
+         * Остановка автообновления
+         */
+        onBeforeUnmount(() => {
+            store.task = null;
+            store.stopAutofetch();
+        });
+        /** Запрос к API на обновление статуса задания */
         const updateJobStatus = async (tare_id: number, done: boolean, tare_mark: string) => {
             try {
                 await store.updateJobStatus(props.taskID, props.materialID, tare_id, done);
@@ -107,11 +124,14 @@ export default defineComponent({
                 alert(error);
             }
         };
-        const handleClickRow = (row: frontend.ITaskPosition, column: any) => {
+        /** Обработчик клика на строку - запрос на обновление статуса задания */
+        const handleClickRow = (row: frontend.IJob, column: any) => {
             if (column.no === 8) return;
             updateJobStatus(row.tare_id, !row.done, row.tare_mark);
         };
-        const sumJobsStatus = (jobs: Array<frontend.ITaskPosition>, status: boolean) => jobs.reduce((prev, job) => prev = job.done === status ? prev+1 : prev, 0);
+        /** Функция для подсчета кол-ва заданий по статусу */
+        const sumJobsStatus = (jobs: Array<frontend.IJob>, status: boolean) => jobs.reduce((prev, job) => prev = job.done === status ? prev + 1 : prev, 0);
+        /** Вычисляемое свойство (обертка для таблицы) - метаданные задачи */
         const metaInfo = computed(() => ([
             {
                 label: "Материал",
@@ -126,6 +146,7 @@ export default defineComponent({
                 value: store.task?.operation
             }
         ]));
+        /** Вычисляемое свойство (обертка для таблицы) - статистика заданий */
         const statInfo = computed(() => ([
             {
                 label: "Заданий",
@@ -140,19 +161,12 @@ export default defineComponent({
                 value: store.task?.jobs ? sumJobsStatus(store.task.jobs, false) : 0
             }
         ]));
+        /** Список столбцов таблицы */
         const columns = [
             {
                 prop: "material",
                 label: "Материал"
             },
-            // {
-            //     prop: "lab_material_mark",
-            //     label: "lab_material_mark"
-            // },
-            // {
-            //     prop: "lab_material_group",
-            //     label: "lab_material_group"
-            // },
             {
                 prop: "tare_id",
                 label: "Номер тары"
@@ -165,14 +179,6 @@ export default defineComponent({
                 prop: "tare_type",
                 label: "Тара"
             },
-            // {
-            //     prop: "arrival_tare_amount",
-            //     label: "arrival_tare_amount"
-            // },
-            // {
-            //     prop: "arrival_gross_weight",
-            //     label: "arrival_gross_weight"
-            // },
             {
                 prop: "rest_tare_amount",
                 label: "Кол-во"
@@ -201,12 +207,3 @@ export default defineComponent({
     }
 });
 </script>
-<style>
-.simple-table {
-    border-collapse: collapse;
-}
-.simple-table td {
-    border: 1px solid #dcdfe6;
-    padding: 0.5rem;
-}
-</style>

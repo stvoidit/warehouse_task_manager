@@ -10,13 +10,14 @@ import { createPinia } from "pinia";
 import router from "./router";
 import ruLang from "element-plus/es/locale/lang/ru";
 
-const pinia = createPinia();
-const app = createApp(App);
-[
+const icons = [
     User,
     MessageBox,
     Guide
-].forEach(component => app.component(component.name, component));
+];
+const pinia = createPinia();
+const app = createApp(App);
+icons.forEach(component => app.component(component.name, component));
 app.use(pinia);
 app.use(router);
 app.use(ElementPlus, { locale: ruLang });

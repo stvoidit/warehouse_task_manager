@@ -9,12 +9,14 @@ declare namespace frontend {
     //     "total": number
     // }
 
+    /** Склад */
     export type IStock = {
         id: number
         name: string
         tasks_count: number
     }
 
+    /** Задача для списка */
     export type ITaskL = {
         material: string
         material_id: number
@@ -29,7 +31,8 @@ declare namespace frontend {
         weight_fact: number
     }
 
-    export type ITaskPosition = {
+    /** Задание из задачи */
+    export type IJob = {
         material: string
         lab_material_mark: string
         lab_material_group: string
@@ -45,6 +48,7 @@ declare namespace frontend {
         done: boolean
     }
 
+    /** Задача со списком заданий */
     export type ITaskP = {
         id: number
         doc_number: string
@@ -54,7 +58,7 @@ declare namespace frontend {
         technical_process: string
         operation: string
         material: string
-        jobs: Array<ITaskPosition>
+        jobs: Array<IJob>
     }
 
     export type ILoginPayload = {

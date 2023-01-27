@@ -60,8 +60,11 @@ import { ElMessageBox } from "element-plus";
 export default defineComponent({
     setup() {
         const store = useApplicationStore();
+        /** ссылка на HTML элемент формы */
         const ruleFormRef = ref();
+        /** флаг для отображения модального кона */
         const dialogVisible = ref(false);
+        /** обработчик закрытия модального окна */
         const handleClose = () => {
             ruleFormRef.value.resetFields();
             dialogVisible.value = false;
@@ -70,6 +73,7 @@ export default defineComponent({
             newPassword: "",
             repetitionPassword: ""
         });
+        /** функция-валидатор для пароля */
         const validatePass = (_: any, value: any, callback: any) => {
             if (value === "") {
                 callback(new Error("Пожалуйста, введите пароль"));
@@ -81,6 +85,7 @@ export default defineComponent({
                 callback();
             }
         };
+        /** функция-валидатор для повтора пароля */
         const validatePass2 = (_: any, value: any, callback: any) => {
             if (value === "") {
                 callback(new Error("Пожалуйста, введи пароль заново"));
@@ -90,6 +95,7 @@ export default defineComponent({
                 callback();
             }
         };
+        /** правила валидации формы */
         const rules = {
             newPassword: [
                 { validator: validatePass, trigger: "blur" },
@@ -97,6 +103,7 @@ export default defineComponent({
             ],
             repetitionPassword: [{validator: validatePass2, trigger: "blur"}]
         };
+        /** запрос к API на смену пароля */
         const submitForm = async () => {
             if (!ruleFormRef.value) return;
             if (await ruleFormRef.value.validate(valid => valid) === false) return;

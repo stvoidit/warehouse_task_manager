@@ -100,10 +100,4 @@ export default {
 .flex-grow {
     flex-grow: 1;
 }
-.el-page-header__back {
-    display: none;
-}
-.el-divider.el-divider--vertical {
-    display: none;
-}
 </style>

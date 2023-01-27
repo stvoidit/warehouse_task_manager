@@ -53,11 +53,14 @@ import { ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 export default defineComponent({
     setup() {
+        /** ссылка на HTML элемент формы */
         const ruleFormRef = ref();
+        /** данные формы */
         const loginForm = reactive({
             login: "",
             password: ""
         });
+        /** правила проверки формы */
         const rules = {
             login: {
                 required: true, message: 'Поле "логин" обязательно к заполнению', trigger: "blur"
@@ -68,6 +71,7 @@ export default defineComponent({
         };
         const router = useRouter();
         const store = useApplicationStore();
+        /** запрос к API на авторизацию (получение токена) */
         const handleLogin = async () => {
             if (!ruleFormRef.value) return;
             if (await ruleFormRef.value.validate(valid => valid) === false) return;
@@ -80,12 +84,18 @@ export default defineComponent({
             });
         };
 
+        /** наблюдение за нажатием кнопки Enter для убоства входа на форме */
         const keypressEnter = (event) => { if (event.key === "Enter") handleLogin(); };
+        /**
+         * 1) Проверка токена
+         * 2) Включение отслеживания нажатия Enter
+         */
         onMounted(() => {
             store.checkToken();
             if (store.isAuth) router.push("/");
             document.addEventListener("keypress", keypressEnter);
         });
+        /** Отписка от наблюдения за нажатием Enter */
         onBeforeUnmount(() => document.removeEventListener("keypress", keypressEnter));
         return {
             loginForm,

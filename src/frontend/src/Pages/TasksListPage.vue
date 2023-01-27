@@ -30,13 +30,17 @@ import { useRouter } from "vue-router";
 import { useApplicationStore } from "@/store";
 export default {
     props: {
+        /** ID склада */
         stockID: { type: Number, required: true }
     },
     setup(props) {
         const router = useRouter();
         const store = useApplicationStore();
-        onMounted(() =>store.fetchTasksList(props.stockID));
+        /** Получени от API списка задач на складе */
+        onMounted(() => store.fetchTasksList(props.stockID));
+        /** Обработчик нажатия на строку таблицы - переход в задачу */
         const handleRowClick = (row: frontend.ITaskL) => router.push(`/stock/${props.stockID}/task/${row.doc_id}/material/${row.material_id}`);
+        /** Список столбцов таблицы */
         const columns = [
             {
                 prop: "material",

@@ -252,6 +252,7 @@ UPDATE
 SET
     done = %(status)s
     , net_weight_fact = CASE WHEN %(status)s IS TRUE THEN net_weight ELSE net_weight_fact = 0 END
+    , tare_amount_fact = CASE WHEN %(status)s IS TRUE THEN tare_amount ELSE tare_amount_fact = 0 END
 WHERE
     material = %(material_id)s
     AND

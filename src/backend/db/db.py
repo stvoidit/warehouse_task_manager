@@ -57,6 +57,7 @@ GROUP BY
     , tare_type
 ORDER BY
     doc.planned_date ASC
+    , m.id ASC
     """
     result = []
     async with conn.cursor() as cur:

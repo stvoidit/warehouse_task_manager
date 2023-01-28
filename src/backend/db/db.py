@@ -181,6 +181,8 @@ ORDER BY
     , arrival.tare_id
     """
     task = await select_task_meta(conn, stock_id, doc_id)
+    if task is None:
+        return task
     jobs = []
     async with conn.cursor() as cur:
         await cur.execute(q, {"doc_id": doc_id, "stock": stock_id, "material_id": material_id})

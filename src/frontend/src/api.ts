@@ -81,6 +81,10 @@ class ClientAPI {
             window.localStorage.removeItem("token");
             location.href = "/login";
         }
+        if (response.status === 404) {
+            alert("Задача не найдена");
+            location.href = "/";
+        }
         if (response.status !== 200) {
             location.href = "/";
         }

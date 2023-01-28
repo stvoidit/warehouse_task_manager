@@ -1,4 +1,4 @@
-from aiohttp.web import HTTPBadRequest, HTTPForbidden, HTTPCreated, Request
+from aiohttp.web import HTTPBadRequest, HTTPForbidden, HTTPCreated, HTTPNotFound, Request
 
 from db import check_user, select_task, select_tasks, change_password, select_stocks, update_job_status
 from utils import jsonify
@@ -61,6 +61,8 @@ async def get_task(request: Request):
     task = {}
     async with request.app["db"].acquire() as conn:
         task = await select_task(conn, stock_id, doc_id, material_id)
+        if task is None:
+            raise HTTPNotFound()
     return await jsonify(task, request)
 
 async def update_job_status_handler(request: Request):

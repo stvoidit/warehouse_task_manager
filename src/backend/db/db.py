@@ -56,7 +56,7 @@ GROUP BY
     , doc.operation
     , tare_type
 ORDER BY
-    doc.planned_date ASC
+    doc.id ASC
     , m.id ASC
     """
     result = []

@@ -25,6 +25,8 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
                         "task",
                         "management"
                     ],
+                    display: "fullscreen",
+                    orientation: "landscape",
                     name: "WTM",
                     short_name: "warehouse task manager",
                     description: "warehouse task manager",

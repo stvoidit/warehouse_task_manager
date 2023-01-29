@@ -2,19 +2,20 @@
     <el-row v-if="store.isAuth">
         <el-col v-loading="store.loading">
             <!-- <pre>{{ store.task }}</pre> -->
-            <el-row class="mb">
-                {{ store.task?.doc_number }}
+            <el-row>
+                <b>{{ store.task?.doc_number }}</b>
             </el-row>
             <el-row
                 class="mb"
                 :gutter="20">
                 <el-col
-                    :xs="12"
+                    :xs="24"
                     :sm="12"
                     :md="12"
                     :lg="8"
                     :xl="6">
                     <el-table
+                        class="mt"
                         :data="metaInfo"
                         :border="true"
                         :show-header="false"
@@ -27,12 +28,13 @@
                     </el-table>
                 </el-col>
                 <el-col
-                    :xs="12"
+                    :xs="24"
                     :sm="12"
                     :md="12"
                     :lg="8"
                     :xl="6">
                     <el-table
+                        class="mt"
                         :data="statInfo"
                         :border="true"
                         :show-header="false"
@@ -50,6 +52,7 @@
                     :data="store.task?.jobs"
                     :border="true"
                     size="small"
+                    table-layout="auto"
                     style="width: 100%"
                     @row-click="handleClickRow">
                     <el-table-column

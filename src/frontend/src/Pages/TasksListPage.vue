@@ -5,13 +5,15 @@
         v-loading="store.loading"
         :data="store.tasks"
         :border="true"
+        table-layout="auto"
         size="small"
         @row-click="handleRowClick">
         <el-table-column
             v-for="col in columns"
             :key="col.prop"
             :prop="col.prop"
-            :label="col.label" />
+            :label="col.label"
+            :width="col.width" />
         <el-table-column label="Остаток кол-во">
             <template #default="scope">
                 {{ scope.row.amount - scope.row.amount_fact }}
@@ -44,7 +46,8 @@ export default {
         const columns = [
             {
                 prop: "material",
-                label: "Материал"
+                label: "Материал",
+                width: 100
             },
             {
                 prop: "doc_number",

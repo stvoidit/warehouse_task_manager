@@ -26,7 +26,7 @@
                     <el-icon style="vertical-align: middle">
                         <User />
                     </el-icon>
-                    <span>{{ store.currentUser?.employee_name }}</span>
+                    <span v-if="isLandscape">{{ store.currentUser?.employee_name }} </span>
                 </el-button>
             </template>
             <template #default>
@@ -61,7 +61,7 @@
 import { useApplicationStore } from "@/store";
 import ChangePasswordDialog from "./ChangePasswordDialog.vue";
 import { useRoute } from "vue-router";
-import { computed } from "vue";
+import { computed, ref, onMounted } from "vue";
 export default {
     components: {
         ChangePasswordDialog
@@ -87,10 +87,24 @@ export default {
             }
             return menuRoutes;
         });
+
+        const orientation = ref("landscape-primary");
+        const isLandscape = computed(() => orientation.value === "landscape-primary");
+        onMounted(() => {
+            try {
+                orientation.value = screen.orientation.type;
+                window.addEventListener("orientationchange", () => {
+                    orientation.value = screen.orientation.type;
+                }, false);
+            } catch (error) {
+                console.warn(error);
+            }
+        });
         return {
             store,
             handleLogOut,
-            routes
+            routes,
+            isLandscape
         };
     }
 };

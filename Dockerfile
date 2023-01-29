@@ -23,4 +23,4 @@ RUN pip --no-cache-dir install -U pip setuptools && pip --no-cache-dir install -
 COPY --from=frontend frontend/dist ./static
 COPY src/backend .
 COPY config.toml .
-ENTRYPOINT ["gunicorn", "-c", "gunicorn.config.py", "main:init_app"]
+ENTRYPOINT ["gunicorn", "-c", "gunicorn.config.py"]

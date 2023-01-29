@@ -224,6 +224,16 @@ async def change_password(conn: Connection, user_id: int, password_hash: str):
     async with conn.cursor() as cur:
         await cur.execute(q, {"user_id": user_id, "password_hash": password_hash})
 
+async def check_can_login(conn: Connection, user_id: int):
+    """ проверка возможности входа по токену"""
+    q = """ SELECT EXISTS (SELECT TRUE FROM staff s WHERE s.id = %(user_id)s AND s.can_login IS TRUE ) AS can_login """
+    can_login = False
+    async with conn.cursor() as cur:
+        await cur.execute(q, {"user_id": user_id})
+        result = await cur.fetchone()
+        if result.get("can_login", 0) == 1:
+            can_login = True
+    return can_login
 
 async def select_stocks(conn: Connection):
     # TODO: прокинуть ID юзера

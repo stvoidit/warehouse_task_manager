@@ -1,6 +1,7 @@
 import jwt
 from aiohttp.web import HTTPForbidden, Request, RequestHandler, middleware
 
+from db import check_can_login
 
 @middleware
 async def middleware_check_token(request: Request, handler: RequestHandler) -> RequestHandler:
@@ -25,6 +26,10 @@ async def middleware_check_token(request: Request, handler: RequestHandler) -> R
             decoded_token = security.validate_jwt(token)
             if decoded_token.get("payload"):
                 user_id = decoded_token.get("payload").get("id")
+                async with request.app["db"].acquire() as conn:
+                    can_login = await check_can_login(conn, user_id)
+                    if can_login is False:
+                        raise HTTPForbidden()
                 request.user_id = user_id
         except (jwt.exceptions.ExpiredSignatureError, jwt.exceptions.InvalidSignatureError) as exc:
             raise HTTPForbidden(reason=exc) # pylint: disable=raise-missing-from

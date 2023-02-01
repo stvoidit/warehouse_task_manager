@@ -1,4 +1,3 @@
-import { ElNotification, NotificationParams } from "element-plus";
 import { computed, reactive, ref, shallowRef } from "vue";
 
 import ClientAPI from "@/api";
@@ -52,20 +51,12 @@ export const useApplicationStore = defineStore("app_store", () => {
 
     /** ID таймера */
     let timer: NodeJS.Timer;
-    /** конфигурация для ElNotification */
-    const notificationOptions: NotificationParams = {
-        message: "автообновление данных",
-        type: "info",
-        position: "bottom-left",
-        showClose: false,
-        duration: 1500
-    };
     /** интервал в ms для setInterval */
     const delay = 15_000;
     /** запуск автообновления */
     const doAutofetch = (stockID: number, taskID: number, materialID: number) => {
         timer = setInterval(() => {
-            fetchTask(stockID, taskID, materialID, false).then(() => ElNotification(notificationOptions));
+            fetchTask(stockID, taskID, materialID, false);
         }, delay);
     };
     /** остановка автообновления */

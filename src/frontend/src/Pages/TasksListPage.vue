@@ -6,7 +6,6 @@
         :data="store.tasks"
         :border="true"
         table-layout="auto"
-        size="small"
         @row-click="handleRowClick">
         <el-table-column
             v-for="col in columns"
@@ -47,15 +46,17 @@ export default {
             {
                 prop: "material",
                 label: "Материал",
-                width: 100
+                width: 200
             },
             {
                 prop: "doc_number",
-                label: "Задание"
+                label: "Задание",
+                width: 100
             },
             {
                 prop: "planned_date",
-                label: "План. Дата"
+                label: "План. Дата",
+                width: 100
             },
             {
                 prop: "technical_process",
@@ -63,7 +64,8 @@ export default {
             },
             {
                 prop: "operation",
-                label: "Операция"
+                label: "Операция",
+                width: 200
             },
             {
                 prop: "tare_type",

@@ -18,8 +18,7 @@
                         class="mt"
                         :data="metaInfo"
                         :border="true"
-                        :show-header="false"
-                        size="small">
+                        :show-header="false">
                         <el-table-column
                             prop="label"
                             :width="150" />
@@ -37,8 +36,7 @@
                         class="mt"
                         :data="statInfo"
                         :border="true"
-                        :show-header="false"
-                        size="small">
+                        :show-header="false">
                         <el-table-column
                             prop="label"
                             :width="150" />
@@ -51,15 +49,9 @@
                 <el-table
                     :data="store.task?.jobs"
                     :border="true"
-                    size="small"
                     table-layout="auto"
                     style="width: 100%"
                     @row-click="handleClickRow">
-                    <el-table-column
-                        v-for="col in columns"
-                        :key="col.prop"
-                        :prop="col.prop"
-                        :label="col.label" />
                     <el-table-column
                         width="100"
                         label="Выполнено">
@@ -72,6 +64,12 @@
                             </div>
                         </template>
                     </el-table-column>
+                    <el-table-column
+                        v-for="col in columns"
+                        :key="col.prop"
+                        :prop="col.prop"
+                        :label="col.label"
+                        :width="col.width" />
                 </el-table>
             </el-row>
         </el-col>
@@ -168,7 +166,8 @@ export default defineComponent({
         const columns = [
             {
                 prop: "material",
-                label: "Материал"
+                label: "Материал",
+                width: 200
             },
             {
                 prop: "tare_id",
@@ -182,18 +181,18 @@ export default defineComponent({
                 prop: "tare_type",
                 label: "Тара"
             },
-            {
-                prop: "rest_tare_amount",
-                label: "Кол-во"
-            },
+            // {
+            //     prop: "rest_tare_amount",
+            //     label: "Кол-во"
+            // },
             {
                 prop: "rest_gross_weight",
                 label: "Вес брутто"
             },
-            {
-                prop: "task_tare_amount",
-                label: "Задание кол-во"
-            },
+            // {
+            //     prop: "task_tare_amount",
+            //     label: "Задание кол-во"
+            // },
             {
                 prop: "task_net_weight",
                 label: "Задание вес нетто"

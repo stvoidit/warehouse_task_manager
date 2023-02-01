@@ -12,7 +12,7 @@
             :key="col.prop"
             :prop="col.prop"
             :label="col.label"
-            :width="col.width"
+            :min-width="col.width"
             :formatter="col.formatter" />
         <el-table-column label="Остаток кол-во">
             <template #default="scope">

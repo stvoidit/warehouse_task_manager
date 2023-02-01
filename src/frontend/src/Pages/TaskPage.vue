@@ -46,31 +46,31 @@
                 </el-col>
             </el-row>
             <el-row>
-                <el-table
-                    :data="store.task?.jobs"
-                    :border="true"
-                    table-layout="auto"
-                    style="width: 100%"
-                    @row-click="handleClickRow">
-                    <el-table-column
-                        width="100"
-                        label="Выполнено">
-                        <template #default="scope">
-                            <div style="text-align: center;">
-                                <el-checkbox
-                                    v-model="scope.row.done"
-                                    size="large"
-                                    @change="updateJobStatus(scope.row.tare_id, scope.row.done, scope.row.tare_mark)" />
-                            </div>
-                        </template>
-                    </el-table-column>
-                    <el-table-column
-                        v-for="col in columns"
-                        :key="col.prop"
-                        :prop="col.prop"
-                        :label="col.label"
-                        :width="col.width" />
-                </el-table>
+                <el-col>
+                    <el-table
+                        :data="store.task?.jobs"
+                        :border="true"
+                        @row-click="handleClickRow">
+                        <el-table-column
+                            width="100"
+                            label="Выполнено">
+                            <template #default="scope">
+                                <div style="text-align: center;">
+                                    <el-checkbox
+                                        v-model="scope.row.done"
+                                        size="large"
+                                        @change="updateJobStatus(scope.row.tare_id, scope.row.done, scope.row.tare_mark)" />
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                            v-for="col in columns"
+                            :key="col.prop"
+                            :prop="col.prop"
+                            :label="col.label"
+                            :min-width="col.width" />
+                    </el-table>
+                </el-col>
             </el-row>
         </el-col>
     </el-row>
@@ -166,7 +166,8 @@ export default defineComponent({
         const columns = [
             {
                 prop: "material",
-                label: "Материал"
+                label: "Материал",
+                width: 200
             },
             {
                 prop: "tare_id",

@@ -166,36 +166,32 @@ export default defineComponent({
         const columns = [
             {
                 prop: "material",
-                label: "Материал",
-                width: 200
+                label: "Материал"
             },
             {
                 prop: "tare_id",
-                label: "Номер тары"
+                label: "Номер",
+                width: 100
             },
             {
                 prop: "tare_mark",
-                label: "Маркировка тары"
+                label: "Маркировка",
+                width: 150
             },
             {
                 prop: "tare_type",
-                label: "Тара"
+                label: "Тара",
+                width: 100
             },
-            // {
-            //     prop: "rest_tare_amount",
-            //     label: "Кол-во"
-            // },
             {
                 prop: "rest_gross_weight",
-                label: "Вес брутто"
+                label: "Брутто",
+                width: 150
             },
-            // {
-            //     prop: "task_tare_amount",
-            //     label: "Задание кол-во"
-            // },
             {
                 prop: "task_net_weight",
-                label: "Задание вес нетто"
+                label: "Нетто",
+                width: 150
             }
         ];
         return {

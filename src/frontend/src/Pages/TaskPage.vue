@@ -127,7 +127,7 @@ export default defineComponent({
         };
         /** Обработчик клика на строку - запрос на обновление статуса задания */
         const handleClickRow = (row: frontend.IJob, column: any) => {
-            if (column.no === 8) return;
+            if (column.no === 0) return;
             updateJobStatus(row.tare_id, !row.done, row.tare_mark);
         };
         /** Функция для подсчета кол-ва заданий по статусу */

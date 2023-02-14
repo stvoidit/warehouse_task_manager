@@ -75,7 +75,7 @@ async def update_job_status_handler(request: Request):
         raise HTTPBadRequest()
     async with request.app["db"].acquire() as conn:
         try:
-            await update_job_status(conn, doc_id, material_id, tara_id, status)
+            await update_job_status(conn, doc_id, request.user_id, material_id, tara_id, status)
         except Exception as exc:
             raise HTTPBadRequest(body=str(exc)) # pylint: disable=raise-missing-from
     return HTTPCreated()

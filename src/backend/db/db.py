@@ -258,7 +258,7 @@ ORDER BY
         stocks = await cur.fetchall()
     return stocks
 
-async def update_job_status(conn: Connection, doc_id: int, material_id: int, tara_id: int, status: bool):
+async def update_job_status(conn: Connection, doc_id: int, user_id: int, material_id: int, tara_id: int, status: bool):
     q = """
 UPDATE
     production_task
@@ -266,6 +266,7 @@ SET
     done = %(status)s
     , net_weight_fact = CASE WHEN %(status)s IS TRUE THEN net_weight ELSE net_weight_fact = 0 END
     , tare_amount_fact = CASE WHEN %(status)s IS TRUE THEN tare_amount ELSE tare_amount_fact = 0 END
+    , fact_executor = CASE WHEN %(status)s IS TRUE THEN %(user_id)s ELSE fact_executor = 0 END
 WHERE
     material = %(material_id)s
     AND
@@ -274,5 +275,5 @@ WHERE
     tare_id = %(tara_id)s
     """
     async with conn.cursor() as cur:
-        await cur.execute(q, {"doc_id": doc_id, "material_id": material_id, "tara_id": tara_id, "status": status})
+        await cur.execute(q, {"doc_id": doc_id, "user_id": user_id, "material_id": material_id, "tara_id": tara_id, "status": status})
     return

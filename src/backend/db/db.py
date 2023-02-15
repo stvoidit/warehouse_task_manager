@@ -46,6 +46,8 @@ WHERE
         WHERE
             production_task_executor.executor_id = %(user_id)s
     )
+    AND
+    doc.done = 0
 GROUP BY
     m.material
     , m.id
@@ -94,6 +96,8 @@ WHERE
     ptd.id = %(doc_id)s
     AND
     ptd.stock = %(stock_id)s
+    AND
+    ptd.done = 0
     """
     task = None
     async with conn.cursor() as cur:
@@ -235,17 +239,18 @@ async def check_can_login(conn: Connection, user_id: int):
             can_login = True
     return can_login
 
-async def select_stocks(conn: Connection):
-    # TODO: прокинуть ID юзера
+async def select_stocks(conn: Connection, user_id: int):
     q = """
 SELECT
     s.id
     , s.name
-    , COUNT(ptd.id) tasks_count
+    , SUM(IF(ptd.done = 0 AND pte.executor_id = %(user_id)s, 1, 0)) tasks_count
 FROM
     stock s
 LEFT JOIN production_task_doc ptd ON
     ptd.stock = s.id
+LEFT JOIN production_task_executor pte ON
+    pte.doc_id = ptd.id
 GROUP BY
     s.id
     , s.name
@@ -254,7 +259,7 @@ ORDER BY
     """
     stocks = []
     async with conn.cursor() as cur:
-        await cur.execute(q)
+        await cur.execute(q, {"user_id": user_id})
         stocks = await cur.fetchall()
     return stocks
 

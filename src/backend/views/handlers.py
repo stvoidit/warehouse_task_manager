@@ -36,7 +36,7 @@ async def get_stocks(request: Request):
     """ получени списка складов """
     stocks = []
     async with request.app["db"].acquire() as conn:
-        stocks = await select_stocks(conn)
+        stocks = await select_stocks(conn, request.user_id)
     return await jsonify(stocks, request)
 
 async def get_tasks(request: Request):

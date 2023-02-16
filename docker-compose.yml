@@ -10,3 +10,4 @@ services:
       target: aiohttp-backend
     ports:
       - 5530:8080
+    mem_limit: 1G

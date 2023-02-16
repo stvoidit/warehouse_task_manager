@@ -10,7 +10,3 @@ services:
       target: aiohttp-backend
     ports:
       - 5530:8080
-    deploy:
-      resources:
-        limits:
-          memory: 512m

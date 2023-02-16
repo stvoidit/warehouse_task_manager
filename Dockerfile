@@ -22,5 +22,4 @@ COPY src/backend/requirements.txt .
 RUN pip --no-cache-dir install -U pip setuptools && pip --no-cache-dir install -r requirements.txt
 COPY --from=frontend frontend/dist ./static
 COPY src/backend .
-COPY config.toml .
 ENTRYPOINT ["gunicorn", "-c", "gunicorn.config.py"]

@@ -8,5 +8,7 @@ services:
     build:
       context: .
       target: aiohttp-backend
+    volumes:
+      - ./config.toml:/app/config.toml:ro
     ports:
       - 5530:8080

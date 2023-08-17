@@ -1,5 +1,5 @@
 # build vue frontend static files
-FROM node:18-buster-slim AS frontend
+FROM node:18-alpine AS frontend
 WORKDIR /frontend
 RUN npm install -g pnpm
 COPY src/frontend/package.json \
@@ -11,7 +11,7 @@ COPY src/frontend/package.json \
 RUN pnpm install
 COPY src/frontend/src src
 COPY src/frontend/public public
-RUN NODE_ENV=production pnpm build
+RUN NODE_OPTIONS='--max-old-space-size=448' NODE_ENV=production pnpm build
 
 FROM python:3.11-slim-buster as aiohttp-backend
 WORKDIR /app

@@ -60,7 +60,7 @@ export const useApplicationStore = defineStore("app_store", () => {
         }, delay);
     };
     /** остановка автообновления */
-    const stopAutofetch = () => clearInterval(timer);
+    const stopAutofetch = () => clearInterval(timer as NodeJS.Timeout);
 
     /** т.к. процесс выхода (logout) не требует фиксации на бэке, то достаточно просто стереть токен из памяти */
     const logOut = () => {

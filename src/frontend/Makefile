@@ -5,4 +5,4 @@ install:
 	pnpm i
 
 build:
-	pnpm run build
+	pnpm run ts-lint && pnpm run build

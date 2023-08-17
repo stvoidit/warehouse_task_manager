@@ -41,7 +41,9 @@
                             prop="label"
                             :width="150" />
                         <el-table-column
-                            prop="value" />
+                            prop="count" />
+                        <el-table-column
+                            prop="netWeight" />
                     </el-table>
                 </el-col>
             </el-row>
@@ -153,15 +155,18 @@ export default defineComponent({
         const statInfo = computed(() => ([
             {
                 label: "Заданий",
-                value: store.task?.jobs ? store.task.jobs.length : 0
+                count: store.task?.jobs ? store.task.jobs.length : 0,
+                netWeight: store.task?.jobs.reduce((prev,cur) => prev+=cur.task_net_weight, 0)
             },
             {
                 label: "Выполнено",
-                value: store.task?.jobs ? sumJobsStatus(store.task.jobs, true) : 0
+                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, true) : 0,
+                netWeight: store.task?.jobs.reduce((prev,cur) => cur.done ? prev+=cur.task_net_weight : prev, 0)
             },
             {
                 label: "Осталось",
-                value: store.task?.jobs ? sumJobsStatus(store.task.jobs, false) : 0
+                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, false) : 0,
+                netWeight: store.task?.jobs.reduce((prev,cur) => !cur.done ? prev+=cur.task_net_weight : prev, 0)
             }
         ]));
         /** Список столбцов таблицы */

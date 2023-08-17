@@ -58,57 +58,45 @@
     </el-menu>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useApplicationStore } from "@/store";
 import ChangePasswordDialog from "./ChangePasswordDialog.vue";
 import { useRoute } from "vue-router";
 import { computed, ref, onMounted } from "vue";
-export default {
-    components: {
-        ChangePasswordDialog
-    },
-    setup() {
-        const store = useApplicationStore();
-        const handleLogOut = () => store.logOut();
-        const route = useRoute();
-        const routes = computed(() => {
-            const menuRoutes = [
-                {
-                    label: "Список складов",
-                    path: "/",
-                    icon: "Guide"
-                }
-            ];
-            if (route.params.stockID) {
-                menuRoutes.push({
-                    label: "Список задач",
-                    path: `/stock/${route.params.stockID}`,
-                    icon: "MessageBox"
-                });
-            }
-            return menuRoutes;
-        });
 
-        const orientation = ref("landscape-primary");
-        const isLandscape = computed(() => orientation.value === "landscape-primary");
-        onMounted(() => {
-            try {
-                orientation.value = screen.orientation.type;
-                window.addEventListener("orientationchange", () => {
-                    orientation.value = screen.orientation.type;
-                }, false);
-            } catch (error) {
-                console.warn(error);
-            }
+const store = useApplicationStore();
+const handleLogOut = () => store.logOut();
+const route = useRoute();
+const routes = computed(() => {
+    const menuRoutes = [
+        {
+            label: "Список складов",
+            path: "/",
+            icon: "Guide"
+        }
+    ];
+    if (route.params.stockID) {
+        menuRoutes.push({
+            label: "Список задач",
+            path: `/stock/${route.params.stockID}`,
+            icon: "MessageBox"
         });
-        return {
-            store,
-            handleLogOut,
-            routes,
-            isLandscape
-        };
     }
-};
+    return menuRoutes;
+});
+
+const orientation = ref("landscape-primary");
+const isLandscape = computed(() => orientation.value === "landscape-primary");
+onMounted(() => {
+    try {
+        orientation.value = screen.orientation.type;
+        window.addEventListener("orientationchange", () => {
+            orientation.value = screen.orientation.type;
+        }, false);
+    } catch (error) {
+        console.warn(error);
+    }
+});
 </script>
 
 <style>

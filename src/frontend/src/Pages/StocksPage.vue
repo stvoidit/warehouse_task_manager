@@ -24,34 +24,26 @@
     </el-row>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted } from "vue";
+<script setup lang="ts">
+import { onMounted } from "vue";
 import { useApplicationStore } from "@/store";
 import { useRouter } from "vue-router";
-export default defineComponent({
-    setup() {
-        const router = useRouter();
-        const store = useApplicationStore();
-        /** Получение данных от API со списком складов */
-        onMounted(store.fetchStocks);
-        /** Обработчик нажатия строки таблицы - переход на список заданий на складе */
-        const handleRowClick = (row: frontend.IStock) => router.push(`/stock/${row.id}`);
-        /** Список столбцов для таблицы */
-        const columns = [
-            {
-                label: "Название",
-                prop: "name"
-            },
-            {
-                label: "Кол-во задач",
-                prop: "tasks_count"
-            }
-        ];
-        return {
-            store,
-            columns,
-            handleRowClick
-        };
+
+const router = useRouter();
+const store = useApplicationStore();
+/** Получение данных от API со списком складов */
+onMounted(store.fetchStocks);
+/** Обработчик нажатия строки таблицы - переход на список заданий на складе */
+const handleRowClick = (row: frontend.IStock) => router.push(`/stock/${row.id}`);
+/** Список столбцов для таблицы */
+const columns = [
+    {
+        label: "Название",
+        prop: "name"
+    },
+    {
+        label: "Кол-во задач",
+        prop: "tasks_count"
     }
-});
+];
 </script>

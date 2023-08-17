@@ -9,20 +9,10 @@
         </el-main>
     </router-view>
 </template>
-<script lang="ts">
+<script setup lang="ts">
 import HeaderApp from "@/components/HeaderApp.vue";
 import { useApplicationStore } from "@/store";
-export default {
-    components: {
-        HeaderApp
-    },
-    setup() {
-        const store = useApplicationStore();
-        return {
-            store
-        };
-    }
-};
+const store = useApplicationStore();
 </script>
 <style>
 .mt {

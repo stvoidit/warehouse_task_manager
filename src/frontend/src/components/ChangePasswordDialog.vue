@@ -53,79 +53,64 @@
     </el-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, reactive } from "vue";
+<script setup lang="ts">
+import { ref, reactive } from "vue";
 import { useApplicationStore } from "@/store";
 import { ElMessageBox } from "element-plus";
-export default defineComponent({
-    setup() {
-        const store = useApplicationStore();
-        /** ссылка на HTML элемент формы */
-        const ruleFormRef = ref();
-        /** флаг для отображения модального кона */
-        const dialogVisible = ref(false);
-        /** обработчик закрытия модального окна */
-        const handleClose = () => {
-            ruleFormRef.value.resetFields();
-            dialogVisible.value = false;
-        };
-        const changePasswordForm = reactive({
-            newPassword: "",
-            repetitionPassword: ""
-        });
-        /** функция-валидатор для пароля */
-        const validatePass = (_: any, value: any, callback: any) => {
-            if (value === "") {
-                callback(new Error("Пожалуйста, введите пароль"));
-            } else {
-                if (changePasswordForm.repetitionPassword !== "") {
-                    if (!ruleFormRef.value) return;
-                    ruleFormRef.value.validateField("repetitionPassword", () => null);
-                }
-                callback();
-            }
-        };
-        /** функция-валидатор для повтора пароля */
-        const validatePass2 = (_: any, value: any, callback: any) => {
-            if (value === "") {
-                callback(new Error("Пожалуйста, введи пароль заново"));
-            } else if (value !== changePasswordForm.newPassword) {
-                callback(new Error("Пароли не совпадают"));
-            } else {
-                callback();
-            }
-        };
-        /** правила валидации формы */
-        const rules = {
-            newPassword: [
-                { validator: validatePass, trigger: "blur" },
-                { min: 8, message: "Минимальная длина пароля 8 символов", trigger: "blur" }
-            ],
-            repetitionPassword: [{validator: validatePass2, trigger: "blur"}]
-        };
-        /** запрос к API на смену пароля */
-        const submitForm = async () => {
-            if (!ruleFormRef.value) return;
-            if (await ruleFormRef.value.validate(valid => valid) === false) return;
-            store.changePassword(changePasswordForm)
-                .then(() => {
-                    alert("Пароль успешно изменен, пожалуйста, перезайдите в систему");
-                    store.logOut();
-                })
-                .catch(error => ElMessageBox.alert(error, "Ошибка", { confirmButtonText: "OK" }));
-        };
-        return {
-            ruleFormRef,
-            dialogVisible,
-            handleClose,
-            changePasswordForm,
-            rules,
-            submitForm
-        };
-    }
+
+const store = useApplicationStore();
+/** ссылка на HTML элемент формы */
+const ruleFormRef = ref();
+/** флаг для отображения модального кона */
+const dialogVisible = ref(false);
+/** обработчик закрытия модального окна */
+const handleClose = () => {
+    ruleFormRef.value.resetFields();
+    dialogVisible.value = false;
+};
+const changePasswordForm = reactive({
+    newPassword: "",
+    repetitionPassword: ""
 });
+/** функция-валидатор для пароля */
+const validatePass = (_: any, value: any, callback: any) => {
+    if (value === "") {
+        callback(new Error("Пожалуйста, введите пароль"));
+    } else {
+        if (changePasswordForm.repetitionPassword !== "") {
+            if (!ruleFormRef.value) return;
+            ruleFormRef.value.validateField("repetitionPassword", () => null);
+        }
+        callback();
+    }
+};
+/** функция-валидатор для повтора пароля */
+const validatePass2 = (_: any, value: any, callback: any) => {
+    if (value === "") {
+        callback(new Error("Пожалуйста, введи пароль заново"));
+    } else if (value !== changePasswordForm.newPassword) {
+        callback(new Error("Пароли не совпадают"));
+    } else {
+        callback();
+    }
+};
+/** правила валидации формы */
+const rules = {
+    newPassword: [
+        { validator: validatePass, trigger: "blur" },
+        { min: 8, message: "Минимальная длина пароля 8 символов", trigger: "blur" }
+    ],
+    repetitionPassword: [{validator: validatePass2, trigger: "blur"}]
+};
+/** запрос к API на смену пароля */
+const submitForm = async () => {
+    if (!ruleFormRef.value) return;
+    if (await ruleFormRef.value.validate(valid => valid) === false) return;
+    store.changePassword(changePasswordForm)
+        .then(() => {
+            alert("Пароль успешно изменен, пожалуйста, перезайдите в систему");
+            store.logOut();
+        })
+        .catch(error => ElMessageBox.alert(error, "Ошибка", { confirmButtonText: "OK" }));
+};
 </script>
-
-<style scoped>
-
-</style>

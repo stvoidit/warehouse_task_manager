@@ -46,63 +46,54 @@
     </el-row>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, ref, onMounted, onBeforeUnmount } from "vue";
+<script setup lang="ts">
+import { reactive, ref, onMounted, onBeforeUnmount } from "vue";
 import { useApplicationStore } from "@/store";
 import { ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
-export default defineComponent({
-    setup() {
-        /** ссылка на HTML элемент формы */
-        const ruleFormRef = ref();
-        /** данные формы */
-        const loginForm = reactive({
-            login: "",
-            password: ""
-        });
-        /** правила проверки формы */
-        const rules = {
-            login: {
-                required: true, message: 'Поле "логин" обязательно к заполнению', trigger: "blur"
-            },
-            password: {
-                required: true, message: 'Поле "пароль" обязательно к заполнению', trigger: "blur"
-            }
-        };
-        const router = useRouter();
-        const store = useApplicationStore();
-        /** запрос к API на авторизацию (получение токена) */
-        const handleLogin = async () => {
-            if (!ruleFormRef.value) return;
-            if (await ruleFormRef.value.validate(valid => valid) === false) return;
-            store.doLogin(loginForm).catch(error => {
-                if (!ruleFormRef.value) return;
-                ruleFormRef.value.resetFields();
-                ElMessageBox.alert(error, "Ошибка", {
-                    confirmButtonText: "OK"
-                });
-            });
-        };
 
-        /** наблюдение за нажатием кнопки Enter для убоства входа на форме */
-        const keypressEnter = (event) => { if (event.key === "Enter") handleLogin(); };
-        /**
+/** ссылка на HTML элемент формы */
+const ruleFormRef = ref();
+/** данные формы */
+const loginForm = reactive({
+    login: "",
+    password: ""
+});
+/** правила проверки формы */
+const rules = {
+    login: {
+        required: true, message: 'Поле "логин" обязательно к заполнению', trigger: "blur"
+    },
+    password: {
+        required: true, message: 'Поле "пароль" обязательно к заполнению', trigger: "blur"
+    }
+};
+const router = useRouter();
+const store = useApplicationStore();
+/** запрос к API на авторизацию (получение токена) */
+const handleLogin = async () => {
+    if (!ruleFormRef.value) return;
+    if (await ruleFormRef.value.validate(valid => valid) === false) return;
+    store.doLogin(loginForm).catch(error => {
+        if (!ruleFormRef.value) return;
+        ruleFormRef.value.resetFields();
+        ElMessageBox.alert(error, "Ошибка", {
+            confirmButtonText: "OK"
+        });
+    });
+};
+
+/** наблюдение за нажатием кнопки Enter для убоства входа на форме */
+const keypressEnter = (event) => { if (event.key === "Enter") handleLogin(); };
+/**
          * 1) Проверка токена
          * 2) Включение отслеживания нажатия Enter
          */
-        onMounted(() => {
-            store.checkToken();
-            if (store.isAuth) router.push("/");
-            document.addEventListener("keypress", keypressEnter);
-        });
-        /** Отписка от наблюдения за нажатием Enter */
-        onBeforeUnmount(() => document.removeEventListener("keypress", keypressEnter));
-        return {
-            loginForm,
-            handleLogin,
-            ruleFormRef,
-            rules
-        };
-    }
+onMounted(() => {
+    store.checkToken();
+    if (store.isAuth) router.push("/");
+    document.addEventListener("keypress", keypressEnter);
 });
+/** Отписка от наблюдения за нажатием Enter */
+onBeforeUnmount(() => document.removeEventListener("keypress", keypressEnter));
 </script>

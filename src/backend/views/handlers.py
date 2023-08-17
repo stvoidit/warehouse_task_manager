@@ -56,11 +56,12 @@ async def get_task(request: Request):
     stock_id = request.match_info.get("stockID", None)
     doc_id = request.match_info.get("taskID", None)
     material_id = request.match_info.get("materialID", None)
+    tare_type = request.query.get("tareType", None)
     if doc_id is None or stock_id is None or material_id is None:
         raise HTTPBadRequest()
     task = {}
     async with request.app["db"].acquire() as conn:
-        task = await select_task(conn, stock_id, doc_id, material_id)
+        task = await select_task(conn, stock_id, doc_id, material_id, tare_type)
         if task is None:
             raise HTTPNotFound()
     return await jsonify(task, request)

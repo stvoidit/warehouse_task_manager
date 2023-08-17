@@ -88,7 +88,9 @@ export default defineComponent({
         /** ID задачи */
         taskID: { type: Number, required: true },
         /** ID материала */
-        materialID: { type: Number, required: true }
+        materialID: { type: Number, required: true },
+        /** Тип тары */
+        tareType: { type: String, default: () => new URLSearchParams(location.search).get("tareType") }
     },
     setup(props) {
         const router = useRouter();
@@ -99,8 +101,8 @@ export default defineComponent({
          */
         onMounted(() => {
             if (isNaN(props.taskID)) router.push("/");
-            store.fetchTask(props.stockID, props.taskID, props.materialID);
-            store.doAutofetch(props.stockID, props.taskID, props.materialID);
+            store.fetchTask(props.stockID, props.taskID, props.materialID, props.tareType);
+            store.doAutofetch(props.stockID, props.taskID, props.materialID, props.tareType);
         });
         /**
          * Остановка автообновления
@@ -113,7 +115,7 @@ export default defineComponent({
         const updateJobStatus = async (tare_id: number, done: boolean, tare_mark: string) => {
             try {
                 await store.updateJobStatus(props.taskID, props.materialID, tare_id, done);
-                await store.fetchTask(props.stockID, props.taskID, props.materialID);
+                await store.fetchTask(props.stockID, props.taskID, props.materialID, props.tareType);
                 const readebleStatus = done === true ? "готово" : "не выполнено";
                 const message = `Тара с маркировкой "${tare_mark}" (тара ${tare_id}) - статус изменен на "${readebleStatus}"`;
                 ElMessage({

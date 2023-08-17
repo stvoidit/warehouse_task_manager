@@ -105,7 +105,7 @@ WHERE
         task = await cur.fetchone()
     return task
 
-async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id: int):
+async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id: int, tare_type: str):
     """ получение позиций задания """
     q = """
 SELECT
@@ -181,6 +181,8 @@ WHERE
     arrival_doc.stock = %(stock)s
     AND
     m.id = %(material_id)s
+    AND
+    tare_type = %(tare_type)s
 ORDER BY
     m.material
     , arrival.tare_id
@@ -190,7 +192,7 @@ ORDER BY
         return task
     jobs = []
     async with conn.cursor() as cur:
-        await cur.execute(q, {"doc_id": doc_id, "stock": stock_id, "material_id": material_id})
+        await cur.execute(q, {"doc_id": doc_id, "stock": stock_id, "material_id": material_id, "tare_type": tare_type})
         jobs = await cur.fetchall()
     task["jobs"] = jobs
     return task

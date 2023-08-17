@@ -42,9 +42,9 @@ export default {
         /** Получени от API списка задач на складе */
         onMounted(() => store.fetchTasksList(props.stockID));
         /** Обработчик нажатия на строку таблицы - переход в задачу */
-        const handleRowClick = (row: frontend.ITaskL) => router.push(`/stock/${props.stockID}/task/${row.doc_id}/material/${row.material_id}`);
+        const handleRowClick = (row: frontend.ITaskL) => router.push(`/stock/${props.stockID}/task/${row.doc_id}/material/${row.material_id}?tareType=${row.tare_type}`);
         /** Список столбцов таблицы */
-        const dateDormatter = (row, column, cellValue: string) => dayjs(cellValue, "YYYY-MM-DD").format("DD.MM.YYYY");
+        const dateFormatter = (row: any, col: any, cellValue: string) => dayjs(cellValue, "YYYY-MM-DD").format("DD.MM.YYYY");
         const columns = [
             {
                 prop: "material",
@@ -60,7 +60,7 @@ export default {
                 prop: "planned_date",
                 label: "План. Дата",
                 width: 100,
-                formatter: dateDormatter
+                formatter: dateFormatter
             },
             {
                 prop: "technical_process",

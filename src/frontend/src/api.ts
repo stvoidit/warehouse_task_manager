@@ -73,10 +73,10 @@ class ClientAPI {
         return body;
     }
 
-    async fetchTask(stockID: number, taskID: number, materialID: number): Promise<frontend.ITaskP> {
+    async fetchTask(stockID: number, taskID: number, materialID: number, tareType: string): Promise<frontend.ITaskP> {
         /** получение списка позиций в задаче */
         this.checkToken();
-        const response = await fetch(`${BASE_URL}/${STOCK}/${stockID}/${TASK_POSITIONS}/${taskID}/${MATERIAL}/${materialID}`, { headers: this.requestHeaders() });
+        const response = await fetch(`${BASE_URL}/${STOCK}/${stockID}/${TASK_POSITIONS}/${taskID}/${MATERIAL}/${materialID}?tareType=${tareType}`, { headers: this.requestHeaders() });
         if (response.status === 403) {
             window.localStorage.removeItem("token");
             location.href = "/login";

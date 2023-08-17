@@ -5,8 +5,9 @@
         mode="horizontal">
         <el-menu-item
             v-for="menu in routes"
-            :key="menu.path"
-            :route="menu.path">
+            :key="menu.label"
+            :index="menu.label"
+            :route="menu">
             <el-icon>
                 <MessageBox v-if="menu.icon === 'MessageBox'" />
                 <Guide v-if="menu.icon === 'Guide'" />

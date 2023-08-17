@@ -33,9 +33,9 @@ export const useApplicationStore = defineStore("app_store", () => {
         return api.fetchTasksList(stockID).then(body => tasks.value = body).finally(() => loading.value = false);
     };
     /** запрос к API для получения данных задания */
-    const fetchTask = (stockID: number, taskID: number, materialID: number, with_load=true) => {
+    const fetchTask = (stockID: number, taskID: number, materialID: number, tareType: string, with_load=true) => {
         if (with_load) loading.value = true;
-        return api.fetchTask(stockID, taskID, materialID).then(body => task.value = body).finally(() => {
+        return api.fetchTask(stockID, taskID, materialID, tareType).then(body => task.value = body).finally(() => {
             if (with_load) loading.value = false;
         });
     };
@@ -54,9 +54,9 @@ export const useApplicationStore = defineStore("app_store", () => {
     /** интервал в ms для setInterval */
     const delay = 15_000;
     /** запуск автообновления */
-    const doAutofetch = (stockID: number, taskID: number, materialID: number) => {
+    const doAutofetch = (stockID: number, taskID: number, materialID: number, tareType: string) => {
         timer = setInterval(() => {
-            fetchTask(stockID, taskID, materialID, false);
+            fetchTask(stockID, taskID, materialID, tareType, false);
         }, delay);
     };
     /** остановка автообновления */

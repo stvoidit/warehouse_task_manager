@@ -3,7 +3,7 @@
         <el-col v-loading="store.loading">
             <el-row class="mb sticky-row">
                 <el-col>
-                    <span><b>{{ store.task?.doc_number }}{{ queryParams.categoryTask ? ` - ${queryParams.categoryTask}` : '' }}</b></span>
+                    <span style="font-size: 1.4em;"><b>{{ store.task?.doc_number }}{{ store.task?.material ? ` - ${store.task?.material}` : '' }}</b></span>
                     <el-table
                         class="mt"
                         :data="metaInfo.data"
@@ -55,7 +55,6 @@
                     <el-table
                         :data="store.task?.jobs"
                         :border="true"
-                        :row-class-name="rowClassName"
                         @row-click="handleClickRow">
                         <el-table-column
                             width="130"
@@ -170,10 +169,6 @@ const metaInfo = computed(() => ({
             prop: "tareType"
         },
         {
-            label: "Категория",
-            prop: "categoryTask"
-        },
-        {
             label: "Плановая дата",
             prop: "planned_date"
         }
@@ -184,7 +179,6 @@ const metaInfo = computed(() => ({
             technical_process: store.task?.technical_process,
             operation: store.task?.operation,
             tareType: queryParams.tareType,
-            categoryTask: queryParams.categoryTask,
             planned_date: dayjs(store.task?.planned_date, "YYYY-MM-DD").format("DD.MM.YYYY")
         }
     ]
@@ -254,17 +248,17 @@ const columns = [
     }
 ];
 
-/** Подсветка строк по статусе */
-const rowClassName = ({ row }: { row: frontend.IJob }) => {
-    if (statInfo.value.length < 2) return "";
-    if (row.category === queryParams.categoryTask && !row.done) {
-        return "category-row";
-    }
-    if (row.done) {
-        return "row-done";
-    }
-    return "";
-};
+// /** Подсветка строк по статусе */
+// const rowClassName = ({ row }: { row: frontend.IJob }) => {
+//     if (statInfo.value.length < 2) return "";
+//     if (row.category === queryParams.categoryTask && !row.done) {
+//         return "category-row";
+//     }
+//     if (row.done) {
+//         return "row-done";
+//     }
+//     return "";
+// };
 // const filterHandler = (value: string, row: frontend.IJob) => {
 //     const isDone = value === "true" ? true : false;
 //     return row.done === isDone;
@@ -277,10 +271,10 @@ const rowClassName = ({ row }: { row: frontend.IJob }) => {
     z-index: 1000;
     background-color: var(--el-fill-color-blank);
 }
-.category-row {
+/* .category-row {
     background-color: #66b1ff5e !important;
 }
 .row-done {
     background-color: #66ff7291 !important;
-}
+} */
 </style>

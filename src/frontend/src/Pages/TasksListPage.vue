@@ -1,5 +1,4 @@
 <template>
-    <!-- <pre>{{ store.tasks }}</pre> -->
     <el-table
         v-if="store.isAuth"
         v-loading="store.loading"
@@ -41,7 +40,13 @@ const store = useApplicationStore();
 /** Получени от API списка задач на складе */
 onMounted(() => store.fetchTasksList(props.stockID));
 /** Обработчик нажатия на строку таблицы - переход в задачу */
-const handleRowClick = (row: frontend.ITaskL) => router.push(`/stock/${props.stockID}/task/${row.doc_id}/material/${row.material_id}?tareType=${row.tare_type}`);
+const handleRowClick = (row: frontend.ITaskL) => {
+    const qs = (new URLSearchParams({
+        tareType: row.tare_type,
+        categoryTask: row.category
+    })).toString();
+    router.push(`/stock/${props.stockID}/task/${row.doc_id}/material/${row.material_id}?${qs}`);
+};
 /** Список столбцов таблицы */
 const dateFormatter = (row: any, col: any, cellValue: string) => dayjs(cellValue, "YYYY-MM-DD").format("DD.MM.YYYY");
 const columns = [
@@ -74,6 +79,11 @@ const columns = [
     {
         prop: "tare_type",
         label: "Тара",
+        width: 100
+    },
+    {
+        prop: "category",
+        label: "Категория",
         width: 100
     },
     {

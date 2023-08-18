@@ -30,6 +30,7 @@ declare namespace frontend {
         amount_fact: number
         weight_fact: number
         tare_type: string
+        category: string
     }
 
     /** Задание из задачи */
@@ -39,6 +40,7 @@ declare namespace frontend {
         lab_material_group: string
         tare_id: number
         tare_mark: string
+        category: string
         tare_type: string
         arrival_tare_amount: number
         arrival_gross_weight: number

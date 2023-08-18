@@ -37,4 +37,7 @@ body {
 .el-table thead {
     color: black !important;
 }
+.el-main {
+    overflow: inherit !important;
+}
 </style>

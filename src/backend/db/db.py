@@ -14,7 +14,8 @@ SELECT
     , doc.planned_date
     , doc.technical_process
     , doc.operation
-    , tare_type
+    , A.tare_type
+    , production_task.category
     , SUM(tare_amount) AS amount
     , SUM(net_weight) AS weight
     , SUM(tare_amount_fact) AS amount_fact
@@ -37,15 +38,10 @@ INNER JOIN (
             arrival_doc.stock = %(stock_id)s
     ) AS A ON
     A.key_material = production_task.key_material
+INNER JOIN production_task_executor ON
+    production_task_executor.doc_id = doc.id
 WHERE
-    doc.id IN (
-        SELECT
-            production_task_executor.doc_id
-        FROM
-            production_task_executor
-        WHERE
-            production_task_executor.executor_id = %(user_id)s
-    )
+    production_task_executor.executor_id = %(user_id)s
     AND
     doc.done = 0
 GROUP BY
@@ -56,10 +52,13 @@ GROUP BY
     , doc.planned_date
     , doc.technical_process
     , doc.operation
-    , tare_type
+    , A.tare_type
+    , production_task.category
 ORDER BY
     doc.id ASC
     , m.id ASC
+    , production_task.category ASC
+    , A.tare_type ASC
     """
     result = []
     async with conn.cursor() as cur:
@@ -114,6 +113,7 @@ SELECT
     , arrival.tare_id
     , arrival.tare_mark
     , arrival.tare_type
+    , task.category
     , arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0) AS rest_tare_amount
     , arrival.net_weight - IFNULL(P.net_weight, 0) - IFNULL(S.net_weight, 0) + IFNULL(tare.weight, 0) * (arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0)) AS rest_gross_weight
     , task.tare_amount AS task_tare_amount
@@ -168,6 +168,7 @@ INNER JOIN (
             , tare_amount_fact
             , net_weight_fact
             , production_task.done
+            , production_task.category
         FROM
             production_task
         LEFT JOIN production_task_doc ON
@@ -191,8 +192,14 @@ ORDER BY
     if task is None:
         return task
     jobs = []
+    query_args = {
+            "doc_id": doc_id,
+            "stock": stock_id,
+            "material_id": material_id,
+            "tare_type": tare_type
+        }
     async with conn.cursor() as cur:
-        await cur.execute(q, {"doc_id": doc_id, "stock": stock_id, "material_id": material_id, "tare_type": tare_type})
+        await cur.execute(q, query_args)
         jobs = await cur.fetchall()
     task["jobs"] = jobs
     return task

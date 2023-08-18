@@ -147,7 +147,9 @@ const handleClickRow = (row: frontend.IJob, column: any) => {
     updateJobStatus(row.tare_id, !row.done, row.tare_mark);
 };
 /** Функция для подсчета кол-ва заданий по статусу */
-const sumJobsStatus = (jobs: Array<frontend.IJob>, status: boolean) => jobs.reduce((prev, job) => prev = job.done === status ? prev + 1 : prev, 0);
+const sumJobsStatus = (jobs: Array<frontend.IJob>, status: boolean, category: string) => {
+    return jobs.reduce((prev, job) => prev = job.done === status && job.category === category ? prev + 1 : prev, 0);
+};
 /** Вычисляемое свойство (обертка для таблицы) - метаданные задачи */
 const metaInfo = computed(() => ({
     fields: [
@@ -201,12 +203,12 @@ const statInfo = computed(() => {
             },
             {
                 label: "Выполнено",
-                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, true) : 0,
+                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, true, c) : 0,
                 netWeight: store.task?.jobs.reduce((prev,cur) => cur.done && cur.category === c ? prev+=cur.task_net_weight : prev, 0)
             },
             {
                 label: "Осталось",
-                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, false) : 0,
+                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, false, c) : 0,
                 netWeight: store.task?.jobs.reduce((prev,cur) => !cur.done && cur.category === c ? prev+=cur.task_net_weight : prev, 0)
             }
         ]

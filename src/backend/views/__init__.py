@@ -4,7 +4,7 @@ from aiohttp.web import Application, FileResponse, Request
 
 from .handlers import get_task, get_tasks, login_handler, change_password_handler, get_stocks, update_job_status_handler
 
-def index_spa(path, filename):
+def index_spa(path: str, filename: str):
     static_files = [p.name for p in pathlib.Path(path).iterdir() if p.is_dir() is False]
     async def static_view(request: Request):
         path_to_file = pathlib.Path(path, filename)
@@ -14,7 +14,7 @@ def index_spa(path, filename):
     return static_view
 
 
-async def setup_handlers(app: Application):
+def setup_handlers(app: Application):
     try:
         app.router.add_static("/assets", "static/assets")
         app.router.add_get("/{path:(?!api).*}", index_spa("static", "index.html"))

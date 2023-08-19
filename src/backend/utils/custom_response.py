@@ -4,7 +4,7 @@ from io import BytesIO
 from typing import Any
 
 import orjson
-from aiohttp.web import Request, Response
+from aiohttp.web import ContentCoding, Request, Response
 
 
 async def jsonify(
@@ -29,6 +29,12 @@ async def jsonify(
                         body=body,
                         status=status,
                         content_type=content_type)
+    accept_encoding = request.headers.get("Accept-Encoding")
+    if accept_encoding is not None:
+        if "gzip" in accept_encoding:
+            response.enable_compression(ContentCoding.gzip)
+        elif "deflate" in accept_encoding:
+            response.enable_compression(ContentCoding.deflate)
     await response.prepare(request)
     return response
 

@@ -2,7 +2,6 @@ import sys
 from multiprocessing import cpu_count
 from pathlib import Path
 
-
 def on_starting(_):
     if not Path("config.toml").exists():
         print("файл конфигурации config.toml не найден", file=sys.stderr)
@@ -10,7 +9,7 @@ def on_starting(_):
 
 workers = (cpu_count() * 2) + 1
 bind = "0.0.0.0:8080"
-worker_class = "aiohttp.GunicornUVLoopWebWorker"
+worker_class = "aiohttp.worker.GunicornWebWorker"
 preload_app = True
 accesslog = "-"
 errorlog = "-"

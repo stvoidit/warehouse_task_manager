@@ -1,34 +1,26 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from "vue-router";
 
-import LoginPage from "@/Pages/LoginPage.vue";
-import StocksPage from "@/Pages/StocksPage.vue";
-import TaskPage from "@/Pages/TaskPage.vue";
-import TasksListPage from "@/Pages/TasksListPage.vue";
 import useApplicationStore from "@/store";
 
 const routes: Array<RouteRecordRaw> = [
     {
         path: "/login",
-        name: "LoginPage",
-        component: LoginPage
+        component: () => import("@/Pages/LoginPage.vue")
     },
     {
         path: "/",
-        name: "StocksPage",
-        component: StocksPage
+        component: () => import("@/Pages/StocksPage.vue")
     },
     {
         path: "/stock/:stockID",
-        name: "TasksListPage",
-        component: TasksListPage,
+        component: () => import("@/Pages/TasksListPage.vue"),
         props: route => ({
             stockID: (typeof route.params.stockID === "string") ? parseInt(route.params.stockID) : null
         })
     },
     {
         path: "/stock/:stockID/task/:taskID/material/:materialID",
-        name: "TaskPage",
-        component: TaskPage,
+        component: () => import("@/Pages/TaskPage/index.vue"),
         props: route => ({
             stockID: (typeof route.params.stockID === "string") ? parseInt(route.params.stockID) : null,
             taskID: (typeof route.params.taskID === "string") ? parseInt(route.params.taskID) : null,

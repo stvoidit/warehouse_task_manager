@@ -3,8 +3,7 @@
         <HeaderApp />
     </el-header>
     <el-main>
-        <router-view
-            v-slot="{ Component }">
+        <router-view v-slot="{ Component }">
             <component :is="Component" />
         </router-view>
     </el-main>

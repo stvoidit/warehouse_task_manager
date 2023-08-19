@@ -20,9 +20,7 @@
                     </el-table>
                 </el-col>
             </el-row>
-            <el-row
-                class="mb"
-                :gutter="20">
+            <el-row :gutter="20">
                 <el-col
                     v-for="cat in statInfo"
                     :key="cat.categoryLabel"
@@ -50,10 +48,51 @@
                     </el-table>
                 </el-col>
             </el-row>
-            <el-row>
+            <el-row
+                class="mb sticky-row top-padding"
+                :gutter="10">
+                <el-col
+                    :xs="12"
+                    :sm="8"
+                    :md="6"
+                    :lg="3"
+                    :xl="3">
+                    <span><small>Фильтр по статусу выполнения</small></span>
+                    <el-select
+                        v-model="selectedStatuses"
+                        placeholder="Статус">
+                        <el-option
+                            v-for="item in statusesOptions"
+                            :key="item.label"
+                            :label="item.label"
+                            :value="item.value" />
+                    </el-select>
+                </el-col>
+                <el-col
+                    v-if="categoriesOptions.length>1"
+                    :xs="12"
+                    :sm="8"
+                    :md="6"
+                    :lg="3"
+                    :xl="3">
+                    <span><small>Фильтр по статусу выполнения</small></span>
+                    <el-select
+                        v-model="selectedCategorits"
+                        multiple
+                        clearable
+                        placeholder="Категории">
+                        <el-option
+                            v-for="item in categoriesOptions"
+                            :key="item"
+                            :label="item"
+                            :value="item" />
+                    </el-select>
+                </el-col>
+            </el-row>
+            <el-row class="mb">
                 <el-col>
                     <el-table
-                        :data="store.task?.jobs"
+                        :data="computedJobsData"
                         :border="true"
                         @row-click="handleClickRow">
                         <el-table-column
@@ -85,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, computed } from "vue";
+import { onMounted, onBeforeUnmount, computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useApplicationStore } from "@/store";
 import { ElMessage } from "element-plus";
@@ -184,10 +223,43 @@ const metaInfo = computed(() => ({
     ]
 }));
 
+/** фильтр по статусам */
+const selectedStatuses = ref<boolean | string>("all");
+const statusesOptions = [
+    {
+        label: "Все",
+        value: "all"
+    },
+    {
+        label: "Выполнено",
+        value: true
+    },
+    {
+        label: "Не выполнено",
+        value: false
+    }
+];
+/** фильтр по категории */
+const selectedCategorits = ref<string[]>([]);
+const categoriesOptions = computed(() => Array.from(new Set<string>(store.task?.jobs.map(job => job.category === "" ? "" : job.category))).sort());
+/** Список работ для таблицы с учетом фильтров */
+const computedJobsData = computed<frontend.IJob[]>(() => {
+    let jobs = (store.task?.jobs ?? []).filter(j => {
+        switch (selectedStatuses.value) {
+        case true:
+            return j.done === true;
+        case false:
+            return j.done === false;
+        default:
+            return true;
+        }
+    });
+    return selectedCategorits.value.length ? jobs.filter(j => selectedCategorits.value.includes(j.category)) : jobs;
+});
+
 /** Вычисляемое свойство (обертка для таблицы) - статистика заданий */
 const statInfo = computed(() => {
-    const categories = Array.from(new Set<string>(store.task?.jobs.map(job => job.category === "" ? "" : job.category))).sort();
-    return categories.map(c => ({
+    return categoriesOptions.value.map(c => ({
         categoryLabel: c,
         data: [
             {
@@ -270,6 +342,9 @@ const columns = [
     top: 0;
     z-index: 1000;
     background-color: var(--el-fill-color-blank);
+}
+.top-padding {
+    top: 7.8rem;
 }
 /* .category-row {
     background-color: #66b1ff5e !important;

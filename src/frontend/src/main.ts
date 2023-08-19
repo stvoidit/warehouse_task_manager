@@ -1,5 +1,4 @@
 import "dayjs/locale/ru";
-import "element-plus/dist/index.css";
 
 import { Guide, MessageBox, User } from "@element-plus/icons-vue";
 

@@ -98,9 +98,3 @@ onMounted(() => {
     }
 });
 </script>
-
-<style>
-.flex-grow {
-    flex-grow: 1;
-}
-</style>

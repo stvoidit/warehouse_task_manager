@@ -336,20 +336,3 @@ const columns = [
 //     return row.done === isDone;
 // };
 </script>
-<style>
-.sticky-row {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background-color: var(--el-fill-color-blank);
-}
-.top-padding {
-    top: 7.8rem;
-}
-/* .category-row {
-    background-color: #66b1ff5e !important;
-}
-.row-done {
-    background-color: #66ff7291 !important;
-} */
-</style>

@@ -10,14 +10,14 @@ declare namespace frontend {
     // }
 
     /** Склад */
-    export type IStock = {
+    export interface IStock {
         id: number
         name: string
         tasks_count: number
     }
 
     /** Задача для списка */
-    export type ITaskL = {
+    export interface ITaskL {
         material: string
         material_id: number
         doc_id: number
@@ -34,7 +34,7 @@ declare namespace frontend {
     }
 
     /** Задание из задачи */
-    export type IJob = {
+    export interface IJob {
         material: string
         lab_material_mark: string
         lab_material_group: string
@@ -52,7 +52,7 @@ declare namespace frontend {
     }
 
     /** Задача со списком заданий */
-    export type ITaskP = {
+    export interface ITaskP {
         id: number
         doc_number: string
         doc_date: string
@@ -64,12 +64,12 @@ declare namespace frontend {
         jobs: Array<IJob>
     }
 
-    export type ILoginPayload = {
+    export interface ILoginPayload {
         login: string;
         password: string;
     }
 
-    export type IChangePassword = {
+    export interface IChangePassword {
         newPassword: string;
         repetitionPassword: string;
     }

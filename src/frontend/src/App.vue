@@ -1,18 +1,19 @@
 <template>
-    <el-header v-if="store.isAuth">
+    <el-header v-if="isAuth">
         <HeaderApp />
     </el-header>
-    <router-view
-        v-slot="{ Component }">
-        <el-main>
+    <el-main>
+        <router-view
+            v-slot="{ Component }">
             <component :is="Component" />
-        </el-main>
-    </router-view>
+        </router-view>
+    </el-main>
 </template>
 <script setup lang="ts">
 import HeaderApp from "@/components/HeaderApp.vue";
-import { useApplicationStore } from "@/store";
-const store = useApplicationStore();
+import useApplicationStore from "@/store";
+import { storeToRefs} from "pinia";
+const { isAuth } = storeToRefs(useApplicationStore());
 </script>
 <style lang="scss">
 @import "element-plus/dist/index.css";

@@ -4,7 +4,7 @@ import LoginPage from "@/Pages/LoginPage.vue";
 import StocksPage from "@/Pages/StocksPage.vue";
 import TaskPage from "@/Pages/TaskPage.vue";
 import TasksListPage from "@/Pages/TasksListPage.vue";
-import { useApplicationStore } from "@/store";
+import useApplicationStore from "@/store";
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -41,10 +41,7 @@ const router = createRouter({
     routes: routes
 });
 /** проверка токена перед каждым переходом на страницу */
-router.beforeEach(() => {
-    const store = useApplicationStore();
-    store.checkToken();
-});
+router.beforeEach(() => useApplicationStore().checkToken());
 /** обертка для PWA */
 router.isReady().then(async () => {
     const { registerSW } = await import("virtual:pwa-register");

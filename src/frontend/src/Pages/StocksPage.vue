@@ -1,5 +1,4 @@
 <template>
-    <!-- <pre>{{ store.stocks }}</pre> -->
     <el-row
         v-if="store.isAuth"
         justify="center">
@@ -8,7 +7,6 @@
             :span="24"
             :sm="10">
             <el-table
-                v-if="store.isAuth"
                 :data="store.stocks"
                 :border="true"
                 style="width: 100%"
@@ -26,7 +24,7 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { useApplicationStore } from "@/store";
+import useApplicationStore from "@/store";
 import { useRouter } from "vue-router";
 
 const router = useRouter();

@@ -1,9 +1,9 @@
 <template>
-    <el-row v-if="store.isAuth">
-        <el-col v-loading="store.loading">
+    <el-row v-loading="store.loading">
+        <el-col v-if="store.task">
             <el-row class="mb sticky-row">
                 <el-col>
-                    <span style="font-size: 1.4em;"><b>{{ store.task?.doc_number }}{{ store.task?.material ? ` - ${store.task?.material}` : '' }}</b></span>
+                    <span style="font-size: 1.4em;"><b>{{ store.task.doc_number }}{{ store.task?.material ? ` - ${store.task.material}` : '' }}</b></span>
                     <el-table
                         class="mt"
                         :data="metaInfo.data"
@@ -126,7 +126,7 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, computed, ref } from "vue";
 import { useRouter } from "vue-router";
-import { useApplicationStore } from "@/store";
+import useApplicationStore from "@/store";
 import { ElMessage } from "element-plus";
 import dayjs from "dayjs";
 

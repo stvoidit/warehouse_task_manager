@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
-import { useApplicationStore } from "@/store";
+import useApplicationStore from "@/store";
 import { ElMessageBox } from "element-plus";
 
 const store = useApplicationStore();

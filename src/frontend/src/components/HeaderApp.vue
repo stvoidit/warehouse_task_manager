@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { useApplicationStore } from "@/store";
+import useApplicationStore from "@/store";
 import ChangePasswordDialog from "./ChangePasswordDialog.vue";
 import { useRoute } from "vue-router";
 import { computed, ref, onMounted } from "vue";

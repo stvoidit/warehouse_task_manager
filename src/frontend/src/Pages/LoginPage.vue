@@ -48,7 +48,7 @@
 
 <script setup lang="ts">
 import { reactive, ref, onMounted, onBeforeUnmount } from "vue";
-import { useApplicationStore } from "@/store";
+import useApplicationStore from "@/store";
 import { ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 

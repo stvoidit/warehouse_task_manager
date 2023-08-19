@@ -3,7 +3,7 @@ import { computed, reactive, ref, shallowRef } from "vue";
 import ClientAPI from "@/api";
 import { defineStore } from "pinia";
 
-export const useApplicationStore = defineStore("app_store", () => {
+export default defineStore("app_store", () => {
     /** http клиент */
     const api = reactive(new ClientAPI());
     /** информация из декодированного токена о пользователе */

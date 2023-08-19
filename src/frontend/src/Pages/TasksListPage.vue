@@ -1,34 +1,35 @@
 <template>
-    <el-table
-        v-if="store.isAuth"
-        v-loading="store.loading"
-        :data="store.tasks"
-        :border="true"
-        table-layout="auto"
-        @row-click="handleRowClick">
-        <el-table-column
-            v-for="col in columns"
-            :key="col.prop"
-            :prop="col.prop"
-            :label="col.label"
-            :min-width="col.width"
-            :formatter="col.formatter" />
-        <el-table-column label="Остаток кол-во">
-            <template #default="scope">
-                {{ scope.row.amount - scope.row.amount_fact }}
-            </template>
-        </el-table-column>
-        <el-table-column label="Остаток вес">
-            <template #default="scope">
-                {{ scope.row.weight - scope.row.weight_fact }}
-            </template>
-        </el-table-column>
-    </el-table>
+    <el-row v-if="store.isAuth">
+        <el-table
+            v-loading="store.loading"
+            :data="store.tasks"
+            :border="true"
+            table-layout="auto"
+            @row-click="handleRowClick">
+            <el-table-column
+                v-for="col in columns"
+                :key="col.prop"
+                :prop="col.prop"
+                :label="col.label"
+                :min-width="col.width"
+                :formatter="col.formatter" />
+            <el-table-column label="Остаток кол-во">
+                <template #default="scope">
+                    {{ scope.row.amount - scope.row.amount_fact }}
+                </template>
+            </el-table-column>
+            <el-table-column label="Остаток вес">
+                <template #default="scope">
+                    {{ scope.row.weight - scope.row.weight_fact }}
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-row>
 </template>
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { useApplicationStore } from "@/store";
+import useApplicationStore from "@/store";
 import dayjs from "dayjs";
 
 const props = defineProps({

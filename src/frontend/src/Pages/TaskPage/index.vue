@@ -4,12 +4,13 @@
             <MetaInfo
                 :meta-info="metaInfo"
                 :doc-number="store.task.doc_number"
-                :material="store.task.material" />
+                :material="store.task.material">
+                <FiltersJobs
+                    v-model:selected-statuses="selectedStatuses"
+                    v-model:selected-categorits="selectedCategorits"
+                    :categories-options="categoriesOptions" />
+            </MetaInfo>
             <StatInfo :stat-info="statInfo" />
-            <FiltersJobs
-                v-model:selected-statuses="selectedStatuses"
-                v-model:selected-categorits="selectedCategorits"
-                :categories-options="categoriesOptions" />
             <JobsTable
                 :jobs-list="computedJobsData"
                 @change-status="updateJobStatus" />

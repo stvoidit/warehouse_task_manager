@@ -1,9 +1,7 @@
 <template>
-    <el-row
-        class="mb sticky-row top-padding"
-        :gutter="10">
+    <el-row :gutter="10">
         <el-col v-bind="colAttr">
-            <span><small>Фильтр по статусу выполнения</small></span>
+            <div><small>Фильтр по статусу выполнения</small></div>
             <el-select
                 placeholder="Статус"
                 :model-value="selectedStatuses"
@@ -18,7 +16,7 @@
         <el-col
             v-if="categoriesOptions.length>1"
             v-bind="colAttr">
-            <span><small>Фильтр по статусу выполнения</small></span>
+            <div><small>Фильтр по статусу выполнения</small></div>
             <el-select
                 multiple
                 clearable
@@ -71,9 +69,9 @@ const statusesOptions = [
 ];
 const colAttr = {
     xs: 12,
-    sm: 8,
-    md: 6,
-    lg: 3,
-    xl: 3
+    sm: 12,
+    md: 12,
+    lg: 6,
+    xl: 6
 };
 </script>

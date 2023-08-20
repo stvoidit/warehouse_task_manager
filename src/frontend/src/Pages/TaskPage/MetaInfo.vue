@@ -1,7 +1,11 @@
 <template>
-    <el-row class="mb sticky-row">
-        <el-col>
+    <el-row
+        class="mb sticky-row"
+        :gutter="20">
+        <el-col :span="24">
             <span style="font-size: 1.4em;"><b>{{ docNumber }} - {{ material }}</b></span>
+        </el-col>
+        <el-col v-bind="colAttr">
             <el-table
                 class="mt"
                 :data="metaInfo.data"
@@ -16,6 +20,9 @@
                     :label="field.label"
                     :width="150" />
             </el-table>
+        </el-col>
+        <el-col v-bind="colAttr">
+            <slot />
         </el-col>
     </el-row>
 </template>
@@ -49,4 +56,11 @@ defineProps({
         required: true
     }
 });
+const colAttr = {
+    xs: 24,
+    sm: 24,
+    md: 12,
+    lg: 12,
+    xl: 12
+};
 </script>

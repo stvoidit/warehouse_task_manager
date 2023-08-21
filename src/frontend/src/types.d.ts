@@ -25,6 +25,7 @@ declare namespace frontend {
 
     /** Задание из задачи */
     export type IJob = {
+        material_id: string
         material: string
         lab_material_mark: string
         lab_material_group: string

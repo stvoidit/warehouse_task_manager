@@ -4,9 +4,10 @@
             <el-table
                 :data="jobsList"
                 :border="true"
+                :row-key="rowKey"
                 @row-click="handleClickRow">
                 <el-table-column
-                    :width="130"
+                    :width="100"
                     prop="done"
                     column-key="done"
                     label="Выполнено">
@@ -15,7 +16,7 @@
                             <el-checkbox
                                 v-model="row.done"
                                 size="large"
-                                @change="emit('changeStatus', row)" />
+                                @change.capture="emit('changeStatus', row)" />
                         </div>
                     </template>
                 </el-table-column>
@@ -43,6 +44,8 @@ defineProps({
 const emit = defineEmits<{
     changeStatus: [ value: frontend.IJob ]
 }>();
+
+const rowKey = (row:frontend.IJob) => `${row.material_id}-${row.tare_id}`;
 /** Обработчик клика на строку - запрос на обновление статуса задания */
 const handleClickRow = (row: frontend.IJob, column: any) => {
     if (column.no === 0) return;
@@ -87,5 +90,4 @@ const columns = [
         sortable: false
     }
 ];
-
 </script>

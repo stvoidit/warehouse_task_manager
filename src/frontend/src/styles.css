@@ -52,3 +52,7 @@ body {
 .row-done {
     background-color: #66ff7291 !important;
 } */
+
+.row-disabled {
+    background: var(--el-fill-color-light) !important;
+}

@@ -135,7 +135,7 @@ async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id:
     q = """
 SELECT
     m.material
-    , arrival.material
+    , arrival.material as material_id
     , arrival.tare_id
     , arrival.tare_mark
     , arrival.tare_type

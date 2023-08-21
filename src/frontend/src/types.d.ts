@@ -1,23 +1,13 @@
 declare namespace frontend {
-    // export interface feedbackStatsMap { [key: string]: number }
-    // export interface FeedbackStats extends feedbackStatsMap {
-    //     "1": number
-    //     "2": number
-    //     "3": number
-    //     "4": number
-    //     "5": number
-    //     "total": number
-    // }
-
     /** Склад */
-    export interface IStock {
+    export type IStock = {
         id: number
         name: string
         tasks_count: number
     }
 
     /** Задача для списка */
-    export interface ITaskL {
+    export type ITaskL = {
         material: string
         material_id: number
         doc_id: number
@@ -34,7 +24,7 @@ declare namespace frontend {
     }
 
     /** Задание из задачи */
-    export interface IJob {
+    export type IJob = {
         material: string
         lab_material_mark: string
         lab_material_group: string
@@ -51,8 +41,14 @@ declare namespace frontend {
         done: boolean
     }
 
+    /** Ограничение по весу в категории материала */
+    export type ITaskWeight = {
+        category: string
+        task_weight: number
+    }
+
     /** Задача со списком заданий */
-    export interface ITaskP {
+    export type ITaskP = {
         id: number
         doc_number: string
         doc_date: string
@@ -61,15 +57,16 @@ declare namespace frontend {
         technical_process: string
         operation: string
         material: string
+        task_weights: Array<ITaskWeight>
         jobs: Array<IJob>
     }
 
-    export interface ILoginPayload {
+    export type ILoginPayload = {
         login: string;
         password: string;
     }
 
-    export interface IChangePassword {
+    export type IChangePassword = {
         newPassword: string;
         repetitionPassword: string;
     }

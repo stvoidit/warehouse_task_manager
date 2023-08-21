@@ -7,58 +7,79 @@ async def select_tasks(conn: Connection, user_id: int, stock_id: int):
     """ получение списка заданий """
     q = """
 SELECT
-    m.material
-    , m.id AS material_id
-    , doc.id AS doc_id
-    , doc.doc_number
-    , doc.planned_date
-    , doc.technical_process
-    , doc.operation
-    , A.tare_type
-    , production_task.category
-    , SUM(tare_amount) AS amount
-    , SUM(net_weight) AS weight
-    , SUM(tare_amount_fact) AS amount_fact
-    , SUM(net_weight_fact) AS weight_fact
+    subq.material
+    , subq.material_id
+    , subq.doc_id
+    , subq.doc_number
+    , subq.planned_date
+    , subq.technical_process
+    , subq.operation
+    , subq.tare_type
+    , subq.category
+    , subq.amount
+    , IFNULL(ptm.task_weight, subq.weight) AS weight
+    , subq.amount_fact
+    , subq.weight_fact
 FROM
-    production_task
-LEFT JOIN production_task_doc AS doc ON
-    doc.id = production_task.doc_id
-LEFT JOIN material AS m ON
-    m.id = production_task.material
-INNER JOIN (
+    (
         SELECT
-            tare_type
-            , key_material
+            m.material
+            , m.id AS material_id
+            , doc.id AS doc_id
+            , doc.doc_number
+            , doc.planned_date
+            , doc.technical_process
+            , doc.operation
+            , A.tare_type
+            , pt.category
+            , SUM(pt.tare_amount) AS amount
+            , SUM(pt.net_weight) AS weight
+            , SUM(pt.tare_amount_fact) AS amount_fact
+            , SUM(pt.net_weight_fact) AS weight_fact
         FROM
-            arrival
-        LEFT JOIN arrival_doc ON
-            arrival_doc.id = arrival.doc_id
+            production_task pt
+        LEFT JOIN production_task_doc AS doc ON
+            doc.id = pt.doc_id
+        LEFT JOIN material AS m ON
+            m.id = pt.material
+        INNER JOIN (
+                SELECT
+                    tare_type
+                    , key_material
+                FROM
+                    arrival
+                LEFT JOIN arrival_doc ON
+                    arrival_doc.id = arrival.doc_id
+                WHERE
+                    arrival_doc.stock = %(stock_id)s
+            ) AS A ON
+            A.key_material = pt.key_material
+        INNER JOIN production_task_executor pte ON
+            pte.doc_id = doc.id
         WHERE
-            arrival_doc.stock = %(stock_id)s
-    ) AS A ON
-    A.key_material = production_task.key_material
-INNER JOIN production_task_executor ON
-    production_task_executor.doc_id = doc.id
-WHERE
-    production_task_executor.executor_id = %(user_id)s
-    AND
-    doc.done = 0
-GROUP BY
-    m.material
-    , m.id
-    , doc.id
-    , doc.doc_number
-    , doc.planned_date
-    , doc.technical_process
-    , doc.operation
-    , A.tare_type
-    , production_task.category
+            pte.executor_id = %(user_id)s
+            AND
+            doc.done = 0
+        GROUP BY
+            m.material
+            , m.id
+            , doc.id
+            , doc.doc_number
+            , doc.planned_date
+            , doc.technical_process
+            , doc.operation
+            , A.tare_type
+            , pt.category
+    ) AS subq
+LEFT JOIN production_task_materials ptm ON
+    ptm.doc_id = subq.doc_id
+    AND ptm.material = subq.material_id
+    AND ptm.category = subq.category
 ORDER BY
-    doc.id ASC
-    , m.id ASC
-    , production_task.category ASC
-    , A.tare_type ASC
+    subq.doc_id ASC
+    , subq.material_id ASC
+    , subq.category ASC
+    , subq.tare_type ASC
     """
     result = []
     async with conn.cursor() as cur:
@@ -106,6 +127,11 @@ WHERE
 
 async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id: int, tare_type: str):
     """ получение позиций задания """
+    task = await select_task_meta(conn, stock_id, doc_id)
+    if task is None:
+        return task
+    task["task_weights"] = await get_task_weights(conn, doc_id, material_id)
+
     q = """
 SELECT
     m.material
@@ -188,9 +214,6 @@ ORDER BY
     m.material
     , arrival.tare_id
     """
-    task = await select_task_meta(conn, stock_id, doc_id)
-    if task is None:
-        return task
     jobs = []
     query_args = {
             "doc_id": doc_id,
@@ -204,6 +227,23 @@ ORDER BY
     task["jobs"] = jobs
     return task
 
+
+async def get_task_weights(conn: Connection, doc_id: int, material_id: int):
+    q = """
+SELECT
+    category
+    , task_weight
+FROM
+    production_task_materials ptm
+WHERE
+    material = %(material_id)s
+    AND doc_id = %(doc_id)s
+"""
+    task_weights: list[dict] = {}
+    async with conn.cursor() as cur:
+        await cur.execute(q, {"doc_id": doc_id, "material_id": material_id})
+        task_weights = await cur.fetchall()
+    return task_weights
 
 async def check_user(conn: Connection, login: str, password_hash: str):
     """ проверка авторизации пользователя """

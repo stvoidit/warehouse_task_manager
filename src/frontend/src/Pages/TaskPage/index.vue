@@ -139,23 +139,33 @@ const computedJobsData = computed<frontend.IJob[]>(() => {
 
 /** Вычисляемое свойство (обертка для таблицы) - статистика заданий */
 const statInfo = computed(() => {
-    return categoriesOptions.value.map(c => ({
-        categoryLabel: c,
+    const findTaskWeight = (category: string) => {
+        const catWeightstore = store.task?.task_weights.find(tw => tw.category === category);
+        if (catWeightstore) {
+            return catWeightstore.task_weight;
+        }
+        return store.task?.jobs.reduce((prev,cur) => cur.category === category ? prev+=cur.task_net_weight : prev, 0)??0;
+    };
+    const sumNetWeightComplited = (category: string) => {
+        return store.task?.jobs.reduce((prev,cur) => cur.done && cur.category === category ? prev+=cur.task_net_weight : prev, 0)??0;
+    };
+    return categoriesOptions.value.map(category => ({
+        categoryLabel: category,
         data: [
             {
                 label: "Заданий",
-                count: store.task?.jobs.reduce((prev,cur) => cur.category === c ? prev+=1 : prev, 0),
-                netWeight: store.task?.jobs.reduce((prev,cur) => cur.category === c ? prev+=cur.task_net_weight : prev, 0)
+                count: store.task?.jobs.reduce((prev,cur) => cur.category === category ? prev+=1 : prev, 0),
+                netWeight: findTaskWeight(category)
             },
             {
                 label: "Выполнено",
-                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, true, c) : 0,
-                netWeight: store.task?.jobs.reduce((prev,cur) => cur.done && cur.category === c ? prev+=cur.task_net_weight : prev, 0)
+                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, true, category) : 0,
+                netWeight: store.task?.jobs.reduce((prev,cur) => cur.done && cur.category === category ? prev+=cur.task_net_weight : prev, 0)
             },
             {
                 label: "Осталось",
-                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, false, c) : 0,
-                netWeight: store.task?.jobs.reduce((prev,cur) => !cur.done && cur.category === c ? prev+=cur.task_net_weight : prev, 0)
+                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, false, category) : 0,
+                netWeight: findTaskWeight(category) - sumNetWeightComplited(category)
             }
         ]
     }));

@@ -19,10 +19,11 @@ async def _on_startup(app: Application):
     """ инициализация соединения с БД """
     app["db"] = await create_connect_db(**app["config"]["database"])
 
+
 async def init_app() -> Application:
     """ инициализация всего приложения """
     logging.basicConfig(level=logging.INFO)
-    app = Application(middlewares=[ middleware_check_token ])
+    app = Application(middlewares=[middleware_check_token])
     cnf = read_config("config.toml")
     app["config"] = cnf
     app["crypto"] = CryptoGuard(cnf["service"]["secret"])

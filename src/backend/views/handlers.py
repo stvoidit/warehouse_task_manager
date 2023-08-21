@@ -61,7 +61,7 @@ async def get_task(request: Request):
         raise HTTPBadRequest()
     task = {}
     async with request.app["db"].acquire() as conn:
-        task = await select_task(conn, stock_id, doc_id, material_id, tare_type)
+        task = await select_task(conn, int(stock_id), int(doc_id), int(material_id), tare_type)
         if task is None:
             raise HTTPNotFound()
     return await jsonify(task, request)

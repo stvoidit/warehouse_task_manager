@@ -39,6 +39,7 @@ declare namespace frontend {
         rest_gross_weight: number
         task_tare_amount: number
         task_net_weight: number
+        net_weight_fact: number
         done: boolean
     }
 

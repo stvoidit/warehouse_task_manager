@@ -66,23 +66,44 @@ onBeforeUnmount(() => {
 const updateJobStatus = async (job: frontend.IJob) => {
     try {
         const newStatus = !job.done;
-        if (newStatus === true && job.task_net_weight > remainingWeight.value[job.category]) {
+        if (newStatus === true) {
+            try {
+                const { value } = await ElMessageBox.prompt(
+                    "Введите вес списания",
+                    {
+                        confirmButtonText: "Подтверждение",
+                        cancelButtonText: "Отмена",
+                        type: "info",
+                        inputType: "number",
+                        inputValue: job.task_net_weight.toFixed(2),
+                        inputPattern: /^\d+\.?\d{0,2}?$/
+                    }
+                );
+                job.net_weight_fact = parseFloat(value);
+            } catch (error) {
+                // eslint-disable-next-line
+                console.warn(error);
+                return;
+            }
+        }
+        if (newStatus === true && job.net_weight_fact > remainingWeight.value[job.category]) {
             try {
                 await ElMessageBox.confirm(
-                    `Превышение веса на ${(remainingWeight.value[job.category]-job.task_net_weight)*-1}`,
                     "Предупреждение",
                     {
+                        message: `Превышение веса на ${(remainingWeight.value[job.category] - job.net_weight_fact) * -1}`,
                         confirmButtonText: "Подтверждение",
                         cancelButtonText: "Отмена",
                         type: "warning"
                     }
                 );
             } catch (error) {
+                // eslint-disable-next-line
                 console.warn(error);
                 return;
             }
         }
-        await store.updateJobStatus(props.taskID, props.materialID, job.tare_id, newStatus);
+        await store.updateJobStatus(props.taskID, props.materialID, job.tare_id, job.net_weight_fact, newStatus);
         await store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
         const readebleStatus = newStatus === true ? "готово" : "не выполнено";
         const message = `Тара с маркировкой "${job.tare_mark}" (тара ${job.tare_id}) - статус изменен на "${readebleStatus}"`;
@@ -144,7 +165,7 @@ const statInfo = computed(() => {
         return store.task?.jobs.reduce((prev,cur) => cur.category === category ? prev+=cur.task_net_weight : prev, 0)??0;
     };
     const sumNetWeightComplited = (category: string) => {
-        return store.task?.jobs.reduce((prev,cur) => cur.done && cur.category === category ? prev+=cur.task_net_weight : prev, 0)??0;
+        return store.task?.jobs.reduce((prev,cur) => cur.done && cur.category === category ? prev+=cur.net_weight_fact : prev, 0)??0;
     };
     return categoriesOptions.value.map(category => ({
         categoryLabel: category,
@@ -157,7 +178,7 @@ const statInfo = computed(() => {
             {
                 label: "Выполнено",
                 count: store.task?.jobs ? sumJobsStatus(store.task.jobs, true, category) : 0,
-                netWeight: store.task?.jobs.reduce((prev,cur) => cur.done && cur.category === category ? prev+=cur.task_net_weight : prev, 0)
+                netWeight: store.task?.jobs.reduce((prev,cur) => cur.done && cur.category === category ? prev+=cur.net_weight_fact : prev, 0)
             },
             {
                 label: "Осталось",

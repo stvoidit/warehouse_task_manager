@@ -72,11 +72,12 @@ async def update_job_status_handler(request: Request):
     material_id =job.get("materialID", None)
     tara_id =job.get("taraID", None)
     status = job.get("done", None)
-    if doc_id is None or material_id is None or tara_id is None or status is None:
+    net_weight_fact = job.get("netWeightFact", None)
+    if doc_id is None or material_id is None or tara_id is None or status is None or net_weight_fact is None:
         raise HTTPBadRequest()
     async with request.app["db"].acquire() as conn:
         try:
-            await update_job_status(conn, doc_id, request.user_id, material_id, tara_id, status)
+            await update_job_status(conn, doc_id, request.user_id, material_id, tara_id, float(net_weight_fact), status) # pylint: disable=too-many-function-args
         except Exception as exc:
             raise HTTPBadRequest(body=str(exc)) # pylint: disable=raise-missing-from
     return HTTPCreated()

@@ -89,6 +89,12 @@ const columns = [
         label: "Нетто",
         width: 150,
         sortable: false
+    },
+    {
+        prop: "net_weight_fact",
+        label: "Нетто (факт)",
+        width: 150,
+        sortable: false
     }
 ];
 </script>

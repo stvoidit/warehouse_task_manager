@@ -93,12 +93,13 @@ class ClientAPI {
         return body;
     }
 
-    async updateJobStatus(taskID: number, materialID: number, taraID: number, done: boolean) {
+    async updateJobStatus(taskID: number, materialID: number, taraID: number, netWeightFact: number, done: boolean) {
         const url = `${BASE_URL}/${JOB}`;
         const payload = {
             taskID,
             materialID,
             taraID,
+            netWeightFact,
             done
         };
         const headers = {

@@ -144,6 +144,7 @@ SELECT
     , arrival.net_weight - IFNULL(P.net_weight, 0) - IFNULL(S.net_weight, 0) + IFNULL(tare.weight, 0) * (arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0)) AS rest_gross_weight
     , task.tare_amount AS task_tare_amount
     , task.net_weight AS task_net_weight
+    , task.net_weight_fact
     , task.done
 FROM
     arrival
@@ -312,7 +313,7 @@ ORDER BY
         stocks = await cur.fetchall()
     return stocks
 
-async def update_job_status(conn: Connection, doc_id: int, user_id: int, material_id: int, tara_id: int, status: bool):
+async def update_job_status(conn: Connection, doc_id: int, user_id: int, material_id: int, tara_id: int, net_weight_fact: float, status: bool):
 #     validate_query = """
 # SELECT
 #     subq.doc_id
@@ -399,9 +400,9 @@ UPDATE
     production_task
 SET
     done = %(status)s
-    , net_weight_fact = CASE WHEN %(status)s IS TRUE THEN net_weight ELSE net_weight_fact = 0 END
-    , tare_amount_fact = CASE WHEN %(status)s IS TRUE THEN tare_amount ELSE tare_amount_fact = 0 END
-    , fact_executor = CASE WHEN %(status)s IS TRUE THEN %(user_id)s ELSE fact_executor = 0 END
+    , net_weight_fact = CASE WHEN %(status)s IS TRUE THEN %(net_weight_fact)s ELSE 0 END
+    , tare_amount_fact = CASE WHEN %(status)s IS TRUE AND %(net_weight_fact)s = net_weight THEN 1 ELSE 0 END
+    , fact_executor = CASE WHEN %(status)s IS TRUE THEN %(user_id)s ELSE 0 END
 WHERE
     material = %(material_id)s
     AND
@@ -409,6 +410,14 @@ WHERE
     AND
     tare_id = %(tara_id)s
     """
+    query_args = {
+        "doc_id": doc_id,
+        "user_id": user_id,
+        "material_id": material_id,
+        "tara_id": tara_id,
+        "net_weight_fact": net_weight_fact,
+        "status": status
+    }
     async with conn.cursor() as cur:
-        await cur.execute(q, {"doc_id": doc_id, "user_id": user_id, "material_id": material_id, "tara_id": tara_id, "status": status})
+        await cur.execute(q, query_args)
     return

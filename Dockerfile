@@ -11,7 +11,8 @@ COPY src/frontend/package.json \
 RUN pnpm install
 COPY src/frontend/src src
 COPY src/frontend/public public
-RUN NODE_OPTIONS='--max-old-space-size=384' NODE_ENV=production pnpm build
+# ENV NODE_OPTIONS='--max-old-space-size=384'
+RUN NODE_ENV=production pnpm build
 
 FROM python:3.11-slim-buster as aiohttp-backend
 WORKDIR /app

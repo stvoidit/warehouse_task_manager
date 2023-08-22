@@ -63,35 +63,15 @@ onBeforeUnmount(() => {
     store.stopAutofetch();
 });
 /** Запрос к API на обновление статуса задания */
-const updateJobStatus = async (job: frontend.IJob) => {
+const updateJobStatus = async (job: frontend.IJob, weight: number) => {
     try {
         const newStatus = !job.done;
-        if (newStatus === true) {
-            try {
-                const { value } = await ElMessageBox.prompt(
-                    "Введите вес списания",
-                    {
-                        confirmButtonText: "Подтверждение",
-                        cancelButtonText: "Отмена",
-                        type: "info",
-                        inputType: "number",
-                        inputValue: job.task_net_weight.toFixed(2),
-                        inputPattern: /^\d+\.?\d{0,2}?$/
-                    }
-                );
-                job.net_weight_fact = parseFloat(value);
-            } catch (error) {
-                // eslint-disable-next-line
-                console.warn(error);
-                return;
-            }
-        }
-        if (newStatus === true && job.net_weight_fact > remainingWeight.value[job.category]) {
+        if (newStatus === true && weight > remainingWeight.value[job.category]) {
             try {
                 await ElMessageBox.confirm(
                     "Предупреждение",
                     {
-                        message: `Превышение веса на ${(remainingWeight.value[job.category] - job.net_weight_fact) * -1}`,
+                        message: `Превышение веса на ${(remainingWeight.value[job.category] - weight) * -1}`,
                         confirmButtonText: "Подтверждение",
                         cancelButtonText: "Отмена",
                         type: "warning"
@@ -103,7 +83,7 @@ const updateJobStatus = async (job: frontend.IJob) => {
                 return;
             }
         }
-        await store.updateJobStatus(props.taskID, props.materialID, job.tare_id, job.net_weight_fact, newStatus);
+        await store.updateJobStatus(props.taskID, props.materialID, job.tare_id, weight, newStatus);
         await store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
         const readebleStatus = newStatus === true ? "готово" : "не выполнено";
         const message = `Тара с маркировкой "${job.tare_mark}" (тара ${job.tare_id}) - статус изменен на "${readebleStatus}"`;

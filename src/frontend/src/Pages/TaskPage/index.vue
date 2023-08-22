@@ -68,12 +68,12 @@ const updateJobStatus = async ({ tare_id, done, tare_mark } : {tare_id: number, 
     try {
         await store.updateJobStatus(props.taskID, props.materialID, tare_id, !done);
         await store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
-        const readebleStatus = done === true ? "готово" : "не выполнено";
+        const readebleStatus = !done === true ? "готово" : "не выполнено";
         const message = `Тара с маркировкой "${tare_mark}" (тара ${tare_id}) - статус изменен на "${readebleStatus}"`;
         ElMessage({
             showClose: false,
             message: message,
-            type: done ? "success" : "warning"
+            type: !done ? "success" : "warning"
         });
     } catch (error) {
         alert(error);

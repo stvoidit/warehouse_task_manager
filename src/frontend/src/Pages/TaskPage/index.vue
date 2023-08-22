@@ -12,6 +12,7 @@
             </MetaInfo>
             <StatInfo :stat-info="statInfo" />
             <JobsTable
+                :remaining-weight="remainingWeight"
                 :jobs-list="computedJobsData"
                 @change-status="updateJobStatus" />
         </el-col>
@@ -117,26 +118,6 @@ const metaInfo = computed(() => ({
     ]
 }));
 
-/** фильтр по статусам */
-const selectedStatuses = ref<number>(0);
-/** фильтр по категории */
-const selectedCategorits = ref<string[]>([]);
-const categoriesOptions = computed(() => Array.from(new Set<string>(store.task?.jobs.map(job => job.category === "" ? "" : job.category))).sort());
-/** Список работ для таблицы с учетом фильтров */
-const computedJobsData = computed<frontend.IJob[]>(() => {
-    let jobs = (store.task?.jobs ?? []).filter(j => {
-        switch (selectedStatuses.value) {
-        case 1:
-            return j.done === true;
-        case 2:
-            return j.done === false;
-        default:
-            return true;
-        }
-    });
-    return selectedCategorits.value.length ? jobs.filter(j => selectedCategorits.value.includes(j.category)) : jobs;
-});
-
 /** Вычисляемое свойство (обертка для таблицы) - статистика заданий */
 const statInfo = computed(() => {
     const findTaskWeight = (category: string) => {
@@ -171,19 +152,32 @@ const statInfo = computed(() => {
     }));
 });
 
-// /** Подсветка строк по статусе */
-// const rowClassName = ({ row }: { row: frontend.IJob }) => {
-//     if (statInfo.value.length < 2) return "";
-//     if (row.category === queryParams.categoryTask && !row.done) {
-//         return "category-row";
-//     }
-//     if (row.done) {
-//         return "row-done";
-//     }
-//     return "";
-// };
-// const filterHandler = (value: string, row: frontend.IJob) => {
-//     const isDone = value === "true" ? true : false;
-//     return row.done === isDone;
-// };
+/** Остатки веса по категориям */
+const remainingWeight = computed(() => {
+    const remainings: {[key: string]: number} = {};
+    statInfo.value.forEach(si => {
+        remainings[si.categoryLabel] = si.data[2]?.netWeight??0;
+    });
+    return remainings;
+});
+
+/** фильтр по статусам */
+const selectedStatuses = ref<number>(0);
+/** фильтр по категории */
+const selectedCategorits = ref<string[]>([]);
+const categoriesOptions = computed(() => Array.from(new Set<string>(store.task?.jobs.map(job => job.category === "" ? "" : job.category))).sort());
+/** Список работ для таблицы с учетом фильтров */
+const computedJobsData = computed<frontend.IJob[]>(() => {
+    let jobs = (store.task?.jobs ?? []).filter(j => {
+        switch (selectedStatuses.value) {
+        case 1:
+            return j.done === true;
+        case 2:
+            return j.done === false;
+        default:
+            return true;
+        }
+    });
+    return selectedCategorits.value.length ? jobs.filter(j => selectedCategorits.value.includes(j.category)) : jobs;
+});
 </script>

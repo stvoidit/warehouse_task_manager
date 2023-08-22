@@ -55,4 +55,5 @@ body {
 
 .row-disabled {
     background: var(--el-fill-color-light) !important;
+    cursor: not-allowed;
 }

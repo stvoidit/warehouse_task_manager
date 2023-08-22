@@ -12,7 +12,6 @@
             </MetaInfo>
             <StatInfo :stat-info="statInfo" />
             <JobsTable
-                :remaining-weight="remainingWeight"
                 :jobs-list="computedJobsData"
                 @change-status="updateJobStatus" />
         </el-col>
@@ -23,7 +22,7 @@
 import { onMounted, onBeforeUnmount, computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import useApplicationStore from "@/store";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import dayjs from "dayjs";
 import MetaInfo from "./MetaInfo.vue";
 import StatInfo from "./StatInfo.vue";
@@ -57,23 +56,40 @@ onMounted(() => {
     store.doAutofetch(props.stockID, props.taskID, props.materialID, queryParams.tareType);
 });
 /**
-         * Остановка автообновления
-         */
+ * Остановка автообновления
+ */
 onBeforeUnmount(() => {
     store.task = null;
     store.stopAutofetch();
 });
 /** Запрос к API на обновление статуса задания */
-const updateJobStatus = async ({ tare_id, done, tare_mark } : {tare_id: number, done: boolean, tare_mark: string}) => {
+const updateJobStatus = async (job: frontend.IJob) => {
     try {
-        await store.updateJobStatus(props.taskID, props.materialID, tare_id, !done);
+        const newStatus = !job.done;
+        if (newStatus === true && job.task_net_weight > remainingWeight.value[job.category]) {
+            try {
+                await ElMessageBox.confirm(
+                    `Превышение веса на ${(remainingWeight.value[job.category]-job.task_net_weight)*-1}`,
+                    "Предупреждение",
+                    {
+                        confirmButtonText: "Подтверждение",
+                        cancelButtonText: "Отмена",
+                        type: "warning"
+                    }
+                );
+            } catch (error) {
+                console.warn(error);
+                return;
+            }
+        }
+        await store.updateJobStatus(props.taskID, props.materialID, job.tare_id, newStatus);
         await store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
-        const readebleStatus = !done === true ? "готово" : "не выполнено";
-        const message = `Тара с маркировкой "${tare_mark}" (тара ${tare_id}) - статус изменен на "${readebleStatus}"`;
+        const readebleStatus = newStatus === true ? "готово" : "не выполнено";
+        const message = `Тара с маркировкой "${job.tare_mark}" (тара ${job.tare_id}) - статус изменен на "${readebleStatus}"`;
         ElMessage({
             showClose: false,
             message: message,
-            type: !done ? "success" : "warning"
+            type: newStatus ? "success" : "warning"
         });
     } catch (error) {
         alert(error);

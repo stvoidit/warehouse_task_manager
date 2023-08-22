@@ -313,87 +313,86 @@ ORDER BY
     return stocks
 
 async def update_job_status(conn: Connection, doc_id: int, user_id: int, material_id: int, tara_id: int, status: bool):
-    validate_query = """
-SELECT
-    subq.doc_id
-    , subq.material_id
-    , subq.category
-    , IFNULL(ptm.task_weight, subq.weight) - pt_done.net_weight_fact AS remaining_weight
-    , task_job.net_weight AS job_net_weight
-    , task_job.net_weight <= (
-        IFNULL(ptm.task_weight, subq.weight) - pt_done.net_weight_fact
-    ) AS can_done
-FROM
-    (
-        SELECT
-            pt.doc_id
-            , pt.material AS material_id
-            , pt.category
-            , sum(pt.net_weight) AS weight
-        FROM
-            production_task pt
-        WHERE
-            pt.doc_id = %(doc_id)s
-            AND
-            pt.material = %(material_id)s
-            AND
-            pt.done IS FALSE
-            AND pt.category = (
-                SELECT
-                    category
-                FROM
-                    production_task
-                WHERE
-                    tare_id = %(tara_id)s
-                    AND material = %(material_id)s
-            )
-        GROUP BY
-            pt.doc_id
-            , pt.material
-            , pt.category
-    ) AS subq
-LEFT JOIN production_task_materials ptm ON
-    ptm.doc_id = subq.doc_id
-    AND ptm.material = subq.material_id
-    AND ptm.category = subq.category
-INNER JOIN (
-        SELECT
-            pt.doc_id
-            , pt.material AS material_id
-            , pt.category
-            , sum(pt.net_weight_fact) AS net_weight_fact
-        FROM
-            production_task pt
-        WHERE
-            pt.done IS TRUE
-        GROUP BY
-            pt.doc_id
-            , pt.material
-            , pt.category
-    ) pt_done ON
-    pt_done.doc_id = subq.doc_id
-    AND pt_done.material_id = subq.material_id
-    AND pt_done.category = subq.category
-INNER JOIN production_task AS task_job ON
-    task_job.doc_id = subq.doc_id
-    AND
-    task_job.material = subq.material_id
-    AND
-    task_job.category = subq.category
-    AND
-    task_job.tare_id = %(tara_id)s
-"""
-    # Валидация доступности действия.
-    # Если статус работы изменяется на "выполнено", то проверяем  превышение веса по задаче в категории.
-    # В случае превышение веса выбрасываем ошибку.
-    can_done = True
-    if status is True:
-        async with conn.cursor() as cur:
-            await cur.execute(validate_query, {"doc_id": doc_id, "material_id": material_id, "tara_id": tara_id})
-            result = await cur.fetchone()
-            can_done = bool(result["can_done"])
-    if can_done is False:
-        raise Exception("Превышение веса")
+#     validate_query = """
+# SELECT
+#     subq.doc_id
+#     , subq.material_id
+#     , subq.category
+#     , IFNULL(ptm.task_weight, subq.weight) - pt_done.net_weight_fact AS remaining_weight
+#     , task_job.net_weight AS job_net_weight
+#     , task_job.net_weight <= (
+#         IFNULL(ptm.task_weight, subq.weight) - pt_done.net_weight_fact
+#     ) AS can_done
+# FROM
+#     (
+#         SELECT
+#             pt.doc_id
+#             , pt.material AS material_id
+#             , pt.category
+#             , sum(pt.net_weight) AS weight
+#         FROM
+#             production_task pt
+#         WHERE
+#             pt.doc_id = %(doc_id)s
+#             AND
+#             pt.material = %(material_id)s
+#             AND pt.category = (
+#                 SELECT
+#                     category
+#                 FROM
+#                     production_task
+#                 WHERE
+#                     tare_id = %(tara_id)s
+#                     AND material = %(material_id)s
+#             )
+#         GROUP BY
+#             pt.doc_id
+#             , pt.material
+#             , pt.category
+#     ) AS subq
+# LEFT JOIN production_task_materials ptm ON
+#     ptm.doc_id = subq.doc_id
+#     AND ptm.material = subq.material_id
+#     AND ptm.category = subq.category
+# INNER JOIN (
+#         SELECT
+#             pt.doc_id
+#             , pt.material AS material_id
+#             , pt.category
+#             , sum(pt.net_weight_fact) AS net_weight_fact
+#         FROM
+#             production_task pt
+#         WHERE
+#             pt.done IS TRUE
+#         GROUP BY
+#             pt.doc_id
+#             , pt.material
+#             , pt.category
+#     ) pt_done ON
+#     pt_done.doc_id = subq.doc_id
+#     AND pt_done.material_id = subq.material_id
+#     AND pt_done.category = subq.category
+# INNER JOIN production_task AS task_job ON
+#     task_job.doc_id = subq.doc_id
+#     AND
+#     task_job.material = subq.material_id
+#     AND
+#     task_job.category = subq.category
+#     AND
+#     task_job.tare_id = %(tara_id)s
+# """
+#     # Валидация доступности действия.
+#     # Если статус работы изменяется на "выполнено", то проверяем  превышение веса по задаче в категории.
+#     # В случае превышение веса выбрасываем ошибку.
+#     can_done = True
+#     if status is True:
+#         async with conn.cursor() as cur:
+#             await cur.execute(validate_query, {"doc_id": doc_id, "material_id": material_id, "tara_id": tara_id})
+#             result = await cur.fetchone()
+#             print(result)
+#             can_done = bool(result["can_done"])
+    # if can_done is False:
+    #     raise Exception("Превышение веса")
 
     q = """
 UPDATE

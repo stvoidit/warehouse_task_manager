@@ -112,6 +112,23 @@ const handleClickRow = async (job: frontend.IJob, column: any) => {
             return;
         }
     } else {
+        if (job.done === true && job.task_net_weight === job.net_weight_fact) {
+            try {
+                await ElMessageBox.confirm(
+                    "Предупреждение",
+                    {
+                        message: "Взятый вес был введен вручную. Хотите изменить статус выполнения на \"не выполнено\"?",
+                        confirmButtonText: "Да",
+                        cancelButtonText: "Нет",
+                        type: "warning"
+                    }
+                );
+            } catch (error) {
+                // eslint-disable-next-line
+                console.warn(error);
+                return;
+            }
+        }
         emit("changeStatus", job, job.rest_gross_weight);
     }
 };

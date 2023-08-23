@@ -112,7 +112,7 @@ const handleClickRow = async (job: frontend.IJob, column: any) => {
             return;
         }
     } else {
-        if (job.done === true && job.task_net_weight === job.net_weight_fact) {
+        if (job.done === true && job.task_net_weight !== job.net_weight_fact) {
             try {
                 await ElMessageBox.confirm(
                     "Предупреждение",

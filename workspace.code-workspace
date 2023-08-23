@@ -10,5 +10,7 @@
 			"path": "src/frontend"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"python.defaultInterpreterPath": "src/backend/.venv/bin/python"
+	}
 }

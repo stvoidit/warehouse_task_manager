@@ -81,6 +81,36 @@ const handleClickRow = async (job: frontend.IJob, column: any) => {
                 console.warn(error);
             return;
         }
+    } else if (column.columnKey === "net_weight_fact" && job.done === true && job.task_net_weight !== job.net_weight_fact) {
+        try {
+            const { value } = await ElMessageBox.prompt(
+                "Введите остаток веса брутто",
+                {
+                    confirmButtonText: "Подтверждение",
+                    cancelButtonText: "Отмена",
+                    type: "info",
+                    inputType: "number",
+                    inputValue: (job.net_weight_fact+job.tara_weight).toFixed(2),
+                    inputPattern: /^\d+\.?\d{0,2}?$/,
+                    inputValidator: (value) => {
+                        if (parseFloat(value) > job.rest_gross_weight) {
+                            return "Превышение допустимого ввода веса брутто";
+                        }
+                        if (parseFloat(value) < job.tara_weight) {
+                            return "Вес брутто не может быть меньше веса тары";
+                        }
+                        return true;
+                    }
+                }
+            );
+            const fateJob = { ...job };
+            fateJob.done = false;
+            emit("changeStatus", fateJob, parseFloat(value));
+        } catch (error) {
+            // eslint-disable-next-line
+                console.warn(error);
+            return;
+        }
     } else {
         emit("changeStatus", job, job.rest_gross_weight);
     }

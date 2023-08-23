@@ -52,21 +52,24 @@ const cellStyle = ({ column }: { column:any }) => column.columnKey === "net_weig
 
 /** Обработчик клика на строку - запрос на обновление статуса задания */
 const handleClickRow = async (job: frontend.IJob, column: any) => {
-    if (column?.no === 0) return;
+    if (column.columnKey === "done") return;
     if (column.columnKey === "net_weight_fact" && job.done === false) {
         try {
             const { value } = await ElMessageBox.prompt(
-                "Введите вес списания",
+                "Введите остаток веса брутто",
                 {
                     confirmButtonText: "Подтверждение",
                     cancelButtonText: "Отмена",
                     type: "info",
                     inputType: "number",
-                    inputValue: job.task_net_weight.toFixed(2),
+                    inputValue: job.rest_gross_weight.toFixed(2),
                     inputPattern: /^\d+\.?\d{0,2}?$/,
                     inputValidator: (value) => {
-                        if (parseFloat(value) > job.task_net_weight) {
-                            return "Превышение допустимого ввода веса";
+                        if (parseFloat(value) > job.rest_gross_weight) {
+                            return "Превышение допустимого ввода веса брутто";
+                        }
+                        if (parseFloat(value) < job.tara_weight) {
+                            return "Вес брутто не может быть меньше веса тары";
                         }
                         return true;
                     }
@@ -79,7 +82,7 @@ const handleClickRow = async (job: frontend.IJob, column: any) => {
             return;
         }
     } else {
-        emit("changeStatus", job, job.task_net_weight);
+        emit("changeStatus", job, job.rest_gross_weight);
     }
 };
 
@@ -123,7 +126,7 @@ const columns = [
     },
     {
         prop: "net_weight_fact",
-        label: "Нетто (факт)",
+        label: "Нетто (взято)",
         width: 150,
         sortable: false
     }

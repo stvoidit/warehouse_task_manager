@@ -139,8 +139,8 @@ SELECT
     , arrival.tare_id
     , arrival.tare_mark
     , arrival.tare_type
+    , tare.weight AS tara_weight
     , task.category
-    , arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0) AS rest_tare_amount
     , arrival.net_weight - IFNULL(P.net_weight, 0) - IFNULL(S.net_weight, 0) + IFNULL(tare.weight, 0) * (arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0)) AS rest_gross_weight
     , task.tare_amount AS task_tare_amount
     , task.net_weight AS task_net_weight
@@ -415,8 +415,8 @@ WHERE
         "user_id": user_id,
         "material_id": material_id,
         "tara_id": tara_id,
-        "net_weight_fact": net_weight_fact,
-        "status": status
+        "status": status,
+        "net_weight_fact": net_weight_fact
     }
     async with conn.cursor() as cur:
         await cur.execute(q, query_args)

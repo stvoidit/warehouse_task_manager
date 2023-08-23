@@ -65,13 +65,14 @@ onBeforeUnmount(() => {
 /** Запрос к API на обновление статуса задания */
 const updateJobStatus = async (job: frontend.IJob, weight: number) => {
     try {
+        const realNetWeightFact = weight - job.tara_weight;
         const newStatus = !job.done;
-        if (newStatus === true && weight > remainingWeight.value[job.category]) {
+        if (newStatus === true && realNetWeightFact > remainingWeight.value[job.category]) {
             try {
                 await ElMessageBox.confirm(
                     "Предупреждение",
                     {
-                        message: `Превышение веса на ${(remainingWeight.value[job.category] - weight) * -1}`,
+                        message: `Превышение веса (нетто) на ${(remainingWeight.value[job.category] - realNetWeightFact) * -1}`,
                         confirmButtonText: "Подтверждение",
                         cancelButtonText: "Отмена",
                         type: "warning"
@@ -83,7 +84,7 @@ const updateJobStatus = async (job: frontend.IJob, weight: number) => {
                 return;
             }
         }
-        await store.updateJobStatus(props.taskID, props.materialID, job.tare_id, weight, newStatus);
+        await store.updateJobStatus(props.taskID, props.materialID, job.tare_id, realNetWeightFact, newStatus);
         await store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
         const readebleStatus = newStatus === true ? "готово" : "не выполнено";
         const message = `Тара с маркировкой "${job.tare_mark}" (тара ${job.tare_id}) - статус изменен на "${readebleStatus}"`;

@@ -25,21 +25,29 @@ declare namespace frontend {
 
     /** Задание из задачи */
     export type IJob = {
+        /** id материала */
         material_id: string
+        /** название материала */
         material: string
-        lab_material_mark: string
-        lab_material_group: string
+        /** id тары */
         tare_id: number
+        /** маркировка */
         tare_mark: string
-        category: string
-        tare_type: string
-        arrival_tare_amount: number
-        arrival_gross_weight: number
-        rest_tare_amount: number
+        /** вес тары */
+        tara_weight: number
+        /** брутто */
         rest_gross_weight: number
+        /** категория */
+        category: string
+        /** тип тары */
+        tare_type: string
+        /** кол-во тар */
         task_tare_amount: number
+        /** нетто */
         task_net_weight: number
+        /** взято веса нетто */
         net_weight_fact: number
+        /** работа выполнена */
         done: boolean
     }
 

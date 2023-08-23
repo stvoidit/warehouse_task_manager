@@ -13,11 +13,10 @@
                     column-key="done"
                     label="Выполнено">
                     <template #default="{ row }: { row: frontend.IJob }">
-                        <div style="text-align: center;">
-                            <el-checkbox
-                                v-model="row.done"
-                                size="large"
-                                @change.capture="emit('changeStatus', row, row.task_net_weight)" />
+                        <div
+                            style="text-align: center;"
+                            @click.prevent>
+                            <el-checkbox :model-value="row.done" />
                         </div>
                     </template>
                 </el-table-column>
@@ -52,7 +51,7 @@ const cellStyle = ({ column }: { column:any }) => column.columnKey === "net_weig
 
 /** Обработчик клика на строку - запрос на обновление статуса задания */
 const handleClickRow = async (job: frontend.IJob, column: any) => {
-    if (column.columnKey === "done") return;
+    // if (column.columnKey === "done") return;
     if (column.columnKey === "net_weight_fact" && job.done === false) {
         try {
             const { value } = await ElMessageBox.prompt(

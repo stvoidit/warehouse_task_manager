@@ -14,6 +14,7 @@
                     <el-form-item label="Остаток (брутто)">
                         <el-input-number
                             v-model="takenWeight"
+                            size="large"
                             :precision="2"
                             :min="dialogJob.tara_weight"
                             :max="dialogJob.rest_gross_weight" />
@@ -21,6 +22,7 @@
                     <el-form-item label="Вид дополнительной обработки">
                         <el-select
                             v-model="dialogJob.add_processing_id"
+                            size="large"
                             :disabled="blockActionRow(dialogJob)"
                             fit-input-width>
                             <el-option

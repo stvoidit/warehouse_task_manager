@@ -1,9 +1,12 @@
 <template>
-    <el-row :gutter="10">
+    <el-row
+        :gutter="10"
+        style="margin-top: 0.75rem;">
         <el-col v-bind="colAttr">
             <div><small>Фильтр по статусу выполнения</small></div>
             <el-select
                 placeholder="Статус"
+                size="large"
                 :model-value="selectedStatuses"
                 @change="(value: number) => emit('update:selectedStatuses', value)">
                 <el-option
@@ -17,10 +20,11 @@
             v-if="categoriesOptions.length>1"
             class="mb"
             v-bind="colAttr">
-            <div><small>Фильтр по статусу выполнения</small></div>
+            <div><small>Фильтр по категории</small></div>
             <el-select
                 multiple
                 clearable
+                size="large"
                 :model-value="selectedCategorits"
                 placeholder="Категории"
                 @change="(value: string[]) => emit('update:selectedCategorits', value)">

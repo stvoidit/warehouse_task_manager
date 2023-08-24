@@ -76,7 +76,7 @@ const colAttr = {
     xs: 12,
     sm: 12,
     md: 12,
-    lg: 6,
-    xl: 6
+    lg: 12,
+    xl: 8
 };
 </script>

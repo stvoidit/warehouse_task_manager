@@ -26,7 +26,7 @@
                     <el-icon style="vertical-align: middle">
                         <User />
                     </el-icon>
-                    <span v-if="isLandscape">{{ store.currentUser?.employee_name }} </span>
+                    <span v-if="store.isLandscape">{{ store.currentUser?.employee_name }} </span>
                 </el-button>
             </template>
             <template #default>
@@ -61,7 +61,7 @@
 import useApplicationStore from "@/store";
 import ChangePasswordDialog from "./ChangePasswordDialog.vue";
 import { useRoute } from "vue-router";
-import { computed, ref, onMounted } from "vue";
+import { computed } from "vue";
 
 const store = useApplicationStore();
 const handleLogOut = () => store.logOut();
@@ -84,17 +84,17 @@ const routes = computed(() => {
     return menuRoutes;
 });
 
-const orientation = ref("landscape-primary");
-const isLandscape = computed(() => orientation.value === "landscape-primary");
-onMounted(() => {
-    try {
-        orientation.value = screen.orientation.type;
-        window.addEventListener("orientationchange", () => {
-            orientation.value = screen.orientation.type;
-        }, false);
-    } catch (error) {
-        // eslint-disable-next-line
-        console.warn(error);
-    }
-});
+// const orientation = ref("landscape-primary");
+// const isLandscape = computed(() => orientation.value === "landscape-primary");
+// onMounted(() => {
+//     try {
+//         orientation.value = screen.orientation.type;
+//         window.addEventListener("orientationchange", () => {
+//             orientation.value = screen.orientation.type;
+//         }, false);
+//     } catch (error) {
+//         // eslint-disable-next-line
+//         console.warn(error);
+//     }
+// });
 </script>

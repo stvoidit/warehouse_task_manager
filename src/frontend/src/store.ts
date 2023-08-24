@@ -51,7 +51,6 @@ export default defineStore("app_store", () => {
 
     /** ID таймера */
     let timer: NodeJS.Timer;
-    const autofetchEnabled = ref(false);
     /** интервал в ms для setInterval */
     const delay = 15_000;
     /** запуск автообновления */
@@ -59,12 +58,10 @@ export default defineStore("app_store", () => {
         timer = setInterval(() => {
             fetchTask(stockID, taskID, materialID, tareType, false);
         }, delay);
-        autofetchEnabled.value = true;
     };
     /** остановка автообновления */
     const stopAutofetch = () => {
         clearInterval(timer);
-        autofetchEnabled.value = false;
     };
 
     /** т.к. процесс выхода (logout) не требует фиксации на бэке, то достаточно просто стереть токен из памяти */
@@ -74,6 +71,19 @@ export default defineStore("app_store", () => {
         window.localStorage.removeItem("token");
         location.href = "/login";
     };
+
+    const orientation = ref("landscape-primary");
+    const isLandscape = computed(() => orientation.value === "landscape-primary");
+    try {
+        orientation.value = screen.orientation.type;
+        window.addEventListener("orientationchange", () => {
+            orientation.value = screen.orientation.type;
+        }, false);
+    } catch (error) {
+        // eslint-disable-next-line
+        console.warn(error);
+    }
+
 
     return {
         doLogin,
@@ -90,9 +100,9 @@ export default defineStore("app_store", () => {
         changePassword,
         logOut,
         loading,
+        isLandscape,
 
         doAutofetch,
-        stopAutofetch,
-        autofetchEnabled
+        stopAutofetch
     };
 });

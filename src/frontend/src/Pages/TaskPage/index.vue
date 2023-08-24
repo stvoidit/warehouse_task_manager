@@ -8,14 +8,13 @@
                 <FiltersJobs
                     v-model:selected-statuses="selectedStatuses"
                     v-model:selected-categorits="selectedCategorits"
-                    :autofetch="store.autofetchEnabled"
-                    :categories-options="categoriesOptions"
-                    @update:autofetch="autofetchToggle" />
+                    :categories-options="categoriesOptions" />
             </MetaInfo>
             <StatInfo :stat-info="statInfo" />
             <JobsTable
                 :jobs-list="computedJobsData"
                 :processing-types="store.task.processing_types"
+                :is-landscape="store.isLandscape"
                 @change-status="updateJobStatus"
                 @processing-change="processingChange" />
         </el-col>
@@ -66,26 +65,19 @@ onBeforeUnmount(() => {
     store.task = null;
     store.stopAutofetch();
 });
-const autofetchToggle = (value: boolean) => {
-    if (value === true) {
-        store.doAutofetch(props.stockID, props.taskID, props.materialID, queryParams.tareType);
-    } else {
-        store.stopAutofetch();
-    }
-    store.autofetchEnabled = value;
-};
 const processingChange = () => store.stopAutofetch();
 /** Запрос к API на обновление статуса задания */
 const updateJobStatus = async (job: frontend.IJob, weight: number) => {
     try {
         const realNetWeightFact = weight - job.tara_weight;
+        const alertWeight = job.net_weight_fact > 0 ? (remainingWeight.value[job.category] + (job.net_weight_fact-realNetWeightFact)) : (remainingWeight.value[job.category] - realNetWeightFact);
         const newStatus = !job.done;
-        if (newStatus === true && realNetWeightFact > remainingWeight.value[job.category]) {
+        if (newStatus === true && alertWeight < 0) {
             try {
                 await ElMessageBox.confirm(
                     "Предупреждение",
                     {
-                        message: `Превышение веса (нетто) на ${(remainingWeight.value[job.category] - realNetWeightFact) * -1}`,
+                        message: `Превышение веса (нетто) на ${alertWeight*-1}`,
                         confirmButtonText: "Подтверждение",
                         cancelButtonText: "Отмена",
                         type: "warning"
@@ -106,7 +98,6 @@ const updateJobStatus = async (job: frontend.IJob, weight: number) => {
             message: message,
             type: newStatus ? "success" : "warning"
         });
-        if (store.autofetchEnabled === false) store.doAutofetch(props.stockID, props.taskID, props.materialID, queryParams.tareType);
     } catch (error) {
         alert(error);
     }

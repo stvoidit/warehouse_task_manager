@@ -1,6 +1,58 @@
 <template>
     <el-row class="mb">
         <el-col>
+            <el-dialog
+                v-model="dialogVisible"
+                :show-close="false"
+                :align-center="true"
+                title="Введите остаток веса брутто и/или выберите тип процесса"
+                :width="isLandscape ? '33%': '100%'"
+                @close="resetDialoagForm">
+                <template #header>
+                    <h3>
+                        Введите остаток веса брутто и/или выберите тип процесса
+                    </h3>
+                </template>
+                <el-form
+                    v-if="dialogJob"
+                    label-position="top">
+                    <el-form-item label="Вес брутто">
+                        <el-input-number
+                            v-model="takenWeight"
+                            :precision="2"
+                            :min="dialogJob.tara_weight"
+                            :max="dialogJob.rest_gross_weight" />
+                    </el-form-item>
+                    <el-form-item label="Тип процесса">
+                        <el-select
+                            v-model="dialogJob.add_processing_id"
+                            :disabled="blockActionRow(dialogJob)"
+                            fit-input-width>
+                            <el-option
+                                :value="0"
+                                label=" " />
+                            <el-option
+                                v-for="pt in processingTypes"
+                                :key="pt.id"
+                                :label="pt.process_name"
+                                :value="pt.id" />
+                        </el-select>
+                    </el-form-item>
+                </el-form>
+                <template #footer>
+                    <span class="dialog-footer">
+                        <el-button @click="dialogVisible = false">
+                            Закрыть
+                        </el-button>
+                        <el-button
+                            v-if="dialogJob"
+                            type="success"
+                            @click="emit('changeStatus',dialogJob, takenWeight); dialogVisible = false">
+                            Подтвердить
+                        </el-button>
+                    </span>
+                </template>
+            </el-dialog>
             <el-table
                 :data="jobsList"
                 :border="true"
@@ -36,20 +88,7 @@
                     column-key="add_processing_id"
                     label="Тип процесса">
                     <template #default="{ row }: { row: frontend.IJob }">
-                        <el-select
-                            v-model="row.add_processing_id"
-                            :disabled="blockActionRow(row)"
-                            fit-input-width
-                            @visible-change="emit('processingChange', true)">
-                            <el-option
-                                :value="0"
-                                label=" " />
-                            <el-option
-                                v-for="pt in processingTypes"
-                                :key="pt.id"
-                                :label="pt.process_name"
-                                :value="pt.id" />
-                        </el-select>
+                        {{ processingTypes.find(pt => pt.id === row.add_processing_id)?.process_name }}
                     </template>
                 </el-table-column>
             </el-table>
@@ -58,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
+import { PropType, ref } from "vue";
 import { ElMessageBox } from "element-plus";
 
 defineProps({
@@ -69,6 +108,10 @@ defineProps({
     processingTypes: {
         type: Array as PropType<frontend.IProcessingType[]>,
         default: () => [] as frontend.IProcessingType[]
+    },
+    isLandscape: {
+        type: Boolean,
+        default: true
     }
 });
 const emit = defineEmits<{
@@ -77,72 +120,32 @@ const emit = defineEmits<{
     processingChange: [value: boolean]
 }>();
 const rowKey = (row: frontend.IJob) => `${row.material_id}-${row.tare_id}`;
-const cellStyle = ({ column }: { column: any }) => column.columnKey === "net_weight_fact" ? { cursor: "alias" } : {};
+const cellStyle = ({ column }: { column: any }) => [
+    "net_weight_fact",
+    "add_processing_id"
+].includes(column.columnKey) ? { cursor: "alias" } : {};
 const rowClass = ( {row } : { row: frontend.IJob }) => blockActionRow(row) ? "row-disabled" : "";
 const blockActionRow = (job: frontend.IJob) => job.done === true && job.add_processing_id > 0;
+const dialogVisible = ref(false);
+const dialogJob = ref<frontend.IJob | null>(null);
+const takenWeight = ref(0);
+const resetDialoagForm = () => {
+    dialogJob.value = null;
+    takenWeight.value = 0;
+};
 
 /** Обработчик клика на строку - запрос на обновление статуса задания */
 const handleClickRow = async (job: frontend.IJob, column: any) => {
-    if (blockActionRow(job)) return;
-    if (column.columnKey === "add_processing_id") return;
-    if (column.columnKey === "net_weight_fact" && job.done === false) {
-        try {
-            const { value } = await ElMessageBox.prompt(
-                "Введите остаток веса брутто",
-                {
-                    confirmButtonText: "Подтверждение",
-                    cancelButtonText: "Отмена",
-                    type: "info",
-                    inputType: "number",
-                    inputValue: job.rest_gross_weight.toFixed(2),
-                    inputPattern: /^\d+\.?\d{0,2}?$/,
-                    inputValidator: (value) => {
-                        if (parseFloat(value) > job.rest_gross_weight) {
-                            return "Превышение допустимого ввода веса брутто";
-                        }
-                        if (parseFloat(value) < job.tara_weight) {
-                            return "Вес брутто не может быть меньше веса тары";
-                        }
-                        return true;
-                    }
-                }
-            );
-            emit("changeStatus", job, parseFloat(value));
-        } catch (error) {
-            // eslint-disable-next-line
-            console.warn(error);
-            return;
-        }
-    } else if (column.columnKey === "net_weight_fact" && job.done === true && job.task_net_weight !== job.net_weight_fact) {
-        try {
-            const { value } = await ElMessageBox.prompt(
-                "Введите остаток веса брутто",
-                {
-                    confirmButtonText: "Подтверждение",
-                    cancelButtonText: "Отмена",
-                    type: "info",
-                    inputType: "number",
-                    inputValue: (job.net_weight_fact+job.tara_weight).toFixed(2),
-                    inputPattern: /^\d+\.?\d{0,2}?$/,
-                    inputValidator: (value) => {
-                        if (parseFloat(value) > job.rest_gross_weight) {
-                            return "Превышение допустимого ввода веса брутто";
-                        }
-                        if (parseFloat(value) < job.tara_weight) {
-                            return "Вес брутто не может быть меньше веса тары";
-                        }
-                        return true;
-                    }
-                }
-            );
-            const fateJob = { ...job };
-            fateJob.done = false;
-            emit("changeStatus", fateJob, parseFloat(value));
-        } catch (error) {
-            // eslint-disable-next-line
-                console.warn(error);
-            return;
-        }
+    const targetCols = [
+        "net_weight_fact",
+        "add_processing_id"
+    ];
+    if (!targetCols.includes(column.columnKey) && job.done && job.add_processing_id > 0) return;
+    if (targetCols.includes(column.columnKey)) {
+        dialogVisible.value = true;
+        dialogJob.value = { ...job };
+        if (dialogJob.value.done) dialogJob.value.done = false;
+        takenWeight.value = dialogJob.value.net_weight_fact > 0 ? dialogJob.value.net_weight_fact+job.tara_weight : dialogJob.value.rest_gross_weight;
     } else {
         if (job.done === true && job.task_net_weight !== job.net_weight_fact) {
             try {

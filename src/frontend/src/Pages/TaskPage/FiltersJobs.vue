@@ -31,14 +31,6 @@
                     :value="item" />
             </el-select>
         </el-col>
-        <el-col :span="24">
-            <span>автообновление: </span>
-            <el-switch
-                :model-value="autofetch"
-                size="small"
-                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-                @change="(value) => emit('update:autofetch', Boolean(value))" />
-        </el-col>
     </el-row>
 </template>
 
@@ -56,16 +48,11 @@ defineProps({
     categoriesOptions: {
         type: Array as PropType<string[]>,
         required: true
-    },
-    autofetch: {
-        type: Boolean,
-        required: true
     }
 });
 const emit = defineEmits<{
     "update:selectedStatuses": [ value: number ],
-    "update:selectedCategorits": [value: string[]],
-    "update:autofetch": [ value: boolean ]
+    "update:selectedCategorits": [value: string[]]
 }>();
 const statusesOptions = [
     {

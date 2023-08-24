@@ -58,10 +58,10 @@
                 :row-class-name="rowClass"
                 @row-click="handleClickRow">
                 <el-table-column
-                    :width="100"
+                    :width="80"
                     prop="done"
                     column-key="done"
-                    label="Выполнено">
+                    label="">
                     <template #default="{ row }: { row: frontend.IJob }">
                         <div
                             style="text-align: center;"
@@ -117,10 +117,22 @@ const emit = defineEmits<{
     processingChange: [value: boolean]
 }>();
 const rowKey = (row: frontend.IJob) => `${row.material_id}-${row.tare_id}`;
-const cellStyle = ({ column }: { column: any }) => [
-    "net_weight_fact",
-    "add_processing_id"
-].includes(column.columnKey) ? { cursor: "alias" } : {};
+const cellStyle = ({ column }: { column: any }) => {
+    if ([
+        "net_weight_fact",
+        "add_processing_id"
+    ].includes(column.columnKey)) {
+        return { cursor: "alias" };
+    }
+    if (column.columnKey === "tare_id") {
+        return {
+            fontSize: "18px",
+            fontWeight: "bold"
+        };
+    }
+
+    return {};
+};
 const rowClass = ( {row } : { row: frontend.IJob }) => blockActionRow(row) ? "row-disabled" : "";
 const blockActionRow = (job: frontend.IJob) => job.done === true && job.add_processing_id > 0;
 const dialogVisible = ref(false);

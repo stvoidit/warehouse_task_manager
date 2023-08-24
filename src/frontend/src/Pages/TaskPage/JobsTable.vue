@@ -81,7 +81,7 @@
                     :width="180"
                     prop="add_processing_id"
                     column-key="add_processing_id"
-                    label="Тип процесса">
+                    label="Доп. обработка">
                     <template #default="{ row }: { row: frontend.IJob }">
                         {{ processingTypes.find(pt => pt.id === row.add_processing_id)?.process_name }}
                     </template>
@@ -203,7 +203,7 @@ const columns = [
     },
     {
         prop: "net_weight_fact",
-        label: "Нетто (взято)",
+        label: "Нетто (выполнено)",
         width: 150,
         sortable: false
     }

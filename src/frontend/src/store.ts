@@ -45,12 +45,13 @@ export default defineStore("app_store", () => {
         return api.changePasswor(payload).finally(() => loading.value = false);
     };
     /** изменение статуса "выполнено" для задания в задаче */
-    const updateJobStatus = (taskID: number, materialID: number, taraID: number, netWeightFact: number, done: boolean) => {
-        return api.updateJobStatus(taskID, materialID, taraID, netWeightFact, done);
+    const updateJobStatus = (taskID: number, materialID: number, taraID: number, netWeightFact: number, add_processing_id: number, done: boolean) => {
+        return api.updateJobStatus(taskID, materialID, taraID, netWeightFact, add_processing_id, done);
     };
 
     /** ID таймера */
     let timer: NodeJS.Timer;
+    const autofetchEnabled = ref(false);
     /** интервал в ms для setInterval */
     const delay = 15_000;
     /** запуск автообновления */
@@ -58,9 +59,13 @@ export default defineStore("app_store", () => {
         timer = setInterval(() => {
             fetchTask(stockID, taskID, materialID, tareType, false);
         }, delay);
+        autofetchEnabled.value = true;
     };
     /** остановка автообновления */
-    const stopAutofetch = () => clearInterval(timer as NodeJS.Timeout);
+    const stopAutofetch = () => {
+        clearInterval(timer);
+        autofetchEnabled.value = false;
+    };
 
     /** т.к. процесс выхода (logout) не требует фиксации на бэке, то достаточно просто стереть токен из памяти */
     const logOut = () => {
@@ -87,6 +92,7 @@ export default defineStore("app_store", () => {
         loading,
 
         doAutofetch,
-        stopAutofetch
+        stopAutofetch,
+        autofetchEnabled
     };
 });

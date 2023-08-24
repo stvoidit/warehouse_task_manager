@@ -8,12 +8,16 @@
                 <FiltersJobs
                     v-model:selected-statuses="selectedStatuses"
                     v-model:selected-categorits="selectedCategorits"
-                    :categories-options="categoriesOptions" />
+                    :autofetch="store.autofetchEnabled"
+                    :categories-options="categoriesOptions"
+                    @update:autofetch="autofetchToggle" />
             </MetaInfo>
             <StatInfo :stat-info="statInfo" />
             <JobsTable
                 :jobs-list="computedJobsData"
-                @change-status="updateJobStatus" />
+                :processing-types="store.task.processing_types"
+                @change-status="updateJobStatus"
+                @processing-change="processingChange" />
         </el-col>
     </el-row>
 </template>
@@ -62,6 +66,15 @@ onBeforeUnmount(() => {
     store.task = null;
     store.stopAutofetch();
 });
+const autofetchToggle = (value: boolean) => {
+    if (value === true) {
+        store.doAutofetch(props.stockID, props.taskID, props.materialID, queryParams.tareType);
+    } else {
+        store.stopAutofetch();
+    }
+    store.autofetchEnabled = value;
+};
+const processingChange = () => store.stopAutofetch();
 /** Запрос к API на обновление статуса задания */
 const updateJobStatus = async (job: frontend.IJob, weight: number) => {
     try {
@@ -84,7 +97,7 @@ const updateJobStatus = async (job: frontend.IJob, weight: number) => {
                 return;
             }
         }
-        await store.updateJobStatus(props.taskID, props.materialID, job.tare_id, realNetWeightFact, newStatus);
+        await store.updateJobStatus(props.taskID, props.materialID, job.tare_id, realNetWeightFact, job.add_processing_id, newStatus);
         await store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
         const readebleStatus = newStatus === true ? "готово" : "не выполнено";
         const message = `Тара с маркировкой "${job.tare_mark}" (тара ${job.tare_id}) - статус изменен на "${readebleStatus}"`;
@@ -93,6 +106,7 @@ const updateJobStatus = async (job: frontend.IJob, weight: number) => {
             message: message,
             type: newStatus ? "success" : "warning"
         });
+        if (store.autofetchEnabled === false) store.doAutofetch(props.stockID, props.taskID, props.materialID, queryParams.tareType);
     } catch (error) {
         alert(error);
     }

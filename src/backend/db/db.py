@@ -125,12 +125,21 @@ WHERE
         task = await cur.fetchone()
     return task
 
+async def select_processing_types(conn: Connection):
+    q = """SELECT pt.id, pt.process_name FROM processing_type AS pt ORDER BY pt.id ASC"""
+    processing_types: list[dict] = []
+    async with conn.cursor() as cur:
+        await cur.execute(q)
+        processing_types.extend(await cur.fetchall())
+    return processing_types
+
 async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id: int, tare_type: str):
     """ получение позиций задания """
     task = await select_task_meta(conn, stock_id, doc_id)
     if task is None:
         return task
     task["task_weights"] = await get_task_weights(conn, doc_id, material_id)
+    task["processing_types"] = await select_processing_types(conn)
 
     q = """
 SELECT
@@ -145,6 +154,7 @@ SELECT
     , task.tare_amount AS task_tare_amount
     , task.net_weight AS task_net_weight
     , task.net_weight_fact
+    , task.add_processing_id
     , task.done
 FROM
     arrival
@@ -196,6 +206,7 @@ INNER JOIN (
             , net_weight_fact
             , production_task.done
             , production_task.category
+            , add_processing_id
         FROM
             production_task
         LEFT JOIN production_task_doc ON
@@ -301,6 +312,8 @@ LEFT JOIN production_task_doc ptd ON
     ptd.stock = s.id
 LEFT JOIN production_task_executor pte ON
     pte.doc_id = ptd.id
+WHERE
+    s.app IS TRUE
 GROUP BY
     s.id
     , s.name
@@ -313,7 +326,7 @@ ORDER BY
         stocks = await cur.fetchall()
     return stocks
 
-async def update_job_status(conn: Connection, doc_id: int, user_id: int, material_id: int, tara_id: int, net_weight_fact: float, status: bool):
+async def update_job_status(conn: Connection, doc_id: int, user_id: int, material_id: int, tara_id: int, net_weight_fact: float, add_processing_id: int, status: bool):
 #     validate_query = """
 # SELECT
 #     subq.doc_id
@@ -403,6 +416,7 @@ SET
     , net_weight_fact = CASE WHEN %(status)s IS TRUE THEN %(net_weight_fact)s ELSE 0 END
     , tare_amount_fact = CASE WHEN %(status)s IS TRUE AND %(net_weight_fact)s = net_weight THEN 1 ELSE 0 END
     , fact_executor = CASE WHEN %(status)s IS TRUE THEN %(user_id)s ELSE 0 END
+    , add_processing_id = CASE WHEN %(status)s IS TRUE THEN %(add_processing_id)s ELSE 0 END
 WHERE
     material = %(material_id)s
     AND
@@ -416,7 +430,8 @@ WHERE
         "material_id": material_id,
         "tara_id": tara_id,
         "status": status,
-        "net_weight_fact": net_weight_fact
+        "net_weight_fact": net_weight_fact,
+        "add_processing_id": add_processing_id
     }
     async with conn.cursor() as cur:
         await cur.execute(q, query_args)

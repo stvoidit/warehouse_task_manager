@@ -9,8 +9,7 @@
             :index="menu.label"
             :route="menu">
             <el-icon>
-                <MessageBox v-if="menu.icon === 'MessageBox'" />
-                <Guide v-if="menu.icon === 'Guide'" />
+                <component :is="menu.icon" />
             </el-icon>
             <span>{{ menu.label }}</span>
         </el-menu-item>
@@ -94,6 +93,7 @@ onMounted(() => {
             orientation.value = screen.orientation.type;
         }, false);
     } catch (error) {
+        // eslint-disable-next-line
         console.warn(error);
     }
 });

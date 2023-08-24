@@ -47,6 +47,8 @@ declare namespace frontend {
         task_net_weight: number
         /** взято веса нетто */
         net_weight_fact: number
+        /** id типа процесса */
+        add_processing_id: number
         /** работа выполнена */
         done: boolean
     }
@@ -55,6 +57,11 @@ declare namespace frontend {
     export type ITaskWeight = {
         category: string
         task_weight: number
+    }
+
+    export type IProcessingType = {
+        id: number
+        process_name: string
     }
 
     /** Задача со списком заданий */
@@ -69,6 +76,7 @@ declare namespace frontend {
         material: string
         task_weights: Array<ITaskWeight>
         jobs: Array<IJob>
+        processing_types: Array<IProcessingType>
     }
 
     export type ILoginPayload = {

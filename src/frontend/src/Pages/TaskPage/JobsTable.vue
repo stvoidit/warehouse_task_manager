@@ -6,6 +6,7 @@
                 :border="true"
                 :row-key="rowKey"
                 :cell-style="cellStyle"
+                :row-class-name="rowClass"
                 @row-click="handleClickRow">
                 <el-table-column
                     :width="100"
@@ -16,7 +17,9 @@
                         <div
                             style="text-align: center;"
                             @click.prevent>
-                            <el-checkbox :model-value="row.done" />
+                            <el-checkbox
+                                :model-value="row.done"
+                                :disabled="blockActionRow(row)" />
                         </div>
                     </template>
                 </el-table-column>
@@ -27,6 +30,28 @@
                     :column-key="col.prop"
                     :label="col.label"
                     :min-width="col.width" />
+                <el-table-column
+                    :width="180"
+                    prop="add_processing_id"
+                    column-key="add_processing_id"
+                    label="Тип процесса">
+                    <template #default="{ row }: { row: frontend.IJob }">
+                        <el-select
+                            v-model="row.add_processing_id"
+                            :disabled="blockActionRow(row)"
+                            fit-input-width
+                            @visible-change="emit('processingChange', true)">
+                            <el-option
+                                :value="0"
+                                label=" " />
+                            <el-option
+                                v-for="pt in processingTypes"
+                                :key="pt.id"
+                                :label="pt.process_name"
+                                :value="pt.id" />
+                        </el-select>
+                    </template>
+                </el-table-column>
             </el-table>
         </el-col>
     </el-row>
@@ -40,18 +65,26 @@ defineProps({
     jobsList: {
         type: Array as PropType<frontend.IJob[]>,
         required: true
+    },
+    processingTypes: {
+        type: Array as PropType<frontend.IProcessingType[]>,
+        default: () => [] as frontend.IProcessingType[]
     }
 });
 const emit = defineEmits<{
     /** эмит оригинальной работы + вес который списываем фактически */
-    changeStatus: [ value: frontend.IJob, weight: number ]
+    changeStatus: [value: frontend.IJob, weight: number],
+    processingChange: [value: boolean]
 }>();
 const rowKey = (row: frontend.IJob) => `${row.material_id}-${row.tare_id}`;
-const cellStyle = ({ column }: { column:any }) => column.columnKey === "net_weight_fact" ? {cursor:"alias"} : {};
+const cellStyle = ({ column }: { column: any }) => column.columnKey === "net_weight_fact" ? { cursor: "alias" } : {};
+const rowClass = ( {row } : { row: frontend.IJob }) => blockActionRow(row) ? "row-disabled" : "";
+const blockActionRow = (job: frontend.IJob) => job.done === true && job.add_processing_id > 0;
 
 /** Обработчик клика на строку - запрос на обновление статуса задания */
 const handleClickRow = async (job: frontend.IJob, column: any) => {
-    // if (column.columnKey === "done") return;
+    if (blockActionRow(job)) return;
+    if (column.columnKey === "add_processing_id") return;
     if (column.columnKey === "net_weight_fact" && job.done === false) {
         try {
             const { value } = await ElMessageBox.prompt(
@@ -77,7 +110,7 @@ const handleClickRow = async (job: frontend.IJob, column: any) => {
             emit("changeStatus", job, parseFloat(value));
         } catch (error) {
             // eslint-disable-next-line
-                console.warn(error);
+            console.warn(error);
             return;
         }
     } else if (column.columnKey === "net_weight_fact" && job.done === true && job.task_net_weight !== job.net_weight_fact) {

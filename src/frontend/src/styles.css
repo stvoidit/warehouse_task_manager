@@ -55,5 +55,13 @@ body {
 
 .row-disabled {
     background: var(--el-fill-color-light) !important;
-    cursor: not-allowed;
+    cursor: not-allowed !important;
+}
+
+.el-switch__core .el-switch__inner {
+    padding: 8px 25px 8px 25px !important;
+}
+
+.el-switch__core .el-switch__inner .is-text {
+    font-size: 18px;
 }

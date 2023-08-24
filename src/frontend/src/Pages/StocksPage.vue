@@ -30,7 +30,10 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const store = useApplicationStore();
 /** Получение данных от API со списком складов */
-onMounted(store.fetchStocks);
+onMounted(async () => {
+    await store.fetchStocks();
+    if (store.stocks.length === 1) handleRowClick(store.stocks[0]);
+});
 /** Обработчик нажатия строки таблицы - переход на список заданий на складе */
 const handleRowClick = (row: frontend.IStock) => router.push(`/stock/${row.id}`);
 /** Список столбцов для таблицы */

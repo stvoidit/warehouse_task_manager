@@ -80,7 +80,7 @@
                     :label="col.label"
                     :min-width="col.width" />
                 <el-table-column
-                    :width="180"
+                    :width="200"
                     prop="add_processing_id"
                     column-key="add_processing_id"
                     label="Доп. обработка">
@@ -218,7 +218,7 @@ const columns = [
     {
         prop: "net_weight_fact",
         label: "Нетто (выполнено)",
-        width: 150,
+        width: 180,
         sortable: false
     }
 ];

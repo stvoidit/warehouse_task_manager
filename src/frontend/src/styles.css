@@ -65,3 +65,7 @@ body {
 .el-switch__core .el-switch__inner .is-text {
     font-size: 18px;
 }
+
+.el-select {
+    width: 100%;
+}

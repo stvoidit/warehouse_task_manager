@@ -4,26 +4,21 @@
             <el-dialog
                 v-model="dialogVisible"
                 :show-close="false"
+                title="Введите остаток веса брутто и/или укажите дополнительный вид обработки материала"
                 :align-center="true"
-                title="Введите остаток веса брутто и/или выберите тип процесса"
                 :width="isLandscape ? '33%': '100%'"
                 @close="resetDialoagForm">
-                <template #header>
-                    <h3>
-                        Введите остаток веса брутто и/или выберите тип процесса
-                    </h3>
-                </template>
                 <el-form
                     v-if="dialogJob"
                     label-position="top">
-                    <el-form-item label="Вес брутто">
+                    <el-form-item label="Остаток (брутто)">
                         <el-input-number
                             v-model="takenWeight"
                             :precision="2"
                             :min="dialogJob.tara_weight"
                             :max="dialogJob.rest_gross_weight" />
                     </el-form-item>
-                    <el-form-item label="Тип процесса">
+                    <el-form-item label="Вид дополнительной обработки">
                         <el-select
                             v-model="dialogJob.add_processing_id"
                             :disabled="blockActionRow(dialogJob)"

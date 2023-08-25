@@ -31,10 +31,10 @@
             </template>
             <template #default>
                 <el-row :gutter="0">
-                    <el-col :span="12">
+                    <el-col :span="10">
                         <div><b>ID:</b> {{ store.currentUser?.id }}</div>
                     </el-col>
-                    <el-col :span="12">
+                    <el-col :span="14">
                         <div><b>Логин:</b> {{ store.currentUser?.login }}</div>
                     </el-col>
                 </el-row>

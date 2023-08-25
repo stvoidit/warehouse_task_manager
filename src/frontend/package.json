@@ -2,7 +2,7 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
     "dayjs": "^1.11.9",
-    "element-plus": "^2.3.9",
+    "element-plus": "^2.3.10",
     "jwt-decode": "^3.1.2",
     "pinia": "^2.1.6",
     "vite-plugin-pwa": "^0.16.4",
@@ -10,7 +10,7 @@
     "vue-router": "^4.2.4"
   },
   "devDependencies": {
-    "@types/node": "^18.17.7",
+    "@types/node": "^18.17.11",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vitejs/plugin-vue": "^4.3.3",

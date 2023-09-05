@@ -139,7 +139,9 @@ const dialogVisible = ref(false);
 const dialogJob = ref<frontend.IJob | null>(null);
 const takenWeight = ref(0);
 const resetDialoagForm = () => {
+    /** копия frontend.IJob */
     dialogJob.value = null;
+    /** ВЕС БРУТТО!!! ФАКТ (НЕТТО) СЧИТАЕМ В ОТПРАВЕ ЗАПРОСА */
     takenWeight.value = 0;
 };
 
@@ -154,7 +156,7 @@ const handleClickRow = async (job: frontend.IJob, column: any) => {
         dialogVisible.value = true;
         dialogJob.value = { ...job };
         if (dialogJob.value.done) dialogJob.value.done = false;
-        takenWeight.value = dialogJob.value.net_weight_fact > 0 ? dialogJob.value.rest_gross_weight - (dialogJob.value.net_weight_fact) : dialogJob.value.rest_gross_weight;
+        takenWeight.value = dialogJob.value.net_weight_fact > 0 ? dialogJob.value.net_weight_fact+dialogJob.value.tara_weight : dialogJob.value.rest_gross_weight;
     } else {
         if (job.done === true && job.task_net_weight !== job.net_weight_fact) {
             try {

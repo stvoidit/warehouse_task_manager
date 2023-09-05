@@ -91,7 +91,7 @@ const updateJobStatus = async (job: frontend.IJob, weight: number) => {
                 return;
             }
         }
-        await store.updateJobStatus(props.taskID, props.materialID, job.tare_id, job.rest_gross_weight - weight, job.add_processing_id, newStatus);
+        await store.updateJobStatus(props.taskID, props.materialID, job.tare_id, realNetWeightFact, job.add_processing_id, newStatus);
         await store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
         const readebleStatus = newStatus === true ? "готово" : "не выполнено";
         const message = `Тара с маркировкой "${job.tare_mark}" (тара ${job.tare_id}) - статус изменен на "${readebleStatus}"`;

@@ -122,10 +122,30 @@ WHERE
     AND
     ptd.done = 0
     """
+
+    q_categories_materials = """
+SELECT
+    pt.category
+    , GROUP_CONCAT(DISTINCT m.material) AS meterials
+FROM
+    production_task AS pt
+LEFT JOIN material AS m ON
+    m.id = pt.material
+WHERE
+    doc_id = %(doc_id)s
+GROUP BY
+    pt.category
+"""
     task = None
     async with conn.cursor() as cur:
         await cur.execute(q, {"doc_id": doc_id, "stock_id": stock_id, "material_id": material_id})
         task = await cur.fetchone()
+        if task is not None:
+            catmat = {}
+            await cur.execute(q_categories_materials, {"doc_id": doc_id})
+            for row in await cur.fetchall():
+                catmat[row["category"]] = row["meterials"]
+            task["catmat"] = catmat
     return task
 
 async def select_processing_types(conn: Connection):
@@ -236,7 +256,6 @@ ORDER BY
             "material_id": material_id,
             "tare_type": tare_type
         }
-    print(query_args)
     async with conn.cursor() as cur:
         await cur.execute(q, query_args)
         jobs = await cur.fetchall()

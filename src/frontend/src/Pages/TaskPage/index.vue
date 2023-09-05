@@ -10,7 +10,9 @@
                     v-model:selected-categorits="selectedCategorits"
                     :categories-options="categoriesOptions" />
             </MetaInfo>
-            <StatInfo :stat-info="statInfo" />
+            <StatInfo
+                :stat-info="statInfo"
+                :catmat="store.task.catmat" />
             <JobsTable
                 :jobs-list="computedJobsData"
                 :processing-types="store.task.processing_types"

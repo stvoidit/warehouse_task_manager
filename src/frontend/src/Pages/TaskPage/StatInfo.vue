@@ -5,8 +5,28 @@
             :key="cat.categoryLabel"
             class="mb"
             v-bind="colAttr">
-            <div :style="{minHeight: '1.3rem'}">
-                <b>{{ cat.categoryLabel }}</b>
+            <div :style="{minHeight: '1.3rem', padding: '0.25rem'}">
+                <b style="margin-right: 0.3rem;">{{ cat.categoryLabel }}</b>
+                <el-popover
+                    v-if="catmat[cat.categoryLabel]"
+                    :width="200"
+                    trigger="click">
+                    <template #reference>
+                        <el-button
+                            size="small"
+                            type="primary"
+                            icon="tickets"
+                            circle />
+                    </template>
+                    <b>материалы:</b>
+                    <ul>
+                        <li
+                            v-for="mat in catmat[cat.categoryLabel].split(',')"
+                            :key="mat">
+                            {{ mat }}
+                        </li>
+                    </ul>
+                </el-popover>
             </div>
             <el-table
                 :data="cat.data"
@@ -39,6 +59,10 @@ defineProps({
     statInfo: {
         type: Array as PropType<IStatInfo[]>,
         required: true
+    },
+    catmat: {
+        type: Object as PropType<frontend.ICatMat>,
+        default: () => ({})
     }
 });
 const colAttr = {

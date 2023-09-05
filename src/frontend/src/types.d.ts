@@ -64,6 +64,10 @@ declare namespace frontend {
         process_name: string
     }
 
+    export type ICatMat = {
+        [key: string]: string
+    }
+
     /** Задача со списком заданий */
     export type ITaskP = {
         id: number
@@ -77,6 +81,7 @@ declare namespace frontend {
         task_weights: Array<ITaskWeight>
         jobs: Array<IJob>
         processing_types: Array<IProcessingType>
+        catmat: ICatMat
     }
 
     export type ILoginPayload = {

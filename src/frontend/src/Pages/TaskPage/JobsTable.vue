@@ -44,7 +44,7 @@
                         <el-button
                             v-if="dialogJob"
                             type="success"
-                            @click="emit('changeStatus',dialogJob, takenWeight); dialogVisible = false">
+                            @click="handleDialogWeight(dialogJob, takenWeight)">
                             Подтвердить
                         </el-button>
                     </span>
@@ -177,6 +177,16 @@ const handleClickRow = async (job: frontend.IJob, column: any) => {
         }
         emit("changeStatus", job, job.rest_gross_weight);
     }
+};
+
+/**
+ * При вводе в диалоге - вводится ОСТАТОК В ТАРЕ,
+ * поэтому необходимо высчитать взятый ГРОСС вес.
+ * Особенность костылинга
+ */
+const handleDialogWeight = (job: frontend.IJob, weight: number) => {
+    emit("changeStatus", job, (job.rest_gross_weight - weight) + job.tara_weight);
+    dialogVisible.value = false;
 };
 
 /** Список столбцов таблицы */

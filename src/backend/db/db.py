@@ -88,7 +88,7 @@ ORDER BY
     return result
 
 
-async def select_task_meta(conn: Connection, stock_id: int, doc_id: int):
+async def select_task_meta(conn: Connection, stock_id: int, doc_id: int, material_id: int):
     q = """
 SELECT
     ptd.id
@@ -101,11 +101,12 @@ SELECT
     , task.material
 FROM
     production_task_doc ptd
-LEFT JOIN (
+INNER JOIN (
         SELECT
             DISTINCT
             pt.doc_id
             , m.material
+            , pt.material AS material_id
         FROM
             production_task pt
         INNER JOIN material AS m ON
@@ -117,11 +118,13 @@ WHERE
     AND
     ptd.stock = %(stock_id)s
     AND
+    task.material_id = %(material_id)s
+    AND
     ptd.done = 0
     """
     task = None
     async with conn.cursor() as cur:
-        await cur.execute(q, {"doc_id": doc_id, "stock_id": stock_id})
+        await cur.execute(q, {"doc_id": doc_id, "stock_id": stock_id, "material_id": material_id})
         task = await cur.fetchone()
     return task
 
@@ -135,7 +138,7 @@ async def select_processing_types(conn: Connection):
 
 async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id: int, tare_type: str):
     """ получение позиций задания """
-    task = await select_task_meta(conn, stock_id, doc_id)
+    task = await select_task_meta(conn, stock_id, doc_id, material_id)
     if task is None:
         return task
     task["task_weights"] = await get_task_weights(conn, doc_id, material_id)
@@ -233,6 +236,7 @@ ORDER BY
             "material_id": material_id,
             "tare_type": tare_type
         }
+    print(query_args)
     async with conn.cursor() as cur:
         await cur.execute(q, query_args)
         jobs = await cur.fetchall()

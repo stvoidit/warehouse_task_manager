@@ -241,7 +241,7 @@ ORDER BY
 
 
 async def get_task_weights(conn: Connection, doc_id: int, material_id: int):
-    q = """
+    q1 = """
 SELECT
     category
     , task_weight
@@ -251,10 +251,35 @@ WHERE
     material = %(material_id)s
     AND doc_id = %(doc_id)s
 """
-    task_weights: list[dict] = {}
+    q2 = """
+SELECT
+    category
+    , task_weight
+FROM
+    production_task_categories
+WHERE
+    doc_id = %(doc_id)s
+"""
+
+    task_weights: list[dict] = []
     async with conn.cursor() as cur:
-        await cur.execute(q, {"doc_id": doc_id, "material_id": material_id})
+        await cur.execute(q1, {"doc_id": doc_id, "material_id": material_id})
         task_weights = await cur.fetchall()
+        # fix: пустой результат возвращает пустой tuple, а не list
+        if isinstance(task_weights, tuple):
+            task_weights = []
+        await cur.execute(q2, {"doc_id": doc_id})
+        # проверяем, что если категория есть в списке, то заменяем вес
+        # если категории нет, то добавляем
+        for row in await cur.fetchall():
+            catname: str = row["category"]
+            exists = False
+            for i, tw in enumerate(task_weights):
+                if tw["category"] == catname:
+                    task_weights[i] = row
+                    exists = True
+            if not exists:
+                task_weights.append(row)
     return task_weights
 
 async def check_user(conn: Connection, login: str, password_hash: str):

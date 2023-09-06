@@ -18,7 +18,7 @@
                     :formatter="col.formatter" />
                 <el-table-column label="Остаток">
                     <template #default="{ row }:{ row:frontend.ITaskL }">
-                        {{ calculationRemainder(row.weight, row.weight_fact) }}
+                        {{ typeof row.weight === 'number' ? calculationRemainder(row.weight, row.weight_fact) : '-' }}
                     </template>
                 </el-table-column>
             </el-table>
@@ -26,7 +26,7 @@
         <el-col :span="24">
             <el-table
                 v-loading="store.loading"
-                :data="store.tasks"
+                :data="computedDataTasks"
                 :border="true"
                 :flexible="true"
                 table-layout="auto"
@@ -40,7 +40,7 @@
                     :formatter="col.formatter" />
                 <el-table-column label="Остаток">
                     <template #default="{ row }:{ row:frontend.ITaskL }">
-                        {{ calculationRemainder(row.weight, row.weight_fact) }}
+                        {{ typeof row.weight === 'number' ? calculationRemainder(row.weight, row.weight_fact) : '-' }}
                     </template>
                 </el-table-column>
             </el-table>
@@ -48,7 +48,7 @@
     </el-row>
 </template>
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import useApplicationStore from "@/store";
 import dayjs from "dayjs";
@@ -62,8 +62,28 @@ const store = useApplicationStore();
 /** Получени от API списка задач на складе */
 onMounted(async () => {
     store.fetchTasksList(props.stockID);
-
 });
+
+const computedDataTasks = computed(() => {
+    const copyArr = [...store.tasks];
+    const categoriesCount = new Map<string, number>();
+    copyArr.forEach(t => {
+        if (categoriesCount.has(t.category)) {
+            categoriesCount.set(t.category, (categoriesCount.get(t.category)??0)+1);
+        } else {
+            categoriesCount.set(t.category, 1);
+        }
+    });
+    return copyArr.map(t => {
+        if (categoriesCount.get(t.category) ?? 0 > 1) {
+            if (t.weight === 0) {
+                t.weight = "-";
+            }
+        }
+        return t;
+    });
+});
+
 /** Обработчик нажатия на строку таблицы - переход в задачу */
 const handleRowClick = (row: frontend.ITaskL) => {
     const qs = (new URLSearchParams({

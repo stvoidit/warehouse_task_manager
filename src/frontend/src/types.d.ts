@@ -16,7 +16,7 @@ declare namespace frontend {
         technical_process: string
         operation: string
         amount: number
-        weight: number
+        weight: number|string
         amount_fact: number
         weight_fact: number
         tare_type: string

@@ -113,23 +113,28 @@ const metaInfo = computed(() => ({
     fields: [
         {
             label: "Материал",
-            prop: "material"
+            prop: "material",
+            width: 150
         },
         {
             label: "Техпроцесс",
-            prop: "technical_process"
+            prop: "technical_process",
+            width: 220
         },
         {
             label: "Операция",
-            prop: "operation"
+            prop: "operation",
+            width: 150
         },
         {
             label: "Тара",
-            prop: "tareType"
+            prop: "tareType",
+            width: 100
         },
         {
             label: "Плановая дата",
-            prop: "planned_date"
+            prop: "planned_date",
+            width: 150
         }
     ],
     data: [

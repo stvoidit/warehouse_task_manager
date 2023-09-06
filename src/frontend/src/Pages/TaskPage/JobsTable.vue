@@ -204,12 +204,6 @@ const columns = [
         sortable: false
     },
     {
-        prop: "tare_type",
-        label: "Тара",
-        width: 100,
-        sortable: false
-    },
-    {
         prop: "category",
         label: "Категория",
         width: 150,

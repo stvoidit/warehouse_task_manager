@@ -2,7 +2,7 @@
     <el-row
         class="mb sticky-row"
         :gutter="10">
-        <el-col v-bind="colAttr">
+        <el-col v-bind="colAttr1">
             <el-table
                 class="mt"
                 :style="{fontSize: '16px'}"
@@ -18,7 +18,7 @@
                     :label="field.label" />
             </el-table>
         </el-col>
-        <el-col v-bind="colAttr">
+        <el-col v-bind="colAttr2">
             <slot />
         </el-col>
     </el-row>
@@ -54,11 +54,18 @@ defineProps({
         required: true
     }
 });
-const colAttr = {
+const colAttr1 = {
     xs: 24,
     sm: 24,
-    md: 12,
-    lg: 12,
-    xl: 12
+    md: 18,
+    lg: 18,
+    xl: 18
+};
+const colAttr2 = {
+    xs: 24,
+    sm: 24,
+    md: 6,
+    lg: 6,
+    xl: 6
 };
 </script>

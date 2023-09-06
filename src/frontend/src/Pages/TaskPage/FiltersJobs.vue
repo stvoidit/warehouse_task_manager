@@ -75,8 +75,8 @@ const statusesOptions = [
 const colAttr = {
     xs: 12,
     sm: 12,
-    md: 12,
-    lg: 12,
-    xl: 8
+    md: 24,
+    lg: 24,
+    xl: 24
 };
 </script>

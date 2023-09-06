@@ -18,7 +18,7 @@
                     :formatter="col.formatter" />
                 <el-table-column label="Остаток">
                     <template #default="{ row }:{ row:frontend.ITaskL }">
-                        {{ (row.weight - row.weight_fact).toLocaleString() }}
+                        {{ calculationRemainder(row.weight, row.weight_fact) }}
                     </template>
                 </el-table-column>
             </el-table>

@@ -3,7 +3,7 @@
 from aiomysql import Connection
 
 
-async def select_tasks(conn: Connection, user_id: int, stock_id: int):
+async def select_tasks(conn: Connection, user_id: int, stock_id: int) -> list:
     """ получение списка заданий """
     q = """
 SELECT
@@ -17,7 +17,11 @@ SELECT
     , subq.tare_type
     , subq.category
     , subq.amount
-    , IFNULL(ptm.task_weight, subq.weight) AS weight
+    , IF (
+        IFNULL(ptc.task_weight, 0) = 0
+        , IFNULL(ptm.task_weight, subq.weight)
+        , 0
+    ) AS weight
     , subq.amount_fact
     , subq.weight_fact
 FROM
@@ -75,6 +79,9 @@ LEFT JOIN production_task_materials ptm ON
     ptm.doc_id = subq.doc_id
     AND ptm.material = subq.material_id
     AND ptm.category = subq.category
+LEFT JOIN production_task_categories ptc ON
+    ptc.doc_id = subq.doc_id
+    AND ptc.category = subq.category
 ORDER BY
     subq.doc_id ASC
     , subq.material_id ASC
@@ -85,8 +92,76 @@ ORDER BY
     async with conn.cursor() as cur:
         await cur.execute(q, { "user_id": user_id, "stock_id": stock_id })
         result = await cur.fetchall()
+        if isinstance(result, tuple):
+            result = []
     return result
 
+
+async def select_tasks_progress(conn: Connection, user_id: int, stock_id: int) -> list:
+    q = """
+SELECT
+    subq.material
+    , subq.doc_id
+    , subq.doc_number
+    , subq.planned_date
+    , subq.technical_process
+    , subq.operation
+    , subq.category
+    , subq.amount
+    , ptc.task_weight AS weight
+    , subq.amount_fact
+    , subq.weight_fact
+FROM
+    (
+        SELECT
+            doc.id AS doc_id
+            , doc.doc_number
+            , doc.planned_date
+            , doc.technical_process
+            , doc.operation
+            , pt.category
+            , GROUP_CONCAT(DISTINCT m.material) AS material
+            , SUM(pt.tare_amount) AS amount
+            , SUM(pt.net_weight) AS weight
+            , SUM(pt.tare_amount_fact) AS amount_fact
+            , SUM(pt.net_weight_fact) AS weight_fact
+        FROM
+            production_task pt
+        INNER JOIN production_task_doc AS doc ON
+            doc.id = pt.doc_id
+            AND
+            doc.stock = %(stock_id)s
+        LEFT JOIN material AS m ON
+            m.id = pt.material
+        INNER JOIN production_task_executor pte ON
+            pte.doc_id = doc.id
+        WHERE
+            pte.executor_id = %(user_id)s
+            AND
+            doc.done = 0
+        GROUP BY
+            doc.id
+            , doc.doc_number
+            , doc.planned_date
+            , doc.technical_process
+            , doc.operation
+            , pt.category
+    ) AS subq
+INNER JOIN production_task_categories ptc ON
+    ptc.doc_id = subq.doc_id
+    AND ptc.category = subq.category
+    AND ptc.task_weight > 0
+ORDER BY
+    subq.doc_id ASC
+    , subq.category ASC
+"""
+    result = []
+    async with conn.cursor() as cur:
+        await cur.execute(q, { "user_id": user_id, "stock_id": stock_id })
+        result = await cur.fetchall()
+        if isinstance(result, tuple):
+            result = []
+    return result
 
 async def select_task_meta(conn: Connection, stock_id: int, doc_id: int, material_id: int):
     q = """

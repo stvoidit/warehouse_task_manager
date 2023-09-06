@@ -78,7 +78,8 @@
                     :prop="col.prop"
                     :column-key="col.prop"
                     :label="col.label"
-                    :min-width="col.width" />
+                    :min-width="col.width"
+                    :formatter="col.formatter" />
                 <el-table-column
                     :width="150"
                     prop="add_processing_id"
@@ -188,7 +189,7 @@ const handleDialogWeight = (job: frontend.IJob, weight: number) => {
     emit("changeStatus", job, (job.rest_gross_weight - weight) + job.tara_weight);
     dialogVisible.value = false;
 };
-
+const numberFormatter = (row: any, col: any, cellValue: number) => cellValue.toLocaleString();
 /** Список столбцов таблицы */
 const columns = [
     {
@@ -212,20 +213,23 @@ const columns = [
     {
         prop: "rest_gross_weight",
         label: "Брутто",
-        width: 100,
-        sortable: false
+        // width: 100,
+        sortable: false,
+        formatter: numberFormatter
     },
     {
         prop: "task_net_weight",
         label: "Нетто",
-        width: 100,
-        sortable: false
+        // width: 100,
+        sortable: false,
+        formatter: numberFormatter
     },
     {
         prop: "net_weight_fact",
         label: "Выполнено",
-        width: 110,
-        sortable: false
+        // width: 110,
+        sortable: false,
+        formatter: numberFormatter
     }
 ];
 </script>

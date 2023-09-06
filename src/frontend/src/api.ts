@@ -8,6 +8,7 @@ const CHANGE_PASSWORD = "change_password";
 const STOCK = "stock";
 const MATERIAL = "material";
 const JOB = "job";
+const TASKS_PROGRESS = "tasks_progress";
 
 
 type user = {
@@ -65,6 +66,18 @@ class ClientAPI {
         /** получение списка задач */
         this.checkToken();
         const response = await fetch(`${BASE_URL}/${STOCK}/${stockID}/${TASKS_LIST}`, { headers: this.requestHeaders() });
+        if (response.status === 403) {
+            window.localStorage.removeItem("token");
+            location.href = "/login";
+        }
+        const body = await response.json();
+        return body;
+    }
+
+    async fetchTasksProgress(stockID: number) {
+        /** получение списка прогресса по задачам */
+        this.checkToken();
+        const response = await fetch(`${BASE_URL}/${STOCK}/${stockID}/${TASKS_PROGRESS}`, { headers: this.requestHeaders() });
         if (response.status === 403) {
             window.localStorage.removeItem("token");
             location.href = "/login";

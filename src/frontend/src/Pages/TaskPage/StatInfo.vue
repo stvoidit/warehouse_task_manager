@@ -37,8 +37,12 @@
                     prop="label"
                     :width="150" />
                 <el-table-column
-                    prop="count" />
+                    prop="count"
+
+                    :formatter="numberFormatter" />
                 <el-table-column
+
+                    :formatter="numberFormatter"
                     prop="netWeight" />
             </el-table>
         </el-col>
@@ -65,6 +69,7 @@ defineProps({
         default: () => ({})
     }
 });
+const numberFormatter = (row: any, col: any, cellValue: number) => cellValue.toLocaleString();
 const colAttr = {
     xs:24,
     sm:12,

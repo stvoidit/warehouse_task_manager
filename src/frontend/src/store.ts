@@ -6,6 +6,8 @@ import { defineStore } from "pinia";
 export default defineStore("app_store", () => {
     /** http клиент */
     const api = reactive(new ClientAPI());
+    /** флаг процесса загрузки данных */
+    const loading = ref(false);
     /** информация из декодированного токена о пользователе */
     const currentUser = computed(() => api.currentUser);
     /** вычисляемое свойство - авторизован пользователь или нет */
@@ -17,10 +19,11 @@ export default defineStore("app_store", () => {
     const stocks = shallowRef<Array<frontend.IStock>>([]);
     /** список заданий */
     const tasks = shallowRef<Array<frontend.ITaskL>>([]);
+    /** список прогресса заданий */
+    const tasks_progress = shallowRef<Array<frontend.ITaskL>>([]);
     /** задание */
     const task = ref<frontend.ITaskP | null>(null);
-    /** флаг процесса загрузки данных */
-    const loading = ref(false);
+
 
     const doLogin = (payload: frontend.ILoginPayload) => api.doLogin(payload);
     /** запрос к API для получения списка складов */
@@ -28,10 +31,16 @@ export default defineStore("app_store", () => {
         return api.fetchStocks().then(body => stocks.value = body).finally(() => loading.value = false);
     };
     /** запрос к API для получения списка задач */
+    /** запрос к API для получения списка прогрессса по задачам */
     const fetchTasksList = (stockID: number) => {
         loading.value = true;
+        return Promise.all([
+            api.fetchTasksList(stockID).then(body => tasks.value = body),
+            api.fetchTasksProgress(stockID).then(body => tasks_progress.value = body)
+        ]).finally(() => loading.value = false);
         return api.fetchTasksList(stockID).then(body => tasks.value = body).finally(() => loading.value = false);
     };
+
     /** запрос к API для получения данных задания */
     const fetchTask = (stockID: number, taskID: number, materialID: number, tareType: string, with_load=true) => {
         if (with_load) loading.value = true;
@@ -93,6 +102,7 @@ export default defineStore("app_store", () => {
         updateJobStatus,
         stocks,
         tasks,
+        tasks_progress,
         task,
         isAuth,
         currentUser,

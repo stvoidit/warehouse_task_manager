@@ -52,6 +52,11 @@ const columns = [
         width: 200
     },
     {
+        prop: "category",
+        label: "Категория",
+        width: 100
+    },
+    {
         prop: "planned_date",
         label: "План. Дата",
         width: 100,
@@ -70,11 +75,6 @@ const columns = [
     {
         prop: "tare_type",
         label: "Тара",
-        width: 100
-    },
-    {
-        prop: "category",
-        label: "Категория",
         width: 100
     },
     {

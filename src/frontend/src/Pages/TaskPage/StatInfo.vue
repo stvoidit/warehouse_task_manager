@@ -38,10 +38,8 @@
                     :width="150" />
                 <el-table-column
                     prop="count"
-
                     :formatter="numberFormatter" />
                 <el-table-column
-
                     :formatter="numberFormatter"
                     prop="netWeight" />
             </el-table>

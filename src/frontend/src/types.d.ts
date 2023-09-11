@@ -57,6 +57,7 @@ declare namespace frontend {
     export type ITaskWeight = {
         category: string
         task_weight: number
+        sum_net_weight_fact: number
     }
 
     export type IProcessingType = {

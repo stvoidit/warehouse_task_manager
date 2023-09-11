@@ -341,32 +341,45 @@ ORDER BY
 async def get_task_weights(conn: Connection, doc_id: int, material_id: int):
     q1 = """
 SELECT
-    category
-    , task_weight
+    pt.category
+    , ptm.task_weight
+    , SUM(pt.net_weight_fact) AS sum_net_weight_fact
 FROM
-    production_task_materials ptm
+    production_task pt
+LEFT JOIN production_task_materials ptm ON
+    pt.doc_id = ptm.doc_id
+    AND ptm.category = pt.category
 WHERE
-    material = %(material_id)s
-    AND doc_id = %(doc_id)s
+    ptm.doc_id = %(doc_id)s
+GROUP BY
+    ptm.category
+    , ptm.task_weight
 """
     q2 = """
 SELECT
-    category
-    , task_weight
+    ptc.category
+    , ptc.task_weight
+    , SUM(pt.net_weight_fact) AS sum_net_weight_fact
 FROM
-    production_task_categories
+    production_task pt
+LEFT JOIN production_task_categories ptc ON
+    ptc.doc_id = pt.doc_id
+    AND ptc.category = pt.category
 WHERE
-    doc_id = %(doc_id)s
+    ptc.doc_id = %(doc_id)s
+GROUP BY
+    ptc.category
+    , ptc.task_weight
 """
 
     task_weights: list[dict] = []
     async with conn.cursor() as cur:
-        await cur.execute(q1, {"doc_id": doc_id,"material_id": material_id})
+        await cur.execute(q1, {"doc_id": doc_id})
         task_weights = await cur.fetchall()
         # fix: пустой результат возвращает пустой tuple, а не list
         if isinstance(task_weights, tuple):
             task_weights = []
-        await cur.execute(q2, {"doc_id": material_id})
+        await cur.execute(q2, {"doc_id": doc_id})
         # проверяем, что если категория есть в списке, то заменяем вес
         # если категории нет, то добавляем
         for row in await cur.fetchall():

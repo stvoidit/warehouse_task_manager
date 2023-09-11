@@ -347,27 +347,26 @@ FROM
     production_task_materials ptm
 WHERE
     material = %(material_id)s
+    AND doc_id = %(doc_id)s
 """
     q2 = """
 SELECT
     category
-    , SUM(task_weight)
+    , task_weight
 FROM
     production_task_categories
 WHERE
-    category IN (%(q1)s)
-GROUP BY
-    category
+    doc_id = %(doc_id)s
 """
 
     task_weights: list[dict] = []
     async with conn.cursor() as cur:
-        await cur.execute(q1, {"material_id": material_id})
+        await cur.execute(q1, {"doc_id": doc_id,"material_id": material_id})
         task_weights = await cur.fetchall()
         # fix: пустой результат возвращает пустой tuple, а не list
         if isinstance(task_weights, tuple):
             task_weights = []
-        await cur.execute(q2, {"material_id": material_id, "q1": q1})
+        await cur.execute(q2, {"doc_id": material_id})
         # проверяем, что если категория есть в списке, то заменяем вес
         # если категории нет, то добавляем
         for row in await cur.fetchall():

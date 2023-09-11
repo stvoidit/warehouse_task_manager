@@ -378,7 +378,6 @@ GROUP BY
                     task_weights[i] = row
                     exists = True
             if not exists:
-                print(row)
                 task_weights.append(row)
     return task_weights
 

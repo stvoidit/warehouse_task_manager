@@ -8,7 +8,6 @@
             <div :style="{minHeight: '1.3rem', padding: '0.25rem'}">
                 <b style="margin-right: 0.3rem;">{{ cat.categoryLabel }}</b>
                 <el-popover
-                    v-if="cat.categoryLabel"
                     :width="200"
                     trigger="click">
                     <template #reference>

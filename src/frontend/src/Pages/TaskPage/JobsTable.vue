@@ -211,6 +211,12 @@ const columns = [
         sortable: true
     },
     {
+        prop: "tare_type",
+        label: "Тара",
+        width: 100,
+        sortable: false
+    },
+    {
         prop: "rest_gross_weight",
         label: "Брутто",
         // width: 100,

@@ -231,12 +231,12 @@ async def select_processing_types(conn: Connection):
         processing_types.extend(await cur.fetchall())
     return processing_types
 
-async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id: int):
+async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id: int, user_id: int):
     """ получение позиций задания """
     task = await select_task_meta(conn, stock_id, doc_id, material_id)
     if task is None:
         return task
-    task["task_weights"] = await get_task_weights(conn, doc_id, material_id)
+    task["task_weights"] = await get_task_weights(conn, doc_id, material_id, user_id)
     task["processing_types"] = await select_processing_types(conn)
 
     q = """
@@ -335,59 +335,171 @@ ORDER BY
     return task
 
 
-async def get_task_weights(conn: Connection, doc_id: int, material_id: int):
+async def get_task_weights(conn: Connection, doc_id: int, material_id: int, user_id: int):
     q1 = """
 SELECT
-    pt.category
-    , ptm.task_weight
-    , SUM(pt.net_weight_fact) AS sum_net_weight_fact
+    doc_id
+    , material_id
+    , material
+    , category
+    , tare_amount
+    , task_weight_category AS task_weight
+    , tare_amount_fact
+    , net_weight_fact
+    , category_details
 FROM
-    production_task pt
-LEFT JOIN production_task_materials ptm ON
-    pt.doc_id = ptm.doc_id
-    AND ptm.category = pt.category
-WHERE
-    ptm.doc_id = %(doc_id)s
-GROUP BY
-    ptm.category
-    , ptm.task_weight
-"""
-    q2 = """
+    (
+        SELECT
+            ptm.doc_id
+            , ptm.material AS material_id
+            , m.material
+            , ptm.category
+            , ptm.task_weight AS task_weight_material
+            , ptc.task_weight AS task_weight_category
+            , pt.tare_amount
+            , pt.net_weight
+            , pt.tare_amount_fact
+            , pt.net_weight_fact
+        FROM
+            production_task_materials AS ptm
+        LEFT JOIN production_task_categories AS ptc ON
+            ptm.doc_id = ptc.doc_id
+            AND ptm.category = ptc.category
+        LEFT JOIN material AS m ON
+            m.id = ptm.material
+        INNER JOIN
+            (
+                SELECT
+                    pt.doc_id
+                    , category
+                    , SUM(tare_amount) AS tare_amount
+                    , SUM(net_weight) AS net_weight
+                    , SUM(tare_amount_fact) AS tare_amount_fact
+                    , SUM(net_weight_fact) AS net_weight_fact
+                FROM
+                    production_task AS pt
+                LEFT JOIN production_task_doc AS ptd ON
+                    ptd.id = pt.doc_id
+                LEFT JOIN production_task_executor AS pte ON
+                    pte.doc_id = pt.doc_id
+                WHERE
+                    pte.executor_id = %(user_id)s
+                    AND ptd.done = 0
+                GROUP BY
+                    doc_id
+                    , category
+            ) pt ON
+            pt.doc_id = ptm.doc_id
+            AND pt.category = ptm.category
+        WHERE
+            ptm.doc_id = %(doc_id)s
+            AND ptm.material = %(material_id)s
+            AND NOT ptc.task_weight IS NULL
+    ) task_list
+LEFT JOIN
+        (
+        SELECT
+                ptc.doc_id AS category_details_doc_id
+            , ptc.category AS category_details_category
+            , GROUP_CONCAT(m.material) AS category_details
+        FROM
+                production_task_categories AS ptc
+        LEFT JOIN production_task_materials AS ptm ON
+                ptm.doc_id = ptc.doc_id
+            AND ptm.category = ptc.category
+        LEFT JOIN material AS m ON
+                m.id = ptm.material
+        GROUP BY
+            category_details_doc_id
+            , category_details_category
+    ) details ON
+        details.category_details_doc_id = task_list.doc_id
+    AND details.category_details_category = task_list.category
+UNION ALL
 SELECT
-    ptc.category
-    , ptc.task_weight
-    , SUM(pt.net_weight_fact) AS sum_net_weight_fact
+    doc_id
+    , material_id
+    , material
+    , category
+    , tare_amount
+    , IF(
+        task_weight_material = 0
+        , net_weight
+        , task_weight_material
+    ) AS task_weight
+    , tare_amount_fact
+    , net_weight_fact
+    , material AS category_details
 FROM
-    production_task pt
-LEFT JOIN production_task_categories ptc ON
-    ptc.doc_id = pt.doc_id
-    AND ptc.category = pt.category
-WHERE
-    ptc.doc_id = %(doc_id)s
-GROUP BY
-    ptc.category
-    , ptc.task_weight
+    (
+        SELECT
+            ptm.doc_id
+            , ptm.material AS material_id
+            , ptm.category
+            , m.material
+            , ptm.task_weight AS task_weight_material
+            , pt.tare_amount
+            , pt.net_weight
+            , pt.tare_amount_fact
+            , pt.net_weight_fact
+        FROM
+            (
+                SELECT
+                    ptm.*
+                FROM
+                    production_task_materials AS ptm
+                LEFT JOIN production_task_categories AS ptc ON
+                    ptc.doc_id = ptm.doc_id
+                    AND ptc.category = ptm.category
+                WHERE
+                    ptc.category IS NULL
+            ) ptm
+        LEFT JOIN material AS m ON
+            m.id = ptm.material
+        INNER JOIN
+            (
+                SELECT
+                    pt.doc_id
+                    , material
+                    , category
+                    , SUM(tare_amount) AS tare_amount
+                    , SUM(net_weight) AS net_weight
+                    , SUM(tare_amount_fact) AS tare_amount_fact
+                    , SUM(net_weight_fact) AS net_weight_fact
+                FROM
+                    production_task AS pt
+                LEFT JOIN production_task_doc AS ptd ON
+                    ptd.id = pt.doc_id
+                LEFT JOIN production_task_executor AS pte ON
+                    pte.doc_id = pt.doc_id
+                WHERE
+                    pte.executor_id = %(user_id)s
+                    AND ptd.done = 0
+                GROUP BY
+                    doc_id
+                    , material
+                    , category
+            ) pt ON
+            pt.doc_id = ptm.doc_id
+            AND pt.material = ptm.material
+            AND pt.category = ptm.category
+        WHERE
+            ptm.doc_id = %(doc_id)s
+            AND ptm.material = %(material_id)s
+    ) task_list
 """
-
+    params = {
+        "doc_id": doc_id,
+        "material_id": material_id,
+        "user_id": user_id
+        }
     task_weights: list[dict] = []
     async with conn.cursor() as cur:
-        await cur.execute(q1, {"doc_id": doc_id})
+        await cur.execute(q1, params )
         task_weights = await cur.fetchall()
         # fix: пустой результат возвращает пустой tuple, а не list
         if isinstance(task_weights, tuple):
             task_weights = []
-        await cur.execute(q2, {"doc_id": doc_id})
-        # проверяем, что если категория есть в списке, то заменяем вес
-        # если категории нет, то добавляем
-        for row in await cur.fetchall():
-            catname: str = row["category"]
-            exists = False
-            for i, tw in enumerate(task_weights):
-                if tw["category"] == catname:
-                    task_weights[i] = row
-                    exists = True
-            if not exists:
-                task_weights.append(row)
     return task_weights
 
 async def check_user(conn: Connection, login: str, password_hash: str):

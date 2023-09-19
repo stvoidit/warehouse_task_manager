@@ -57,8 +57,12 @@ declare namespace frontend {
     /** Ограничение по весу в категории материала */
     export type ITaskWeight = {
         category: string
+        net_weight_fact: number
+        material: string
+        material_id: number
+        tare_amount: number
+        tare_amount_fact: number
         task_weight: number
-        sum_net_weight_fact: number
     }
 
     export type IProcessingType = {

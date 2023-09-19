@@ -153,7 +153,7 @@ const statInfo = computed(() => {
         return store.task?.jobs.reduce((prev,cur) => cur.category === category ? prev+=cur.task_net_weight : prev, 0)??0;
     };
     const sumNetWeightComplited = (category: string) => {
-        return store.task?.task_weights.find(tw => tw.category === category)?.sum_net_weight_fact?? store.task?.jobs.reduce((prev,cur) => cur.done && cur.category === category ? prev+=cur.net_weight_fact : prev, 0)??0;
+        return store.task?.task_weights.find(tw => tw.category === category)?.net_weight_fact?? store.task?.jobs.reduce((prev,cur) => cur.done && cur.category === category ? prev+=cur.net_weight_fact : prev, 0)??0;
     };
     return categoriesOptions.value.map(category => ({
         categoryLabel: category,

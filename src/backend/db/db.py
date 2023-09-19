@@ -231,7 +231,7 @@ async def select_processing_types(conn: Connection):
         processing_types.extend(await cur.fetchall())
     return processing_types
 
-async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id: int, tare_type: str):
+async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id: int):
     """ получение позиций задания """
     task = await select_task_meta(conn, stock_id, doc_id, material_id)
     if task is None:
@@ -318,8 +318,6 @@ WHERE
     arrival_doc.stock = %(stock)s
     AND
     m.id = %(material_id)s
-    AND
-    tare_type = %(tare_type)s
 ORDER BY
     m.material
     , arrival.tare_id
@@ -328,8 +326,7 @@ ORDER BY
     query_args = {
             "doc_id": doc_id,
             "stock": stock_id,
-            "material_id": material_id,
-            "tare_type": tare_type
+            "material_id": material_id
         }
     async with conn.cursor() as cur:
         await cur.execute(q, query_args)

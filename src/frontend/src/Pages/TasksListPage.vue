@@ -40,7 +40,7 @@
                     :formatter="col.formatter" />
                 <el-table-column label="Остаток">
                     <template #default="{ row }:{ row:frontend.ITaskL }">
-                        {{ typeof row.weight === 'number' ? calculationRemainder(row.weight, row.weight_fact) : '-' }}
+                        {{ typeof row.weight === 'number' ? calculationRemainder(row.weight, row.net_weight_fact) : '-' }}
                     </template>
                 </el-table-column>
             </el-table>

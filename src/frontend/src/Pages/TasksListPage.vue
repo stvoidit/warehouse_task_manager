@@ -130,18 +130,13 @@ const columns = [
         width: 200
     },
     {
-        prop: "tare_type",
-        label: "Тара",
-        width: 100
-    },
-    {
         prop: "weight",
         label: "Задание",
         formatter: numberFormatter
         // width: 100
     },
     {
-        prop: "weight_fact",
+        prop: "net_weight_fact",
         label: "Выполнено",
         formatter: numberFormatter
         // width: 100

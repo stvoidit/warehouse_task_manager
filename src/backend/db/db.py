@@ -7,90 +7,90 @@ async def select_tasks(conn: Connection, user_id: int, stock_id: int) -> list:
     """ получение списка заданий """
     q = """
 SELECT
-    subq.material
-    , subq.material_id
-    , subq.doc_id
-    , subq.doc_number
-    , subq.planned_date
-    , subq.technical_process
-    , subq.operation
-    , subq.tare_type
-    , subq.category
-    , subq.amount
-    , IF (
-        IFNULL(ptc.task_weight, 0) = 0
-        , IFNULL(ptm.task_weight, subq.weight)
+    doc_id
+    , material_id
+    , material
+    , category
+    , planned_date
+    , technical_process
+    , operation
+    , tare_amount
+    , IF(
+        task_weight_category = 0
+        , IF(
+            task_weight_material = 0
+            , net_weight
+            , task_weight_material
+        )
         , 0
     ) AS weight
-    , subq.amount_fact
-    , subq.weight_fact
+    , tare_amount_fact
+    , net_weight_fact
 FROM
     (
         SELECT
-            m.material
-            , m.id AS material_id
-            , doc.id AS doc_id
-            , doc.doc_number
-            , doc.planned_date
-            , doc.technical_process
-            , doc.operation
-            , A.tare_type
-            , pt.category
-            , SUM(pt.tare_amount) AS amount
-            , SUM(pt.net_weight) AS weight
-            , SUM(pt.tare_amount_fact) AS amount_fact
-            , SUM(pt.net_weight_fact) AS weight_fact
+            ptm.doc_id
+            , ptm.material AS material_id
+            , m.material
+            , ptm.category
+            , pt.planned_date
+            , pt.technical_process
+            , pt.operation
+            , ptm.task_weight AS task_weight_material
+            , IFNULL(ptc.task_weight, 0) AS task_weight_category
+            , pt.tare_amount
+            , pt.net_weight
+            , pt.tare_amount_fact
+            , pt.net_weight_fact
         FROM
-            production_task pt
-        LEFT JOIN production_task_doc AS doc ON
-            doc.id = pt.doc_id
+            production_task_materials AS ptm
+        LEFT JOIN production_task_categories AS ptc ON
+            ptm.doc_id = ptc.doc_id
+            AND ptm.category = ptc.category
         LEFT JOIN material AS m ON
-            m.id = pt.material
-        INNER JOIN (
+            m.id = ptm.material
+        INNER JOIN
+            (
                 SELECT
-                    tare_type
-                    , key_material
+                    pt.doc_id
+                    , material
+                    , category
+                    , ptd.planned_date AS planned_date
+                    , ptd.technical_process AS technical_process
+                    , ptd.operation AS operation
+                    , SUM(tare_amount) AS tare_amount
+                    , SUM(net_weight) AS net_weight
+                    , SUM(tare_amount_fact) AS tare_amount_fact
+                    , SUM(net_weight_fact) AS net_weight_fact
                 FROM
-                    arrival
-                LEFT JOIN arrival_doc ON
-                    arrival_doc.id = arrival.doc_id
+                    production_task AS pt
+                LEFT JOIN production_task_doc AS ptd ON
+                    ptd.id = pt.doc_id
+                LEFT JOIN production_task_executor AS pte ON
+                    pte.doc_id = pt.doc_id
                 WHERE
-                    arrival_doc.stock = %(stock_id)s
-            ) AS A ON
-            A.key_material = pt.key_material
-        INNER JOIN production_task_executor pte ON
-            pte.doc_id = doc.id
-        WHERE
-            pte.executor_id = %(user_id)s
-            AND
-            doc.done = 0
-        GROUP BY
-            m.material
-            , m.id
-            , doc.id
-            , doc.doc_number
-            , doc.planned_date
-            , doc.technical_process
-            , doc.operation
-            , A.tare_type
-            , pt.category
-    ) AS subq
-LEFT JOIN production_task_materials ptm ON
-    ptm.doc_id = subq.doc_id
-    AND ptm.material = subq.material_id
-    AND ptm.category = subq.category
-LEFT JOIN production_task_categories ptc ON
-    ptc.doc_id = subq.doc_id
-    AND ptc.category = subq.category
+                    pte.executor_id = %(user_id)s
+                    AND ptd.done = 0
+                GROUP BY
+                    doc_id
+                    , material
+                    , category
+                    , planned_date
+                    , technical_process
+                    , operation
+            ) pt ON
+            pt.doc_id = ptm.doc_id
+            AND pt.material = ptm.material
+            AND pt.category = ptm.category
+    ) task_list
 ORDER BY
-    subq.doc_id ASC
-    , subq.material_id ASC
-    , subq.category ASC
-    , subq.tare_type ASC
+    doc_id
+    , material
+    , category
     """
     result = []
     async with conn.cursor() as cur:
-        await cur.execute(q, { "user_id": user_id, "stock_id": stock_id })
+        await cur.execute(q, { "user_id": user_id })
         result = await cur.fetchall()
         if isinstance(result, tuple):
             result = []

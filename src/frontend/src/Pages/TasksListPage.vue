@@ -87,7 +87,6 @@ const computedDataTasks = computed(() => {
 /** Обработчик нажатия на строку таблицы - переход в задачу */
 const handleRowClick = (row: frontend.ITaskL) => {
     const qs = (new URLSearchParams({
-        tareType: row.tare_type,
         categoryTask: row.category
     })).toString();
     router.push(`/stock/${props.stockID}/task/${row.doc_id}/material/${row.material_id}?${qs}`);

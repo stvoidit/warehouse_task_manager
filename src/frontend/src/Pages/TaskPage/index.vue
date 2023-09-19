@@ -127,11 +127,6 @@ const metaInfo = computed(() => ({
             width: 150
         },
         {
-            label: "Тара",
-            prop: "tareType",
-            width: 100
-        },
-        {
             label: "Плановая дата",
             prop: "planned_date",
             width: 150

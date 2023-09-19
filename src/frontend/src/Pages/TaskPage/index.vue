@@ -11,8 +11,7 @@
                     :categories-options="categoriesOptions" />
             </MetaInfo>
             <StatInfo
-                :stat-info="statInfo"
-                :catmat="store.task.catmat" />
+                :stat-info="statInfo" />
             <JobsTable
                 :jobs-list="computedJobsData"
                 :processing-types="store.task.processing_types"
@@ -157,6 +156,7 @@ const statInfo = computed(() => {
     };
     return categoriesOptions.value.map(category => ({
         categoryLabel: category,
+        catmat: store.task?.task_weights.find(tw => tw.category === category)?.category_details.split(",")?? [],
         data: [
             {
                 label: "Заданий",

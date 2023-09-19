@@ -63,6 +63,7 @@ declare namespace frontend {
         tare_amount: number
         tare_amount_fact: number
         task_weight: number
+        category_details: string
     }
 
     export type IProcessingType = {

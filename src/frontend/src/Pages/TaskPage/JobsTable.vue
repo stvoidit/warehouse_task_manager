@@ -44,6 +44,7 @@
                         <el-button
                             v-if="dialogJob"
                             type="success"
+                            :disabled="takenWeight === null"
                             @click="handleDialogWeight(dialogJob, takenWeight)">
                             Подтвердить
                         </el-button>

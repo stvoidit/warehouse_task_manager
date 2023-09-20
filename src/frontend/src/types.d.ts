@@ -22,6 +22,7 @@ declare namespace frontend {
         tare_type: string
         category: string
         net_weight_fact: number
+        done: number
     }
 
     /** Задание из задачи */

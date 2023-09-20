@@ -19,6 +19,18 @@ body {
     text-align: center;
 }
 
+.completed-row {
+    background-color: #c9ebb7 !important;
+}
+
+.non-hover.el-table {
+    --el-table-row-hover-bg-color: none !important;
+}
+
+/* .non-hover.el-table>.el-table__row {
+    cursor: default;
+} */
+
 .el-table__row {
     cursor: pointer;
 }

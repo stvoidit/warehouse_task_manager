@@ -5,6 +5,9 @@
             :style="{marginBottom: '2em'}">
             <el-table
                 v-loading="store.loading"
+                :row-style="{cursor: 'default'}"
+                class="non-hover"
+                :row-class-name="rowClass"
                 :data="store.tasks_progress"
                 :border="true"
                 width="100%"
@@ -15,6 +18,7 @@
                     :key="col.prop"
                     :prop="col.prop"
                     :label="col.label"
+                    :min-width="col.width"
                     :formatter="col.formatter" />
                 <el-table-column label="Остаток">
                     <template #default="{ row }:{ row:frontend.ITaskL }">
@@ -26,6 +30,8 @@
         <el-col :span="24">
             <el-table
                 v-loading="store.loading"
+                class="non-hover"
+                :row-class-name="rowClass"
                 :data="computedDataTasks"
                 :border="true"
                 :flexible="true"
@@ -98,9 +104,23 @@ function calculationRemainder(weight: number, weight_fact: number) {
     return result.toLocaleString();
 }
 
+/** раскраска строк таблицы */
+function rowClass({ row }: { row: frontend.ITaskL }) {
+    if (row.done === 1) return "completed-row";
+    return "";
+}
+
 /** Список столбцов таблицы */
 const dateFormatter = (row: any, col: any, cellValue: string) => dayjs(cellValue, "YYYY-MM-DD").format("DD.MM.YYYY");
-const numberFormatter = (row: any, col: any, cellValue: number) => cellValue.toLocaleString();
+const numberFormatter = (row: any, col: any, cellValue: number): string => {
+    try {
+        return cellValue.toLocaleString();
+    } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn(col, cellValue);
+    }
+    return "";
+};
 const columns = [
     {
         prop: "material",
@@ -132,13 +152,11 @@ const columns = [
         prop: "weight",
         label: "Задание",
         formatter: numberFormatter
-        // width: 100
     },
     {
         prop: "net_weight_fact",
         label: "Выполнено",
         formatter: numberFormatter
-        // width: 100
     }
 ];
 const columns_tasks_progress = [
@@ -157,11 +175,13 @@ const columns_tasks_progress = [
     },
     {
         prop: "technical_process",
-        label: "Техпроцесс"
+        label: "Техпроцесс",
+        width: 100
     },
     {
         prop: "operation",
-        label: "Операция"
+        label: "Операция",
+        width: 200
     },
     {
         prop: "weight",
@@ -175,3 +195,6 @@ const columns_tasks_progress = [
     }
 ];
 </script>
+<style>
+
+</style>

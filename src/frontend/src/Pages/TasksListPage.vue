@@ -19,7 +19,10 @@
                     :prop="col.prop"
                     :label="col.label"
                     :min-width="col.width"
-                    :formatter="col.formatter" />
+                    :formatter="col.formatter"
+                    filter-placement="bottom-end"
+                    :filter-method="col.filterMethod"
+                    :filters="col.filters ? col.filters : null" />
                 <el-table-column label="Остаток">
                     <template #default="{ row }:{ row:frontend.ITaskL }">
                         {{ typeof row.weight === 'number' ? calculationRemainder(row.weight, row.weight_fact) : '-' }}
@@ -43,7 +46,10 @@
                     :prop="col.prop"
                     :label="col.label"
                     :min-width="col.width"
-                    :formatter="col.formatter" />
+                    :formatter="col.formatter"
+                    filter-placement="bottom-end"
+                    :filter-method="col.filterMethod"
+                    :filters="col.filters ? col.filters : null" />
                 <el-table-column label="Остаток">
                     <template #default="{ row }:{ row:frontend.ITaskL }">
                         {{ typeof row.weight === 'number' ? calculationRemainder(row.weight, row.net_weight_fact) : '-' }}
@@ -121,6 +127,20 @@ const numberFormatter = (row: any, col: any, cellValue: number): string => {
     }
     return "";
 };
+
+const uniqueOperations = computed(() => {
+    const setOp = new Set(store.tasks.map(task => task.operation));
+    const options: {text:string,value:string}[] = [];
+    for (const op of setOp) {
+        options.push({text: op, value: op});
+    }
+    return options.sort();
+});
+
+const filterByOperation = (value: string, row: any) => {
+    return row.operation === value;
+};
+
 const columns = [
     {
         prop: "material",
@@ -146,7 +166,9 @@ const columns = [
     {
         prop: "operation",
         label: "Операция",
-        width: 200
+        width: 200,
+        filters: uniqueOperations,
+        filterMethod: filterByOperation
     },
     {
         prop: "weight",
@@ -181,7 +203,9 @@ const columns_tasks_progress = [
     {
         prop: "operation",
         label: "Операция",
-        width: 200
+        width: 200,
+        filters: uniqueOperations,
+        filterMethod: filterByOperation
     },
     {
         prop: "weight",

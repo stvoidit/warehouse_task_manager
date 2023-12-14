@@ -1,26 +1,26 @@
 {
   "dependencies": {
-    "@element-plus/icons-vue": "^2.1.0",
+    "@element-plus/icons-vue": "^2.3.1",
     "dayjs": "^1.11.10",
-    "element-plus": "^2.3.14",
+    "element-plus": "^2.4.3",
     "jwt-decode": "^3.1.2",
-    "pinia": "^2.1.6",
-    "vite-plugin-pwa": "^0.16.5",
-    "vue": "^3.3.4",
-    "vue-router": "^4.2.4"
+    "pinia": "^2.1.7",
+    "vite-plugin-pwa": "^0.17.4",
+    "vue": "^3.3.11",
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
-    "@types/node": "^18.17.18",
-    "@typescript-eslint/eslint-plugin": "^6.7.2",
-    "@typescript-eslint/parser": "^6.7.2",
-    "@vitejs/plugin-vue": "^4.3.4",
+    "@types/node": "^20.10.4",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-vue": "^4.5.2",
     "@vue/eslint-config-typescript": "^12.0.0",
-    "eslint": "^8.49.0",
-    "eslint-plugin-vue": "^9.17.0",
-    "sass": "^1.67.0",
-    "typescript": "^5.2.2",
-    "vite": "^4.4.9",
-    "vue-tsc": "^1.8.11",
+    "eslint": "^8.55.0",
+    "eslint-plugin-vue": "^9.19.2",
+    "sass": "^1.69.5",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8",
+    "vue-tsc": "^1.8.25",
     "workbox-window": "^7.0.0"
   },
   "engines": {

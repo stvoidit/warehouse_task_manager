@@ -1,5 +1,5 @@
 # build vue frontend static files
-FROM node:18-alpine AS frontend
+FROM node:20-alpine AS frontend
 WORKDIR /frontend
 RUN npm install -g pnpm
 COPY src/frontend/package.json \

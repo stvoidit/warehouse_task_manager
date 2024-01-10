@@ -14,7 +14,7 @@ COPY src/frontend/public public
 # ENV NODE_OPTIONS='--max-old-space-size=384'
 RUN NODE_ENV=production pnpm build
 
-FROM python:3.11-slim-buster as aiohttp-backend
+FROM python:3.12-slim-bullseye as aiohttp-backend
 WORKDIR /app
 RUN cp /usr/share/zoneinfo/Europe/Moscow /etc/localtime && echo "Europe/Moscow" >/etc/timezone
 RUN apt-get update && apt-get upgrade -y && apt-get install ca-certificates build-essential libmagic-dev -y && apt-get clean

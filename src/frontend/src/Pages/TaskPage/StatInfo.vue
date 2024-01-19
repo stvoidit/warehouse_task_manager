@@ -8,7 +8,7 @@
             <div :style="{minHeight: '1.3rem', padding: '0.25rem'}">
                 <b style="margin-right: 0.3rem;">{{ cat.categoryLabel }}</b>
                 <el-popover
-                    :width="200"
+                    :width="250"
                     trigger="click">
                     <template #reference>
                         <el-button

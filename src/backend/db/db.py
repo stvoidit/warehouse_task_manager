@@ -280,7 +280,7 @@ WHERE
     q_categories_materials = """
 SELECT
     pt.category
-    , GROUP_CONCAT(DISTINCT m.material) AS meterials
+    , GROUP_CONCAT(DISTINCT m.material SEPARATOR ';') AS meterials
 FROM
     production_task AS pt
 LEFT JOIN material AS m ON

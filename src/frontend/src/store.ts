@@ -70,7 +70,7 @@ export default defineStore("app_store", () => {
     };
     /** остановка автообновления */
     const stopAutofetch = () => {
-        clearInterval(timer);
+        clearInterval(timer as unknown as number);
     };
 
     /** т.к. процесс выхода (logout) не требует фиксации на бэке, то достаточно просто стереть токен из памяти */

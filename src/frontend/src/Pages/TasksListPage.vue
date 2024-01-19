@@ -22,7 +22,7 @@
                     :formatter="col.formatter"
                     filter-placement="bottom-end"
                     :filter-method="col.filterMethod"
-                    :filters="col.filters ? col.filters : null" />
+                    :filters="(col.filters as unknown as Filters)" />
                 <el-table-column label="Остаток">
                     <template #default="{ row }:{ row:frontend.ITaskL }">
                         {{ typeof row.weight === 'number' ? calculationRemainder(row.weight, row.weight_fact) : '-' }}
@@ -49,7 +49,7 @@
                     :formatter="col.formatter"
                     filter-placement="bottom-end"
                     :filter-method="col.filterMethod"
-                    :filters="col.filters ? col.filters : null" />
+                    :filters="(col.filters as unknown as Filters)" />
                 <el-table-column label="Остаток">
                     <template #default="{ row }:{ row:frontend.ITaskL }">
                         {{ typeof row.weight === 'number' ? calculationRemainder(row.weight, row.net_weight_fact) : '-' }}
@@ -64,6 +64,7 @@ import { onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import useApplicationStore from "@/store";
 import dayjs from "dayjs";
+import { Filters } from "element-plus/es/components/table/src/table-column/defaults";
 
 const props = defineProps({
     /** ID склада */
@@ -130,7 +131,7 @@ const numberFormatter = (row: any, col: any, cellValue: number): string => {
 
 const uniqueOperations = computed(() => {
     const setOp = new Set(store.tasks.map(task => task.operation));
-    const options: {text:string,value:string}[] = [];
+    const options: Filters = [];
     for (const op of setOp) {
         options.push({text: op, value: op});
     }

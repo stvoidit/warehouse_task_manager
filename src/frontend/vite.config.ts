@@ -54,7 +54,6 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
             })
         ],
         server: {
-            https: false,
             proxy: {
                 "/api": {
                     target: env.VITE_PROXY_TARGET || "http://localhost:8080",

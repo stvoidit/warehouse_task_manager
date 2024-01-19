@@ -156,7 +156,7 @@ const statInfo = computed(() => {
     };
     return categoriesOptions.value.map(category => ({
         categoryLabel: category,
-        catmat: store.task?.task_weights.find(tw => tw.category === category)?.category_details.split(";")?? [],
+        catmat: store.task?.catmat[category]?.split(";")?? [],
         data: [
             {
                 label: "Заданий",

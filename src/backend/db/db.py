@@ -321,13 +321,13 @@ async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id:
     q = """
 SELECT
     m.material
-    , arrival.material as material_id
+    , arrival.material AS material_id
     , arrival.tare_id
     , arrival.tare_mark
     , arrival.tare_type
     , tare.weight AS tara_weight
     , task.category
-    , arrival.net_weight - IFNULL(P.net_weight, 0) - IFNULL(S.net_weight, 0) + IFNULL(tare.weight, 0) * (arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(S.tare_amount, 0)) AS rest_gross_weight
+    , arrival.net_weight - IFNULL(P.net_weight, 0) - IFNULL(A.net_weight, 0) - IFNULL(S.net_weight, 0) + IFNULL(tare.weight, 0) * (arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(A.tare_amount, 0) - IFNULL(S.tare_amount, 0)) AS rest_gross_weight
     , task.tare_amount AS task_tare_amount
     , task.net_weight AS task_net_weight
     , task.net_weight_fact
@@ -343,18 +343,29 @@ LEFT JOIN (
         LEFT JOIN production_doc ON
             production_doc.id = production.doc_id
         WHERE
-            production_doc.stock = %(stock)s
+            production_doc.stock = %(stock_id)s
     ) P ON
     P.key_material = arrival.key_material
 LEFT JOIN (
         SELECT
             *
         FROM
+            adjustment
+        LEFT JOIN adjustment_doc ON
+            adjustment_doc.id = adjustment.doc_id
+        WHERE
+            adjustment_doc.stock = %(stock_id)s
+    ) A ON
+    A.key_material = arrival.key_material
+LEFT JOIN (
+        SELECTs
+            *
+        FROM
             shipment
         LEFT JOIN shipment_doc ON
             shipment_doc.id = shipment.doc_id
         WHERE
-            shipment_doc.stock = %(stock)s
+            shipment_doc.stock = %(stock_id)s
     ) S ON
     S.key_material = arrival.key_material
 LEFT JOIN material AS m ON
@@ -390,11 +401,11 @@ INNER JOIN (
             production_task_doc.id = production_task.doc_id
         WHERE
             production_task_doc.id = %(doc_id)s
-            AND production_task_doc.stock = %(stock)s
+            AND production_task_doc.stock = %(stock_id)s
     ) AS task ON
     task.key_material = arrival.key_material
 WHERE
-    arrival_doc.stock = %(stock)s
+    arrival_doc.stock = %(stock_id)s
     AND
     m.id = %(material_id)s
 ORDER BY
@@ -404,7 +415,7 @@ ORDER BY
     jobs = []
     query_args = {
             "doc_id": doc_id,
-            "stock": stock_id,
+            "stock_id": stock_id,
             "material_id": material_id
         }
     async with conn.cursor() as cur:

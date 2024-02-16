@@ -772,7 +772,7 @@ WHERE
         await cur.execute(q, query_args)
         # На всякий случай перехват ошибки, чтобы совсем не падать
         try:
-            await cur.callproc("update_next_process", [doc_id])
+            await cur.callproc("update_next_process_v2", [doc_id, material_id, tara_id])
         except Exception as e:
             print(f"ERROR callproc \"update_next_process\": {e}")
     return

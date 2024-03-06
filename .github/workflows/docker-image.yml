@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag wtm:latest
+      run: docker build . --file Dockerfile --tag wtm:latest --label "runnumber=${GITHUB_RUN_ID}" --label "org.opencontainers.image.source=https://github.com/stvoidit/warehouse_task_manager"
     - name: Log in to registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
     - name: Push image

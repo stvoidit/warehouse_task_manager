@@ -321,70 +321,48 @@ async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id:
     q = """
 SELECT
     m.material
-    , arrival.material AS material_id
-    , arrival.tare_id
-    , arrival.tare_mark
-    , arrival.tare_type
-    , tare.weight AS tara_weight
+    , sd.material AS material_id
+    , sd.tare_id
+    , sd.tare_mark
+    , sd.tare_type
+    , sd.tare_weight AS tara_weight
     , task.category
-    , arrival.net_weight - IFNULL(P.net_weight, 0) - IFNULL(A.net_weight, 0) - IFNULL(S.net_weight, 0) + IFNULL(tare.weight, 0) * (arrival.tare_amount - IFNULL(P.tare_amount, 0) - IFNULL(A.tare_amount, 0) - IFNULL(S.tare_amount, 0)) AS rest_gross_weight
+    , sd.rest_gross_weight AS rest_gross_weight
     , task.tare_amount AS task_tare_amount
     , task.net_weight AS task_net_weight
     , task.net_weight_fact
     , task.add_processing_id
     , task.done
 FROM
-    arrival
-LEFT JOIN (
-        SELECT
-            *
-        FROM
-            production
-        LEFT JOIN production_doc ON
-            production_doc.id = production.doc_id
-        WHERE
-            production_doc.stock = %(stock_id)s
-    ) P ON
-    P.key_material = arrival.key_material
-LEFT JOIN (
-        SELECT
-            *
-        FROM
-            adjustment
-        LEFT JOIN adjustment_doc ON
-            adjustment_doc.id = adjustment.doc_id
-        WHERE
-            adjustment_doc.stock = %(stock_id)s
-    ) A ON
-    A.key_material = arrival.key_material
-LEFT JOIN (
-        SELECTs
-            *
-        FROM
-            shipment
-        LEFT JOIN shipment_doc ON
-            shipment_doc.id = shipment.doc_id
-        WHERE
-            shipment_doc.stock = %(stock_id)s
-    ) S ON
-    S.key_material = arrival.key_material
+(
+    SELECT
+    sd.*
+    , md.tare_type
+    , md.tare_mark
+    , md.material_group
+    , md.material_mark
+    , sd.rest_net_weight + sd.rest_tare_amount * tare.weight AS rest_gross_weight, tare.weight AS tare_weight
+FROM
+(
+    SELECT
+        stock
+        , material
+        , tare_id
+        , key_material
+        , SUM(tare_amount) AS rest_tare_amount
+        , SUM(net_weight) AS rest_net_weight
+    FROM stock_data AS sd
+    GROUP BY stock, material, tare_id, key_material
+) sd
+LEFT JOIN
+    material_data AS md ON md.key_material = sd.key_material
+LEFT JOIN
+    tare ON tare.id = md.tare_type
+) sd
+LEFT JOIN material_data AS md ON
+    md.key_material = sd.key_material
 LEFT JOIN material AS m ON
-    m.id = arrival.material
-LEFT JOIN tare ON
-    arrival.tare_type = tare.id
-LEFT JOIN (
-        SELECT
-            lab.key_material
-            , TRIM(GROUP_CONCAT(lab.material_mark SEPARATOR ' ')) AS lab_material_mark
-            , TRIM(GROUP_CONCAT(lab.material_group SEPARATOR ' ')) AS lab_material_group
-        FROM
-            laboratory AS lab
-        GROUP BY
-            lab.key_material
-    ) L ON
-    L.key_material = arrival.key_material
-LEFT JOIN arrival_doc ON
-    arrival_doc.id = arrival.doc_id
+    m.id = sd.material
 INNER JOIN (
         SELECT
             key_material
@@ -403,14 +381,14 @@ INNER JOIN (
             production_task_doc.id = %(doc_id)s
             AND production_task_doc.stock = %(stock_id)s
     ) AS task ON
-    task.key_material = arrival.key_material
+    task.key_material = sd.key_material
 WHERE
-    arrival_doc.stock = %(stock_id)s
+    stock = %(stock_id)s
     AND
-    m.id = %(material_id)s
+    sd.material = %(material_id)s
 ORDER BY
     m.material
-    , arrival.tare_id
+    , sd.tare_id
     """
     jobs = []
     query_args = {

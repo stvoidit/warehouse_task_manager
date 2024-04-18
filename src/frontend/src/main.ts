@@ -17,7 +17,7 @@ const icons = [
 ];
 const pinia = createPinia();
 const app = createApp(App);
-icons.forEach(component => app.component(component.name, component));
+icons.forEach(component => app.component(component.name as any as string, component));
 app.use(pinia);
 app.use(router);
 app.use(ElementPlus, { locale: ruLang });

@@ -15,7 +15,7 @@ packaging==23.2
 pycares==4.4.0
 pycparser==2.21
 PyJWT==2.8.0
-PyMySQL==1.1.0
+PyMySQL==1.1.1
 pytz==2024.1
 toml==0.10.2
 yarl==1.9.4

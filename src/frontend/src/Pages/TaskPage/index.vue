@@ -17,7 +17,8 @@
                 :processing-types="store.task.processing_types"
                 :is-landscape="store.isLandscape"
                 @change-status="updateJobStatus"
-                @processing-change="processingChange" />
+                @processing-change="processingChange"
+                @change-r-g-w="onChangeRGW" />
         </el-col>
     </el-row>
 </template>
@@ -176,6 +177,14 @@ const statInfo = computed(() => {
         ]
     }));
 });
+
+const onChangeRGW = (job: frontend.IJob) => {
+    store.updateRestGrossWeight(props.taskID, job).then(() => {
+        store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
+    }).catch(reason => {
+        alert(reason);
+    });
+};
 
 /** Остатки веса по категориям */
 const remainingWeight = computed(() => {

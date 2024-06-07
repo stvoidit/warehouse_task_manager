@@ -1,12 +1,15 @@
 {
 	"folders": [
 		{
+			"name": "warehouse_task_manager",
 			"path": "."
 		},
 		{
+			"name": "backend",
 			"path": "src/backend"
 		},
 		{
+			"name": "frontend",
 			"path": "src/frontend"
 		}
 	],

@@ -1,6 +1,8 @@
 from aiohttp.web import HTTPBadRequest, HTTPForbidden, HTTPCreated, HTTPNotFound, Request
 
-from db import (check_user, select_task, select_tasks, change_password, select_stocks, update_job_status, select_tasks_progress)
+from db import (check_user, select_task, select_tasks, change_password,
+                select_stocks, update_job_status, select_tasks_progress, update_rest_gross_weight
+                )
 from utils import jsonify
 
 
@@ -32,12 +34,14 @@ async def change_password_handler(request: Request):
         await change_password(conn, request.user_id, password_hash)
     return HTTPCreated()
 
+
 async def get_stocks(request: Request):
     """ получени списка складов """
     stocks = []
     async with request.app["db"].acquire() as conn:
         stocks = await select_stocks(conn, request.user_id)
     return await jsonify(stocks, request)
+
 
 async def get_tasks(request: Request):
     """ получение списка заданий """
@@ -76,11 +80,12 @@ async def get_task(request: Request):
             raise HTTPNotFound()
     return await jsonify(task, request)
 
+
 async def update_job_status_handler(request: Request):
     job = await request.json()
     doc_id = job.get("taskID", None)
-    material_id =job.get("materialID", None)
-    tara_id =job.get("taraID", None)
+    material_id = job.get("materialID", None)
+    tara_id = job.get("taraID", None)
     status = job.get("done", None)
     net_weight_fact = job.get("netWeightFact", None)
     add_processing_id = job.get("processingID", 0)
@@ -96,7 +101,32 @@ async def update_job_status_handler(request: Request):
                 tara_id,
                 float(net_weight_fact),
                 int(add_processing_id),
-                status) # pylint: disable=too-many-function-args
+                status)  # pylint: disable=too-many-function-args
         except Exception as exc:
-            raise HTTPBadRequest(body=str(exc)) # pylint: disable=raise-missing-from
+            raise HTTPBadRequest(
+                body=str(exc))  # pylint: disable=raise-missing-from
+    return HTTPCreated()
+
+
+async def rest_gross_weight(request: Request):
+    job = await request.json()
+    # print(job)
+    # return HTTPCreated()
+    doc_id = job.get("taskID", None)
+    material_id = job.get("material_id", None)
+    tare_id = job.get("tare_id", None)
+    gross_weight = job.get("gross_weight", None)
+    if doc_id is None or material_id is None or tare_id is None or gross_weight is None:
+        raise HTTPBadRequest()
+    async with request.app["db"].acquire() as conn:
+        try:
+            await update_rest_gross_weight(
+                conn,
+                doc_id,
+                material_id,
+                tare_id,
+                gross_weight)
+        except Exception as exc:
+            raise HTTPBadRequest(
+                body=str(exc))  # pylint: disable=raise-missing-from
     return HTTPCreated()

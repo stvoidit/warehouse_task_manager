@@ -8,6 +8,7 @@ const CHANGE_PASSWORD = "change_password";
 const STOCK = "stock";
 const MATERIAL = "material";
 const JOB = "job";
+const RGW = "rest_gross_weight";
 const TASKS_PROGRESS = "tasks_progress";
 
 
@@ -121,6 +122,26 @@ class ClientAPI {
             ...this.requestHeaders()
         };
         const response = await fetch(url, { method: "PUT", headers, body: JSON.stringify(payload) });
+        if (response.status !== 201) {
+            throw new Error(await response.text());
+        }
+        return;
+    }
+
+    async updateRestGrossWeight(taskID: number, job: frontend.IJob) {
+        this.checkToken();
+        const url = `${BASE_URL}/${RGW}`;
+        const payload = {
+            taskID,
+            material_id: job.material_id,
+            tare_id: job.tare_id,
+            gross_weight: job.rest_gross_weight
+        };
+        const headers = {
+            "Content-Type": "application/json",
+            ...this.requestHeaders()
+        };
+        const response = await fetch(url, { method: "PUT" ,headers, body: JSON.stringify(payload) });
         if (response.status !== 201) {
             throw new Error(await response.text());
         }

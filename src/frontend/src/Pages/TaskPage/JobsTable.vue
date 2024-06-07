@@ -51,6 +51,11 @@
                     </span>
                 </template>
             </el-dialog>
+            <DialogRestGrossWeight
+                v-model:dialogVisible="dialogVisibleRGW"
+                v-model:job="dialogJob"
+                :is-landscape="isLandscape"
+                @change-r-g-w="(value) => emit('changeRGW', value)" />
             <el-table
                 :data="jobsList"
                 :border="true"
@@ -98,7 +103,7 @@
 <script setup lang="ts">
 import { PropType, ref } from "vue";
 import { ElMessageBox } from "element-plus";
-
+import DialogRestGrossWeight from "./DialogRestGrossWeight.vue";
 defineProps({
     jobsList: {
         type: Array as PropType<frontend.IJob[]>,
@@ -116,13 +121,15 @@ defineProps({
 const emit = defineEmits<{
     /** эмит оригинальной работы + вес который списываем фактически */
     changeStatus: [value: frontend.IJob, weight: number],
-    processingChange: [value: boolean]
+    processingChange: [value: boolean],
+    changeRGW: [value:frontend.IJob]
 }>();
 const rowKey = (row: frontend.IJob) => `${row.material_id}-${row.tare_id}`;
 const cellStyle = ({ column }: { column: any }) => {
     if ([
         "net_weight_fact",
-        "add_processing_id"
+        "add_processing_id",
+        "rest_gross_weight"
     ].includes(column.columnKey)) {
         return { cursor: "alias" };
     }
@@ -132,7 +139,6 @@ const cellStyle = ({ column }: { column: any }) => {
             fontWeight: "bold"
         };
     }
-
     return {};
 };
 const rowClass = ( {row } : { row: frontend.IJob }) => blockActionRow(row) ? "row-disabled" : "";
@@ -147,12 +153,19 @@ const resetDialoagForm = () => {
     takenWeight.value = 0;
 };
 
+const dialogVisibleRGW = ref(false);
+
 /** Обработчик клика на строку - запрос на обновление статуса задания */
 const handleClickRow = async (job: frontend.IJob, column: any) => {
     const targetCols = [
         "net_weight_fact",
         "add_processing_id"
     ];
+    if (column.columnKey === "rest_gross_weight" && job.rest_gross_weight === 0) {
+        dialogJob.value = { ...job };
+        dialogVisibleRGW.value = true;
+        return;
+    }
     if (!targetCols.includes(column.columnKey) && job.done && job.add_processing_id > 0) return;
     if (targetCols.includes(column.columnKey)) {
         dialogVisible.value = true;
@@ -226,7 +239,7 @@ const columns = [
     },
     {
         prop: "task_net_weight",
-        label: "Нетто",
+        label: "Задание",
         // width: 100,
         sortable: false,
         formatter: numberFormatter

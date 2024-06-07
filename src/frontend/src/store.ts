@@ -58,6 +58,10 @@ export default defineStore("app_store", () => {
         return api.updateJobStatus(taskID, materialID, taraID, netWeightFact, add_processing_id, done);
     };
 
+    const updateRestGrossWeight = (taskID: number, job :frontend.IJob) => {
+        return api.updateRestGrossWeight(taskID, job);
+    };
+
     /** ID таймера */
     let timer: NodeJS.Timer;
     /** интервал в ms для setInterval */
@@ -100,6 +104,7 @@ export default defineStore("app_store", () => {
         fetchTasksList,
         fetchTask,
         updateJobStatus,
+        updateRestGrossWeight,
         stocks,
         tasks,
         tasks_progress,

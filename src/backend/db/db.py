@@ -162,7 +162,7 @@ ORDER BY
     """
     result = []
     async with conn.cursor() as cur:
-        await cur.execute(q, { "user_id": user_id, "stock_id": stock_id })
+        await cur.execute(q, {"user_id": user_id, "stock_id": stock_id})
         result = await cur.fetchall()
         if isinstance(result, tuple):
             result = []
@@ -236,11 +236,12 @@ ORDER BY
 """
     result = []
     async with conn.cursor() as cur:
-        await cur.execute(q, { "user_id": user_id, "stock_id": stock_id })
+        await cur.execute(q, {"user_id": user_id, "stock_id": stock_id})
         result = await cur.fetchall()
         if isinstance(result, tuple):
             result = []
     return result
+
 
 async def select_task_meta(conn: Connection, stock_id: int, doc_id: int, material_id: int):
     q = """
@@ -302,6 +303,7 @@ GROUP BY
             task["catmat"] = catmat
     return task
 
+
 async def select_processing_types(conn: Connection):
     q = """SELECT pt.id, pt.process_name FROM processing_type AS pt ORDER BY pt.id ASC"""
     processing_types: list[dict] = []
@@ -309,6 +311,7 @@ async def select_processing_types(conn: Connection):
         await cur.execute(q)
         processing_types.extend(await cur.fetchall())
     return processing_types
+
 
 async def select_task(conn: Connection, stock_id: int, doc_id: int, material_id: int, user_id: int):
     """ получение позиций задания """
@@ -327,7 +330,7 @@ SELECT
     , sd.tare_type
     , sd.tare_weight AS tara_weight
     , task.category
-    , sd.rest_gross_weight AS rest_gross_weight
+    , IF(task.gross_weight = 0, sd.rest_gross_weight, task.gross_weight) AS rest_gross_weight
     , task.tare_amount AS task_tare_amount
     , task.net_weight AS task_net_weight
     , task.net_weight_fact
@@ -336,28 +339,29 @@ SELECT
 FROM
 (
     SELECT
-    sd.*
-    , md.tare_type
-    , md.tare_mark
-    , md.material_group
-    , md.material_mark
-    , sd.rest_net_weight + sd.rest_tare_amount * tare.weight AS rest_gross_weight, tare.weight AS tare_weight
-FROM
-(
-    SELECT
-        stock
-        , material
-        , tare_id
-        , key_material
-        , SUM(tare_amount) AS rest_tare_amount
-        , SUM(net_weight) AS rest_net_weight
-    FROM stock_data AS sd
-    GROUP BY stock, material, tare_id, key_material
-) sd
-LEFT JOIN
-    material_data AS md ON md.key_material = sd.key_material
-LEFT JOIN
-    tare ON tare.id = md.tare_type
+        sd.*
+        , md.tare_type
+        , md.tare_mark
+        , md.material_group
+        , md.material_mark
+        , sd.rest_net_weight + sd.rest_tare_amount * tare.weight AS rest_gross_weight
+        , tare.weight AS tare_weight
+    FROM
+    (
+        SELECT
+            stock
+            , material
+            , tare_id
+            , key_material
+            , SUM(tare_amount) AS rest_tare_amount
+            , SUM(net_weight) AS rest_net_weight
+        FROM stock_data AS sd
+        GROUP BY stock, material, tare_id, key_material
+    ) sd
+    LEFT JOIN
+        material_data AS md ON md.key_material = sd.key_material
+    LEFT JOIN
+        tare ON tare.id = md.tare_type
 ) sd
 LEFT JOIN material_data AS md ON
     md.key_material = sd.key_material
@@ -368,22 +372,23 @@ INNER JOIN (
             key_material
             , tare_amount
             , net_weight
+            , gross_weight
             , tare_amount_fact
             , net_weight_fact
             , production_task.done
             , production_task.category
             , add_processing_id
         FROM
-            production_task
+    production_task
         LEFT JOIN production_task_doc ON
-            production_task_doc.id = production_task.doc_id
+    production_task_doc.id = production_task.doc_id
         WHERE
-            production_task_doc.id = %(doc_id)s
-            AND production_task_doc.stock = %(stock_id)s
-    ) AS task ON
+    production_task_doc.id = %(doc_id)s
+    AND production_task_doc.stock = %(stock_id)s
+) AS task ON
     task.key_material = sd.key_material
 WHERE
-    stock = %(stock_id)s
+    stock =  %(stock_id)s
     AND
     sd.material = %(material_id)s
 ORDER BY
@@ -392,10 +397,10 @@ ORDER BY
     """
     jobs = []
     query_args = {
-            "doc_id": doc_id,
-            "stock_id": stock_id,
-            "material_id": material_id
-        }
+        "doc_id": doc_id,
+        "stock_id": stock_id,
+        "material_id": material_id
+    }
     async with conn.cursor() as cur:
         await cur.execute(q, query_args)
         jobs = await cur.fetchall()
@@ -560,15 +565,16 @@ FROM
         "doc_id": doc_id,
         "material_id": material_id,
         "user_id": user_id
-        }
+    }
     task_weights: list[dict] = []
     async with conn.cursor() as cur:
-        await cur.execute(q1, params )
+        await cur.execute(q1, params)
         task_weights = await cur.fetchall()
         # fix: пустой результат возвращает пустой tuple, а не list
         if isinstance(task_weights, tuple):
             task_weights = []
     return task_weights
+
 
 async def check_user(conn: Connection, login: str, password_hash: str):
     """ проверка авторизации пользователя """
@@ -593,6 +599,7 @@ WHERE
         result = await cur.fetchone()
     return result
 
+
 async def change_password(conn: Connection, user_id: int, password_hash: str):
     q = """
     UPDATE staff
@@ -601,6 +608,7 @@ async def change_password(conn: Connection, user_id: int, password_hash: str):
     """
     async with conn.cursor() as cur:
         await cur.execute(q, {"user_id": user_id, "password_hash": password_hash})
+
 
 async def check_can_login(conn: Connection, user_id: int):
     """ проверка возможности входа по токену"""
@@ -612,6 +620,7 @@ async def check_can_login(conn: Connection, user_id: int):
         if result.get("can_login", 0) == 1:
             can_login = True
     return can_login
+
 
 async def select_stocks(conn: Connection, user_id: int):
     q = """
@@ -639,85 +648,86 @@ ORDER BY
         stocks = await cur.fetchall()
     return stocks
 
+
 async def update_job_status(conn: Connection, doc_id: int, user_id: int, material_id: int, tara_id: int, net_weight_fact: float, add_processing_id: int, status: bool):
-#     validate_query = """
-# SELECT
-#     subq.doc_id
-#     , subq.material_id
-#     , subq.category
-#     , IFNULL(ptm.task_weight, subq.weight) - pt_done.net_weight_fact AS remaining_weight
-#     , task_job.net_weight AS job_net_weight
-#     , task_job.net_weight <= (
-#         IFNULL(ptm.task_weight, subq.weight) - pt_done.net_weight_fact
-#     ) AS can_done
-# FROM
-#     (
-#         SELECT
-#             pt.doc_id
-#             , pt.material AS material_id
-#             , pt.category
-#             , sum(pt.net_weight) AS weight
-#         FROM
-#             production_task pt
-#         WHERE
-#             pt.doc_id = %(doc_id)s
-#             AND
-#             pt.material = %(material_id)s
-#             AND pt.category = (
-#                 SELECT
-#                     category
-#                 FROM
-#                     production_task
-#                 WHERE
-#                     tare_id = %(tara_id)s
-#                     AND material = %(material_id)s
-#             )
-#         GROUP BY
-#             pt.doc_id
-#             , pt.material
-#             , pt.category
-#     ) AS subq
-# LEFT JOIN production_task_materials ptm ON
-#     ptm.doc_id = subq.doc_id
-#     AND ptm.material = subq.material_id
-#     AND ptm.category = subq.category
-# INNER JOIN (
-#         SELECT
-#             pt.doc_id
-#             , pt.material AS material_id
-#             , pt.category
-#             , sum(pt.net_weight_fact) AS net_weight_fact
-#         FROM
-#             production_task pt
-#         WHERE
-#             pt.done IS TRUE
-#         GROUP BY
-#             pt.doc_id
-#             , pt.material
-#             , pt.category
-#     ) pt_done ON
-#     pt_done.doc_id = subq.doc_id
-#     AND pt_done.material_id = subq.material_id
-#     AND pt_done.category = subq.category
-# INNER JOIN production_task AS task_job ON
-#     task_job.doc_id = subq.doc_id
-#     AND
-#     task_job.material = subq.material_id
-#     AND
-#     task_job.category = subq.category
-#     AND
-#     task_job.tare_id = %(tara_id)s
-# """
-#     # Валидация доступности действия.
-#     # Если статус работы изменяется на "выполнено", то проверяем  превышение веса по задаче в категории.
-#     # В случае превышение веса выбрасываем ошибку.
-#     can_done = True
-#     if status is True:
-#         async with conn.cursor() as cur:
-#             await cur.execute(validate_query, {"doc_id": doc_id, "material_id": material_id, "tara_id": tara_id})
-#             result = await cur.fetchone()
-#             print(result)
-#             can_done = bool(result["can_done"])
+    #     validate_query = """
+    # SELECT
+    #     subq.doc_id
+    #     , subq.material_id
+    #     , subq.category
+    #     , IFNULL(ptm.task_weight, subq.weight) - pt_done.net_weight_fact AS remaining_weight
+    #     , task_job.net_weight AS job_net_weight
+    #     , task_job.net_weight <= (
+    #         IFNULL(ptm.task_weight, subq.weight) - pt_done.net_weight_fact
+    #     ) AS can_done
+    # FROM
+    #     (
+    #         SELECT
+    #             pt.doc_id
+    #             , pt.material AS material_id
+    #             , pt.category
+    #             , sum(pt.net_weight) AS weight
+    #         FROM
+    #             production_task pt
+    #         WHERE
+    #             pt.doc_id = %(doc_id)s
+    #             AND
+    #             pt.material = %(material_id)s
+    #             AND pt.category = (
+    #                 SELECT
+    #                     category
+    #                 FROM
+    #                     production_task
+    #                 WHERE
+    #                     tare_id = %(tara_id)s
+    #                     AND material = %(material_id)s
+    #             )
+    #         GROUP BY
+    #             pt.doc_id
+    #             , pt.material
+    #             , pt.category
+    #     ) AS subq
+    # LEFT JOIN production_task_materials ptm ON
+    #     ptm.doc_id = subq.doc_id
+    #     AND ptm.material = subq.material_id
+    #     AND ptm.category = subq.category
+    # INNER JOIN (
+    #         SELECT
+    #             pt.doc_id
+    #             , pt.material AS material_id
+    #             , pt.category
+    #             , sum(pt.net_weight_fact) AS net_weight_fact
+    #         FROM
+    #             production_task pt
+    #         WHERE
+    #             pt.done IS TRUE
+    #         GROUP BY
+    #             pt.doc_id
+    #             , pt.material
+    #             , pt.category
+    #     ) pt_done ON
+    #     pt_done.doc_id = subq.doc_id
+    #     AND pt_done.material_id = subq.material_id
+    #     AND pt_done.category = subq.category
+    # INNER JOIN production_task AS task_job ON
+    #     task_job.doc_id = subq.doc_id
+    #     AND
+    #     task_job.material = subq.material_id
+    #     AND
+    #     task_job.category = subq.category
+    #     AND
+    #     task_job.tare_id = %(tara_id)s
+    # """
+    #     # Валидация доступности действия.
+    #     # Если статус работы изменяется на "выполнено", то проверяем  превышение веса по задаче в категории.
+    #     # В случае превышение веса выбрасываем ошибку.
+    #     can_done = True
+    #     if status is True:
+    #         async with conn.cursor() as cur:
+    #             await cur.execute(validate_query, {"doc_id": doc_id, "material_id": material_id, "tara_id": tara_id})
+    #             result = await cur.fetchone()
+    #             print(result)
+    #             can_done = bool(result["can_done"])
     # if can_done is False:
     #     raise Exception("Превышение веса")
 
@@ -754,3 +764,25 @@ WHERE
         except Exception as e:
             print(f"ERROR callproc \"update_next_process\": {e}")
     return
+
+
+async def update_rest_gross_weight(conn: Connection, doc_id: int, material_id: int, tare_id: int, gross_weight: float):
+    q = """
+UPDATE production_task
+SET
+    net_weight = net_weight - ( gross_weight - %(gross_weight)s )
+    , gross_weight = %(gross_weight)s
+WHERE
+    doc_id = %(doc_id)s
+    AND
+    material = %(material_id)s
+    AND
+    tare_id = %(tare_id)s
+    """
+    async with conn.cursor() as cur:
+        await cur.execute(q, {
+            "doc_id": doc_id,
+            "material_id": material_id,
+            "tare_id": tare_id,
+            "gross_weight": gross_weight
+        })

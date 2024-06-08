@@ -161,7 +161,7 @@ const handleClickRow = async (job: frontend.IJob, column: any) => {
         "net_weight_fact",
         "add_processing_id"
     ];
-    if (column.columnKey === "rest_gross_weight" && job.rest_gross_weight === 0) {
+    if (column.columnKey === "rest_gross_weight" && job.task_net_weight === 0) {
         dialogJob.value = { ...job };
         dialogVisibleRGW.value = true;
         return;

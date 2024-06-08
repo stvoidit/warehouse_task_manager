@@ -770,8 +770,7 @@ async def update_rest_gross_weight(conn: Connection, doc_id: int, material_id: i
     q = """
 UPDATE production_task
 SET
-    net_weight = net_weight - ( gross_weight - %(gross_weight)s )
-    , gross_weight = %(gross_weight)s
+    gross_weight = %(gross_weight)s
 WHERE
     doc_id = %(doc_id)s
     AND

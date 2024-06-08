@@ -4,7 +4,7 @@ WORKDIR /frontend
 ENV PNPM_HOME="/pnpm" PATH+=":$PNPM_HOME"
 RUN corepack enable
 COPY src/frontend/package.json src/frontend/pnpm-lock.yaml ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 COPY src/frontend/vite.config.ts \
     src/frontend/index.html \
     src/frontend/tsconfig.json \

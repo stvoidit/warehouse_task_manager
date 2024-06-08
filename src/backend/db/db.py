@@ -737,7 +737,7 @@ UPDATE
 SET
     done = %(status)s
     , net_weight_fact = CASE WHEN %(status)s IS TRUE THEN %(net_weight_fact)s ELSE 0 END
-    , tare_amount_fact = CASE WHEN %(status)s IS TRUE AND %(net_weight_fact)s = net_weight THEN 1 ELSE 0 END
+    , tare_amount_fact = CASE WHEN %(status)s IS TRUE AND (%(net_weight_fact)s = net_weight OR net_weight = 0) THEN 1 ELSE 0 END
     , fact_executor = CASE WHEN %(status)s IS TRUE THEN %(user_id)s ELSE 0 END
     , add_processing_id = CASE WHEN %(status)s IS TRUE THEN %(add_processing_id)s ELSE 0 END
 WHERE

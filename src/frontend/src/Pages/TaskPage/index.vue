@@ -267,7 +267,7 @@ const checkAll = async (status: boolean) => {
         await ElMessageBox.confirm(
             "Предупреждение",
             {
-                message: `Это действие затронет задач: ${tasksCount}. Отметить их как "${alertText}"?`,
+                message: `Это действие затронет позиции: ${tasksCount}. Отметить их как "${alertText}"?`,
                 confirmButtonText: "Подтвердить",
                 cancelButtonText: "Отмена",
                 type: "warning"

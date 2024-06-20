@@ -81,14 +81,14 @@ const computedDataTasks = computed(() => {
     const copyArr = [...store.tasks];
     const categoriesCount = new Map<string, number>();
     copyArr.forEach(t => {
-        if (categoriesCount.has(t.category as string)) {
-            categoriesCount.set(t.category as string, (categoriesCount.get(t.category as string)??0)+1);
+        if (categoriesCount.has(t.category)) {
+            categoriesCount.set(t.category, (categoriesCount.get(t.category)??0)+1);
         } else {
-            categoriesCount.set(t.category as string, 1);
+            categoriesCount.set(t.category, 1);
         }
     });
     return copyArr.map(t => {
-        if (categoriesCount.get(t.category as string) ?? 0 > 1) {
+        if (categoriesCount.get(t.category) ?? 0 > 1) {
             if (t.weight === 0) {
                 t.weight = "-";
             }
@@ -130,7 +130,7 @@ const numberFormatter = (row: any, col: any, cellValue: number): string => {
 };
 
 const uniqueOperations = computed(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+     
     const setOp = new Set(store.tasks.map(task => task.operation));
     const options: Filters = [];
     for (const op of setOp) {

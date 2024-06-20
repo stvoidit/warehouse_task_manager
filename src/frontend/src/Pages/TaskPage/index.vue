@@ -14,13 +14,24 @@
                 <div
                     style="text-align: end; width: 100%;"
                     class="mb">
-                    <el-button
-                        type="primary"
-                        icon="Edit"
-                        plain
-                        @click="checkAll">
-                        отметить все [{{ checkAllCount }}]
-                    </el-button>
+                    <div>
+                        <el-button
+                            type="success"
+                            icon="Edit"
+                            plain
+                            :disabled="checkAllCount.done === 0"
+                            @click="checkAll(true)">
+                            отметить все [ {{ checkAllCount.done.toLocaleString() }} ]
+                        </el-button>
+                        <el-button
+                            type="warning"
+                            icon="Edit"
+                            plain
+                            :disabled="checkAllCount.progress === 0"
+                            @click="checkAll(false)">
+                            снять все [ {{ checkAllCount.progress.toLocaleString() }} ]
+                        </el-button>
+                    </div>
                 </div>
             </StatInfo>
             <JobsTable
@@ -171,7 +182,7 @@ const statInfo = computed(() => {
         catmat: store.task?.catmat[category]?.split(";")?? [],
         data: [
             {
-                label: "Заданий",
+                label: "Задание",
                 count: store.task?.jobs.reduce((prev,cur) => cur.category === category ? prev+=1 : prev, 0),
                 netWeight: findTaskWeight(category)
             },
@@ -210,7 +221,8 @@ const remainingWeight = computed(() => {
 const selectedStatuses = ref<number>(0);
 /** фильтр по категории */
 const selectedCategorits = ref<string[]>([]);
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
+
 const categoriesOptions = computed(() => Array.from(new Set<string>(store.task?.jobs.map(job => job.category === "" ? "" : job.category))).sort());
 /** Список работ для таблицы с учетом фильтров */
 const computedJobsData = computed<frontend.IJob[]>(() => {
@@ -224,53 +236,58 @@ const computedJobsData = computed<frontend.IJob[]>(() => {
                 return true;
         }
     });
-    return selectedCategorits.value.length ? jobs.filter(j => selectedCategorits.value.includes(j.category as string)) : jobs;
+    return selectedCategorits.value.length ? jobs.filter(j => selectedCategorits.value.includes(j.category)) : jobs;
 });
 
 const checkAllCount = computed(() => {
     const jobs = store.task?.jobs;
     if (!jobs) {
-        return "";
+        return {
+            done: 0,
+            progress: 0
+        };;
     }
-    if (jobs.every(job => job.done === true)) {
-        return jobs.length.toLocaleString();
-    }
-    return jobs.reduce((prev: number, j: frontend.IJob) => {
+    const doneCount = jobs.reduce((prev: number, j: frontend.IJob) => {
         return j.done === true ? prev : prev+1;
-    }, 0).toLocaleString();
+    }, 0);
+    return {
+        done: doneCount,
+        progress: (jobs.length - doneCount)
+    };
 });
 
-const checkAll = async () => {
-    const jobs = store.task?.jobs;
-    if (!jobs) {
+const checkAll = async (status: boolean) => {
+    const jobs: frontend.IJob[] = store.task?.jobs ?? [];
+    if (!jobs.length) {
         return;
     }
-    const checkAllParams: {
-        taskID: number;
-        materialID: number;
-        jobs: any[]
-    } = {
-        taskID:  props.taskID,
-        materialID: props.materialID,
-        jobs: []
-    };
-
-    const allDone = jobs.every(job => job.done === true);
-    if (allDone === true) {
-        checkAllParams.jobs = jobs.map(job => ({
-            tara_id: job.tare_id,
-            add_processing_id: job.add_processing_id,
-            net_weight_fact: 0,
-            status: false
-        }));
-    } else {
-        checkAllParams.jobs = jobs.filter(job => job.done === false).map(job => ({
-            tara_id: job.tare_id,
-            add_processing_id: job.add_processing_id,
-            net_weight_fact: job.rest_gross_weight - job.tara_weight,
-            status: true
-        }));
+    try {
+        const tasksCount = status === true ? checkAllCount.value.done : checkAllCount.value.progress;
+        const alertText = status === true ? "завершенные" : "не завершенные" ;
+        await ElMessageBox.confirm(
+            "Предупреждение",
+            {
+                message: `Это действие затронет задач: ${tasksCount}. Отметить их как "${alertText}"?`,
+                confirmButtonText: "Подтвердить",
+                cancelButtonText: "Отмена",
+                type: "warning"
+            }
+        );
+    } catch (error) {
+        // eslint-disable-next-line
+                console.warn(error);
+        return;
     }
+    const checkAllParams = {
+        taskID: props.taskID,
+        materialID: props.materialID,
+        jobs: jobs.filter(job => job.done !== status).map(job => ({
+            tara_id: job.tare_id,
+            add_processing_id: job.add_processing_id,
+            net_weight_fact: status === true ? job.rest_gross_weight - job.tara_weight : 0,
+            status: status
+        }))
+    };
     await store.updateJobsStatus(checkAllParams);
     await store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
 };

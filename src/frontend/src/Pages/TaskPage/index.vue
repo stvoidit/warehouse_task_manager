@@ -66,10 +66,10 @@ const queryParams = {
  * 1) Получение данных задачи
  * 2) Запуск автообновления
  */
-onMounted(() => {
-    if (isNaN(props.taskID)) router.push("/");
-    store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
-    store.doAutofetch(props.stockID, props.taskID, props.materialID, queryParams.tareType);
+onMounted(async () => {
+    if (isNaN(props.taskID)) await router.push("/");
+    await store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
+    await store.doAutofetch(props.stockID, props.taskID, props.materialID, queryParams.tareType);
 });
 /**
  * Остановка автообновления
@@ -149,7 +149,7 @@ const metaInfo = computed(() => ({
             technical_process: store.task?.technical_process,
             operation: store.task?.operation,
             tareType: queryParams.tareType,
-            planned_date: dayjs(store.task?.planned_date, "YYYY-MM-DD").format("DD.MM.YYYY")
+            planned_date: dayjs(store.task?.planned_date as string, "YYYY-MM-DD").format("DD.MM.YYYY")
         }
     ]
 }));
@@ -177,12 +177,12 @@ const statInfo = computed(() => {
             },
             {
                 label: "Выполнено",
-                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, true, category) : 0,
+                count: store.task?.jobs ? sumJobsStatus(store.task.jobs as frontend.IJob[], true, category) : 0,
                 netWeight: sumNetWeightComplited(category)
             },
             {
                 label: "Осталось",
-                count: store.task?.jobs ? sumJobsStatus(store.task.jobs, false, category) : 0,
+                count: store.task?.jobs ? sumJobsStatus(store.task.jobs as frontend.IJob[], false, category) : 0,
                 netWeight: findTaskWeight(category) - sumNetWeightComplited(category)
             }
         ]
@@ -210,20 +210,21 @@ const remainingWeight = computed(() => {
 const selectedStatuses = ref<number>(0);
 /** фильтр по категории */
 const selectedCategorits = ref<string[]>([]);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 const categoriesOptions = computed(() => Array.from(new Set<string>(store.task?.jobs.map(job => job.category === "" ? "" : job.category))).sort());
 /** Список работ для таблицы с учетом фильтров */
 const computedJobsData = computed<frontend.IJob[]>(() => {
-    let jobs = (store.task?.jobs ?? []).filter(j => {
+    const jobs = (store.task?.jobs ?? []).filter(j => {
         switch (selectedStatuses.value) {
-        case 1:
-            return j.done === true;
-        case 2:
-            return j.done === false;
-        default:
-            return true;
+            case 1:
+                return j.done === true;
+            case 2:
+                return j.done === false;
+            default:
+                return true;
         }
     });
-    return selectedCategorits.value.length ? jobs.filter(j => selectedCategorits.value.includes(j.category)) : jobs;
+    return selectedCategorits.value.length ? jobs.filter(j => selectedCategorits.value.includes(j.category as string)) : jobs;
 });
 
 const checkAllCount = computed(() => {
@@ -244,7 +245,11 @@ const checkAll = async () => {
     if (!jobs) {
         return;
     }
-    const checkAllParams = {
+    const checkAllParams: {
+        taskID: number;
+        materialID: number;
+        jobs: any[]
+    } = {
         taskID:  props.taskID,
         materialID: props.materialID,
         jobs: []

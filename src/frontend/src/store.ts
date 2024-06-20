@@ -63,7 +63,7 @@ export default defineStore("app_store", () => {
         return api.updateJobsStatus(payload).finally(() => {
             loading.value = false;
         });
-    }
+    };
 
     const updateRestGrossWeight = (taskID: number, job :frontend.IJob) => {
         return api.updateRestGrossWeight(taskID, job);

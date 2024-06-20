@@ -9,8 +9,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "composite": true,
+    "allowJs": true,
     "lib": [
       "ESNext",
       "DOM"
@@ -35,8 +34,8 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
-    "src/**/*.tsx",
     "src/**/*.vue",
+    "eslint.config.js",
     "vite.config.ts"
   ]
 }

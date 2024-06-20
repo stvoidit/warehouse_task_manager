@@ -77,7 +77,7 @@ const routes = computed(() => {
     if (route.params.stockID) {
         menuRoutes.push({
             label: "Список задач",
-            path: `/stock/${route.params.stockID}`,
+            path: `/stock/${route.params.stockID as string}`,
             icon: "MessageBox"
         });
     }

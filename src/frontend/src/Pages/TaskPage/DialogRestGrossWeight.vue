@@ -62,11 +62,13 @@ const visible = computed({
 });
 
 const rest_gross_weight = computed({
-    get: () => props.job?.rest_gross_weight,
+    get: () => {
+        return props.job?.rest_gross_weight ?? 0;
+    },
     set: (value: number) => {
         const jobCopy = { ...props.job };
         jobCopy.rest_gross_weight = value;
-        emit("update:job", jobCopy);
+        emit("update:job", jobCopy as frontend.IJob);
     }
 });
 

@@ -37,7 +37,10 @@ router.beforeEach(() => useApplicationStore().checkToken());
 /** обертка для PWA */
 router.isReady().then(async () => {
     const { registerSW } = await import("virtual:pwa-register");
-    registerSW({ immediate: true });
+    return registerSW({ immediate: true });
+}).catch(reason => {
+    // eslint-disable-next-line no-console
+    console.error(reason);
 });
 
 export default router;

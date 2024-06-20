@@ -131,7 +131,7 @@ const cellStyle = ({ column }: { column: any }) => {
         "net_weight_fact",
         "add_processing_id",
         "rest_gross_weight"
-    ].includes(column.columnKey)) {
+    ].includes(column.columnKey as string)) {
         return { cursor: "alias" };
     }
     if (column.columnKey === "tare_id") {
@@ -167,8 +167,8 @@ const handleClickRow = async (job: frontend.IJob, column: any) => {
         dialogVisibleRGW.value = true;
         return;
     }
-    if (!targetCols.includes(column.columnKey) && job.done && job.add_processing_id > 0) return;
-    if (targetCols.includes(column.columnKey)) {
+    if (!targetCols.includes(column.columnKey as string) && job.done && job.add_processing_id > 0) return;
+    if (targetCols.includes(column.columnKey as string)) {
         dialogVisible.value = true;
         dialogJob.value = { ...job };
         if (dialogJob.value.done) dialogJob.value.done = false;

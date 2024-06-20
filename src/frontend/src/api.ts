@@ -168,7 +168,7 @@ class ClientAPI {
             throw "Неправильный логин или пароль";
         }
         const token = await response.json();
-        window.localStorage.setItem("token", token);
+        window.localStorage.setItem("token", token as string);
         this.decodeToken();
         location.href = "/";
         return;

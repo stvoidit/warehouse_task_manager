@@ -10,16 +10,20 @@
     "vue-router": "^4.3.3"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
     "@types/node": "^20.14.6",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
     "@vitejs/plugin-vue": "^5.0.5",
     "@vue/eslint-config-typescript": "^13.0.0",
-    "eslint": "^8.57.0",
+    "eslint": "^9.5.0",
     "eslint-plugin-vue": "^9.26.0",
+    "globals": "^15.6.0",
     "sass": "^1.77.6",
     "typescript": "^5.4.5",
+    "typescript-eslint": "^7.13.1",
     "vite": "^5.3.1",
+    "vue-eslint-parser": "^9.4.3",
     "vue-tsc": "^2.0.21",
     "workbox-window": "^7.1.0"
   },
@@ -32,6 +36,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
+    "fix-lint": "eslint 'src/**/*.{js,ts,vue}' --fix",
     "lint": "eslint --ext .ts,.js,.vue --fix src/",
     "preview": "vite preview",
     "ts-lint": "vue-tsc"

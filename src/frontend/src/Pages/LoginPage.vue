@@ -77,21 +77,21 @@ const handleLogin = async () => {
     store.doLogin(loginForm).catch(error => {
         if (!ruleFormRef.value) return;
         ruleFormRef.value.resetFields();
-        ElMessageBox.alert(error, "Ошибка", {
+        return ElMessageBox.alert(error as string, "Ошибка", {
             confirmButtonText: "OK"
         });
     });
 };
 
 /** наблюдение за нажатием кнопки Enter для убоства входа на форме */
-const keypressEnter = (event) => { if (event.key === "Enter") handleLogin(); };
+const keypressEnter = (event) => { if (event.key === "Enter") handleLogin().catch(reason => {alert(reason);}); };
 /**
          * 1) Проверка токена
          * 2) Включение отслеживания нажатия Enter
          */
-onMounted(() => {
+onMounted(async () => {
     store.checkToken();
-    if (store.isAuth) router.push("/");
+    if (store.isAuth) await router.push("/");
     document.addEventListener("keypress", keypressEnter);
 });
 /** Отписка от наблюдения за нажатием Enter */

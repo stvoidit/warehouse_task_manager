@@ -74,21 +74,21 @@ const router = useRouter();
 const store = useApplicationStore();
 /** Получени от API списка задач на складе */
 onMounted(async () => {
-    store.fetchTasksList(props.stockID);
+    await store.fetchTasksList(props.stockID);
 });
 
 const computedDataTasks = computed(() => {
     const copyArr = [...store.tasks];
     const categoriesCount = new Map<string, number>();
     copyArr.forEach(t => {
-        if (categoriesCount.has(t.category)) {
-            categoriesCount.set(t.category, (categoriesCount.get(t.category)??0)+1);
+        if (categoriesCount.has(t.category as string)) {
+            categoriesCount.set(t.category as string, (categoriesCount.get(t.category as string)??0)+1);
         } else {
-            categoriesCount.set(t.category, 1);
+            categoriesCount.set(t.category as string, 1);
         }
     });
     return copyArr.map(t => {
-        if (categoriesCount.get(t.category) ?? 0 > 1) {
+        if (categoriesCount.get(t.category as string) ?? 0 > 1) {
             if (t.weight === 0) {
                 t.weight = "-";
             }
@@ -98,11 +98,11 @@ const computedDataTasks = computed(() => {
 });
 
 /** Обработчик нажатия на строку таблицы - переход в задачу */
-const handleRowClick = (row: frontend.ITaskL) => {
+const handleRowClick = async (row: frontend.ITaskL) => {
     const qs = (new URLSearchParams({
         categoryTask: row.category
     })).toString();
-    router.push(`/stock/${props.stockID}/task/${row.doc_id}/material/${row.material_id}?${qs}`);
+    await router.push(`/stock/${props.stockID}/task/${row.doc_id}/material/${row.material_id}?${qs}`);
 };
 
 function calculationRemainder(weight: number, weight_fact: number) {
@@ -124,12 +124,13 @@ const numberFormatter = (row: any, col: any, cellValue: number): string => {
         return cellValue.toLocaleString();
     } catch (error) {
         // eslint-disable-next-line no-console
-        console.warn(col, cellValue);
+        console.warn(col, cellValue, error);
     }
     return "";
 };
 
 const uniqueOperations = computed(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const setOp = new Set(store.tasks.map(task => task.operation));
     const options: Filters = [];
     for (const op of setOp) {

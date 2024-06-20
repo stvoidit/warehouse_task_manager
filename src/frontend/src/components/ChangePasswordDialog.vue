@@ -111,6 +111,6 @@ const submitForm = async () => {
             alert("Пароль успешно изменен, пожалуйста, перезайдите в систему");
             store.logOut();
         })
-        .catch(error => ElMessageBox.alert(error, "Ошибка", { confirmButtonText: "OK" }));
+        .catch(error => ElMessageBox.alert(error as string, "Ошибка", { confirmButtonText: "OK" }));
 };
 </script>

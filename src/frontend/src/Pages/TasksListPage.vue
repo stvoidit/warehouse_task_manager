@@ -33,6 +33,7 @@
         <el-col :span="24">
             <el-table
                 v-loading="store.loading"
+                :row-style="{cursor: 'pointer'}"
                 class="non-hover"
                 :row-class-name="rowClass"
                 :data="computedDataTasks"
@@ -130,7 +131,6 @@ const numberFormatter = (row: any, col: any, cellValue: number): string => {
 };
 
 const uniqueOperations = computed(() => {
-     
     const setOp = new Set(store.tasks.map(task => task.operation));
     const options: Filters = [];
     for (const op of setOp) {

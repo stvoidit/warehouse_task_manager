@@ -31,9 +31,9 @@ body {
     cursor: default;
 } */
 
-.el-table__row {
+/* .el-table__row {
     cursor: pointer;
-}
+} */
 
 .el-table thead {
     color: black !important;

@@ -140,6 +140,9 @@ const cellStyle = ({ column }: { column: any }) => {
             fontWeight: "bold"
         };
     }
+    if (column.columnKey === "done") {
+        return { cursor: "pointer" };
+    }
     return {};
 };
 const rowClass = ( {row } : { row: frontend.IJob }) => blockActionRow(row) ? "row-disabled" : "";
@@ -173,7 +176,7 @@ const handleClickRow = async (job: frontend.IJob, column: any) => {
         dialogJob.value = { ...job };
         if (dialogJob.value.done) dialogJob.value.done = false;
         takenWeight.value = dialogJob.value.net_weight_fact > 0 ? dialogJob.value.task_net_weight + dialogJob.value.tara_weight - dialogJob.value.net_weight_fact : dialogJob.value.tara_weight;
-    } else {
+    } else if (column.columnKey === "done") {
         if (job.done === true && job.task_net_weight !== job.net_weight_fact) {
             try {
                 await ElMessageBox.confirm(

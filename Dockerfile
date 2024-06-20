@@ -8,7 +8,7 @@ RUN pnpm install --frozen-lockfile
 COPY src/frontend/vite.config.ts \
     src/frontend/index.html \
     src/frontend/tsconfig.json \
-    src/frontend/.eslintrc.json ./
+    src/frontend/eslint.config.js ./
 RUN pnpm install
 COPY src/frontend/src src
 COPY src/frontend/public public

@@ -10,8 +10,19 @@
                     v-model:selected-categorits="selectedCategorits"
                     :categories-options="categoriesOptions" />
             </MetaInfo>
-            <StatInfo
-                :stat-info="statInfo" />
+            <StatInfo :stat-info="statInfo">
+                <div
+                    style="text-align: end; width: 100%;"
+                    class="mb">
+                    <el-button
+                        type="primary"
+                        icon="Edit"
+                        plain
+                        @click="checkAll">
+                        отметить все [{{ checkAllCount }}]
+                    </el-button>
+                </div>
+            </StatInfo>
             <JobsTable
                 :jobs-list="computedJobsData"
                 :processing-types="store.task.processing_types"
@@ -214,4 +225,48 @@ const computedJobsData = computed<frontend.IJob[]>(() => {
     });
     return selectedCategorits.value.length ? jobs.filter(j => selectedCategorits.value.includes(j.category)) : jobs;
 });
+
+const checkAllCount = computed(() => {
+    const jobs = store.task?.jobs;
+    if (!jobs) {
+        return "";
+    }
+    if (jobs.every(job => job.done === true)) {
+        return jobs.length.toLocaleString();
+    }
+    return jobs.reduce((prev: number, j: frontend.IJob) => {
+        return j.done === true ? prev : prev+1;
+    }, 0).toLocaleString();
+});
+
+const checkAll = async () => {
+    const jobs = store.task?.jobs;
+    if (!jobs) {
+        return;
+    }
+    const checkAllParams = {
+        taskID:  props.taskID,
+        materialID: props.materialID,
+        jobs: []
+    };
+
+    const allDone = jobs.every(job => job.done === true);
+    if (allDone === true) {
+        checkAllParams.jobs = jobs.map(job => ({
+            tara_id: job.tare_id,
+            add_processing_id: job.add_processing_id,
+            net_weight_fact: 0,
+            status: false
+        }));
+    } else {
+        checkAllParams.jobs = jobs.filter(job => job.done === false).map(job => ({
+            tara_id: job.tare_id,
+            add_processing_id: job.add_processing_id,
+            net_weight_fact: job.rest_gross_weight - job.tara_weight,
+            status: true
+        }));
+    }
+    await store.updateJobsStatus(checkAllParams);
+    await store.fetchTask(props.stockID, props.taskID, props.materialID, queryParams.tareType);
+};
 </script>

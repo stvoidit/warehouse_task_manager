@@ -128,6 +128,19 @@ class ClientAPI {
         return;
     }
 
+    async updateJobsStatus(payload: any) {
+        const url = `${BASE_URL}/${JOB}`;
+        const headers = {
+            "Content-Type": "application/json",
+            ...this.requestHeaders()
+        };
+        const response = await fetch(url, { method: "POST", headers, body: JSON.stringify(payload) });
+        if (response.status !== 201) {
+            throw new Error(await response.text());
+        }
+        return;
+    }
+
     async updateRestGrossWeight(taskID: number, job: frontend.IJob) {
         this.checkToken();
         const url = `${BASE_URL}/${RGW}`;

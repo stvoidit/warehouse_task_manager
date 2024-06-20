@@ -10,12 +10,13 @@ def on_starting(_):
 
 
 workers = (cpu_count() * 2) + 1
+worker_tmp_dir = "/dev/shm"
 bind = "0.0.0.0:8080"
 worker_class = "aiohttp.worker.GunicornWebWorker"
-preload_app = True
+preload_app = False
 accesslog = "-"
 errorlog = "-"
 loglevel = "info"
-wsgi_app = "main:init_app"
+wsgi_app = "main:init_app()"
 default_proc_name = "AIOHTTP"
 proc_name = "AIOHTTP"

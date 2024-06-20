@@ -1,6 +1,6 @@
 import "dayjs/locale/ru";
 
-import { Guide, MessageBox, Tickets, User } from "@element-plus/icons-vue";
+import { Edit, Guide, MessageBox, Tickets, User } from "@element-plus/icons-vue";
 
 import App from "./App.vue";
 import ElementPlus from "element-plus";
@@ -13,7 +13,8 @@ const icons = [
     User,
     MessageBox,
     Guide,
-    Tickets
+    Tickets,
+    Edit
 ];
 const pinia = createPinia();
 const app = createApp(App);

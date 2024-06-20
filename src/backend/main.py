@@ -10,7 +10,7 @@ from views import setup_handlers
 
 async def _on_shutdown(app: Application):
     """ мягкое завершение работы - отключение от БД """
-    print("shutdown")
+    logging.info("shutdown")
     app["db"].close()
     await app["db"].wait_closed()
 
@@ -20,9 +20,8 @@ async def _on_startup(app: Application):
     app["db"] = await create_connect_db(**app["config"]["database"])
 
 
-async def init_app() -> Application:
+def init_app() -> Application:
     """ инициализация всего приложения """
-    logging.basicConfig(level=logging.INFO)
     app = Application(middlewares=[middleware_check_token])
     cnf = read_config("config.toml")
     app["config"] = cnf
@@ -34,4 +33,5 @@ async def init_app() -> Application:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
     run_app(app=init_app(), host="0.0.0.0", port=8080)

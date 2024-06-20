@@ -10,10 +10,10 @@ frozenlist==1.4.1
 gunicorn==22.0.0
 idna==3.7
 multidict==6.0.5
-orjson==3.10.3
-packaging==23.2
+orjson==3.10.5
+packaging==24.1
 pycares==4.4.0
-pycparser==2.21
+pycparser==2.22
 PyJWT==2.8.0
 PyMySQL==1.1.1
 pytz==2024.1

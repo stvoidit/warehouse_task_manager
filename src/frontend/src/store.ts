@@ -104,6 +104,7 @@ export default defineStore("app_store", () => {
         fetchTasksList,
         fetchTask,
         updateJobStatus,
+        updateJobsStatus: (v: any) => api.updateJobsStatus(v),
         updateRestGrossWeight,
         stocks,
         tasks,

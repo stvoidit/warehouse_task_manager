@@ -1,5 +1,4 @@
 from aiohttp.web import HTTPBadRequest, HTTPForbidden, HTTPCreated, HTTPNotFound, Request
-
 from db import (check_user, select_task, select_tasks, change_password,
                 select_stocks, update_job_status, select_tasks_progress, update_rest_gross_weight
                 )
@@ -102,6 +101,30 @@ async def update_job_status_handler(request: Request):
                 float(net_weight_fact),
                 int(add_processing_id),
                 status)  # pylint: disable=too-many-function-args
+        except Exception as exc:
+            raise HTTPBadRequest(
+                body=str(exc))  # pylint: disable=raise-missing-from
+    return HTTPCreated()
+
+
+async def update_jobs_status_handler(request: Request):
+    payload: dict = await request.json()
+    doc_id = payload.get("taskID", None)
+    material_id = payload.get("materialID", None)
+    jobs: list[dict] = payload.get("jobs", [])
+    if len(jobs) == 0:
+        return HTTPCreated()
+    if doc_id is None or material_id is None:
+        raise HTTPBadRequest()
+    async with request.app["db"].acquire() as conn:
+        try:
+            for j in jobs:
+                await update_job_status(
+                    conn,
+                    doc_id,
+                    request.user_id,
+                    material_id,
+                    **j)
         except Exception as exc:
             raise HTTPBadRequest(
                 body=str(exc))  # pylint: disable=raise-missing-from

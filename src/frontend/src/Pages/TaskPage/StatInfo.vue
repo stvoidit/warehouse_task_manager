@@ -43,6 +43,7 @@
                     prop="netWeight" />
             </el-table>
         </el-col>
+        <slot />
     </el-row>
 </template>
 

@@ -11,7 +11,7 @@
             label-position="top">
             <el-form-item label="Остаток (брутто)">
                 <el-input-number
-                    v-model="job.rest_gross_weight"
+                    v-model="rest_gross_weight"
                     size="large"
                     :precision="2"
                     :min="0" />
@@ -50,13 +50,23 @@ const props = defineProps({
 });
 const emit = defineEmits<{
     "update:dialogVisible": [value: boolean],
-    "changeRGW": [value: frontend.IJob]
+    "changeRGW": [value: frontend.IJob],
+    "update:job": [value: frontend.IJob],
 }>();
 
 const visible = computed({
     get: () => props.dialogVisible,
     set: (value: boolean) => {
         emit("update:dialogVisible", value);
+    }
+});
+
+const rest_gross_weight = computed({
+    get: () => props.job?.rest_gross_weight,
+    set: (value: number) => {
+        const jobCopy = { ...props.job };
+        jobCopy.rest_gross_weight = value;
+        emit("update:job", jobCopy);
     }
 });
 

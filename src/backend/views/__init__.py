@@ -4,9 +4,9 @@ from aiohttp.web import Application, FileResponse, Request
 
 from .handlers import (
     change_password_handler, get_stocks, get_task,
-    get_tasks, login_handler, tasks_progress,
-    update_job_status_handler, rest_gross_weight
-)
+    get_tasks, login_handler, rest_gross_weight,
+    tasks_progress, update_job_status_handler,
+    update_jobs_status_handler)
 
 
 def index_spa(path: str, filename: str):
@@ -33,6 +33,7 @@ def setup_handlers(app: Application):
         ("POST", "/api/login", login_handler, "login"),
         ("POST", "/api/change_password", change_password_handler, "change_password"),
         ("PUT", "/api/job", update_job_status_handler, "update_job_status"),
+        ("POST", "/api/job", update_jobs_status_handler, "update_jobs_status_handler"),
         ("GET", "/api/stocks", get_stocks, "get_stocks"),
         ("GET", "/api/stock/{stockID}/tasks", get_tasks, "get_tasks"),
         ("GET", "/api/stock/{stockID}/tasks_progress",

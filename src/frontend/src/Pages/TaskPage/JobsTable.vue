@@ -52,6 +52,7 @@
                 </template>
             </el-dialog>
             <DialogRestGrossWeight
+                v-if="dialogJob"
                 v-model:dialogVisible="dialogVisibleRGW"
                 v-model:job="dialogJob"
                 :is-landscape="isLandscape"

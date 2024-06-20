@@ -58,6 +58,13 @@ export default defineStore("app_store", () => {
         return api.updateJobStatus(taskID, materialID, taraID, netWeightFact, add_processing_id, done);
     };
 
+    const updateJobsStatus = (payload: any) => {
+        loading.value = true;
+        return api.updateJobsStatus(payload).finally(() => {
+            loading.value = false;
+        });
+    }
+
     const updateRestGrossWeight = (taskID: number, job :frontend.IJob) => {
         return api.updateRestGrossWeight(taskID, job);
     };
@@ -104,7 +111,7 @@ export default defineStore("app_store", () => {
         fetchTasksList,
         fetchTask,
         updateJobStatus,
-        updateJobsStatus: (v: any) => api.updateJobsStatus(v),
+        updateJobsStatus,
         updateRestGrossWeight,
         stocks,
         tasks,

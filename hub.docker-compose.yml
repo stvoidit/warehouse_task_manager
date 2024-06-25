@@ -6,6 +6,6 @@ services:
     image: ghcr.io/stvoidit/wtm:latest
     restart: always
     volumes:
-      - ${PWD}/config.toml:/app/config.toml:ro
+      - ./config.toml:/app/config.toml:ro
     ports:
       - ${EXPOSE_PORT:-5530}:8080

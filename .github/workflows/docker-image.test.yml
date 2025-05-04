@@ -1,0 +1,25 @@
+name: Docker Image CI [test]
+
+on:
+  push:
+    branches: [ "test" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag wtm:test --label "runnumber=${GITHUB_RUN_ID}" --label "org.opencontainers.image.source=https://github.com/${{ github.repository_owner }}/warehouse_task_manager"
+    - name: Log in to registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+    - name: Push image
+      run: |
+        IMAGE_NAME=wtm:test
+        IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+        docker tag $IMAGE_NAME $IMAGE_ID
+        docker push $IMAGE_ID:test

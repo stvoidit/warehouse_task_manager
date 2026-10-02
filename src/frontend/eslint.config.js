@@ -1,135 +1,155 @@
-import { FlatCompat } from "@eslint/eslintrc";
-import eslint from "@eslint/js";
-import globals from "globals";
+import stylistic from "@stylistic/eslint-plugin";
 import pluginVue from "eslint-plugin-vue";
+import { defineConfig } from "eslint/config";
+import globals from "globals";
 import tseslint from "typescript-eslint";
+import vueEslintParser from "vue-eslint-parser";
 
-
-const compat = new FlatCompat({
-    baseDirectory: import.meta.dirname,
-    recommendedConfig: eslint.configs.recommended
-});
-
-export default [
-    eslint.configs.recommended,
-    ...tseslint.configs.recommendedTypeChecked,
-    ...pluginVue.configs["flat/strongly-recommended"],
-
-    ...compat.extends("@vue/eslint-config-typescript/recommended"),
+export default defineConfig(
+    stylistic.configs.customize({
+        commaDangle: "always-multiline",
+        quotes: "double",
+        semi: true,
+        indent: 4,
+        jsx: false,
+    }),
+    stylistic.configs["disable-legacy"],
+    tseslint.configs.stylisticTypeChecked,
+    tseslint.configs.strictTypeChecked,
+    pluginVue.configs["flat/recommended"],
     {
-        plugins: {
-            "@typescript-eslint": tseslint.plugin
-        },
         languageOptions: {
-            globals: globals.browser,
+            globals: {
+                ...globals.browser,
+                ...globals.es2025,
+            },
+            parser: vueEslintParser,
             parserOptions: {
                 parser: tseslint.parser,
-                project: "tsconfig.json",
+                ecmaVersion: "latest",
+                sourceType: "module",
+                projectService: true,
                 tsconfigRootDir: import.meta.dirname,
-                extraFileExtensions: [".vue"]
-            }
-        }
-    },
-    {
+                extraFileExtensions: [ ".vue" ],
+            },
+        },
+        plugins: {
+            "@stylistic": stylistic,
+            "@typescript-eslint": tseslint.plugin,
+        },
         rules: {
-            "@typescript-eslint/no-explicit-any": 0,
-            "@typescript-eslint/no-empty-function": 0,
-            "@typescript-eslint/ban-types": 0,
-            "@typescript-eslint/no-unsafe-assignment": 0,
-            "@typescript-eslint/no-unsafe-member-access": 0,
-            "@typescript-eslint/no-unsafe-return": 0,
-            "@typescript-eslint/no-unsafe-call": 0,
-            "no-useless-escape": 0,
-            "comma-dangle": [
-                "warn",
-                "never"
-            ],
-            "no-console": "warn",
-            "no-unused-vars": [
-                "warn",
-                {
-                    "args": "none"
-                }
-            ],
-            "vue/no-unused-components": "warn",
-            "array-bracket-newline": [
-                "warn",
-                {
-                    "multiline": true,
-                    "minItems": 2
-                }
-            ],
-            "array-element-newline": [
-                "warn",
-                "always"
-            ],
-            "quotes": [
-                "warn",
+            "@stylistic/quotes": [ "error",
                 "double",
                 {
-                    "avoidEscape": true
-                }
+                    allowTemplateLiterals: "always",
+                },
             ],
-            "indent": [
-                "warn",
-                4,
+            "@stylistic/array-bracket-spacing": [ "error", "always" ],
+            "@stylistic/array-element-newline": [ "error",
                 {
-                    "SwitchCase": 1
-                }
+                    consistent: true,
+                    multiline: true,
+                },
             ],
-            "semi": [
-                "warn",
-                "always"
-            ],
-            "semi-style": [
+            "@stylistic/block-spacing": [ "error", "always" ],
+            "@stylistic/brace-style": [
                 "error",
-                "last"
-            ],
-            "vue/multi-word-component-names": 0,
-            "vue/script-indent": [
-                "warn",
-                4,
+                "1tbs",
                 {
-                    "baseIndent": 0,
-                    "switchCase": 1,
-                    "ignores": []
-                }
+                    allowSingleLine: false,
+                },
+            ],
+            "@typescript-eslint/ban-ts-comment": 0,
+            "@typescript-eslint/no-non-null-assertion": 0,
+            "@typescript-eslint/no-misused-spread": 0,
+            "@typescript-eslint/no-dynamic-delete": 0,
+            "@typescript-eslint/no-unnecessary-condition": "warn",
+            "@typescript-eslint/no-empty-function": "warn",
+            "@typescript-eslint/no-explicit-any": [
+                "error",
+                {
+                    fixToUnknown: true,
+                    ignoreRestArgs: true,
+                },
+            ],
+            // "@typescript-eslint/no-confusing-void-expression": ["warn", {
+            //     ignoreArrowShorthand: true,
+            //     ignoreVoidOperator: true,
+            //     ignoreVoidReturningFunctions: true,
+            // }]
+            "@typescript-eslint/no-unsafe-assignment": 0,
+            "@typescript-eslint/no-unsafe-member-access": 0,
+            "@typescript-eslint/no-unsafe-call": 0,
+            "@typescript-eslint/use-unknown-in-catch-callback-variable": "error",
+            "@typescript-eslint/prefer-nullish-coalescing": [
+                "warn",
+                {
+                    ignoreTernaryTests: true,
+                    ignorePrimitives: true,
+                },
+            ],
+            "@typescript-eslint/restrict-template-expressions": [
+                "warn",
+                {
+                    allowNumber: true,
+                    allowNever: true,
+                },
+            ],
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                {
+                    varsIgnorePattern: "^_",
+                    args: "after-used",
+                    argsIgnorePattern: "^_",
+                    destructuredArrayIgnorePattern: "^_",
+                    caughtErrors: "none",
+                },
+            ],
+            "@typescript-eslint/no-unsafe-return": "warn",
+            "@typescript-eslint/no-unsafe-argument": "warn",
+            "@typescript-eslint/no-floating-promises": [ "warn",
+                {
+                    ignoreIIFE: true,
+                    ignoreVoid: true,
+                    checkThenables: false,
+                },
+            ],
+            "vue/component-definition-name-casing": 0,
+            "vue/html-closing-bracket-newline": [
+                "error",
+                {
+                    singleline: "never",
+                    multiline: "never",
+                },
             ],
             "vue/html-indent": [
-                "warn",
+                "error",
                 4,
                 {
-                    "attribute": 1,
-                    "baseIndent": 1,
-                    "closeBracket": 0,
-                    "alignAttributesVertically": true,
-                    "ignores": []
-                }
+                    alignAttributesVertically: true,
+                    attribute: 1,
+                    baseIndent: 1,
+                    closeBracket: 0,
+                },
             ],
-            "vue/html-closing-bracket-newline": [
-                "warn",
-                {
-                    "singleline": "never",
-                    "multiline": "never"
-                }
-            ],
-            "vue/html-self-closing": [
-                "warn",
-                {
-                    "html": {
-                        "void": "any",
-                        "normal": "always",
-                        "component": "always"
-                    },
-                    "svg": "always",
-                    "math": "always"
-                }
-            ],
+            "vue/no-unused-components": "error",
             "vue/no-v-html": 0,
-            "vue/script-setup-uses-vars": 0,
-            "vue/component-definition-name-casing": 0,
-            "vue/custom-event-name-casing": 0,
-            "vue/no-lone-template": 0
-        }
-    }
-];
+            "vue/script-indent": [
+                "error",
+                4,
+                {
+                    baseIndent: 0,
+                    ignores: [],
+                    switchCase: 1,
+                },
+            ],
+        },
+    },
+    {
+        ignores: [
+            "dist",
+            "public",
+            "node_modules",
+        ],
+    },
+);

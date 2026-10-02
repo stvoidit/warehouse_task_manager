@@ -1,5 +1,5 @@
 # build vue frontend static files
-FROM node:20-alpine AS frontend
+FROM node:24-alpine AS frontend
 WORKDIR /frontend
 ENV PNPM_HOME="/pnpm" PATH+=":$PNPM_HOME"
 RUN corepack enable

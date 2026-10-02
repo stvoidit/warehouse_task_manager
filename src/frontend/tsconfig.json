@@ -3,7 +3,7 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "strict": true,
     "jsx": "preserve",
     "resolveJsonModule": true,
@@ -18,16 +18,15 @@
       "vite/client",
       "@types/node",
       "element-plus/global",
-      "vite-plugin-pwa/client",
+      "vite-plugin-pwa/vue",
       "./src/types"
     ],
     "skipLibCheck": true,
     "noEmit": true,
     "noImplicitAny": false,
-    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     }
   },
@@ -36,6 +35,7 @@
     "src/**/*.d.ts",
     "src/**/*.vue",
     "eslint.config.js",
-    "vite.config.ts"
+    "vite.config.ts",
+    "types.d.ts"
   ]
 }

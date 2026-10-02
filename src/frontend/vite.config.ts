@@ -1,7 +1,6 @@
 import { ConfigEnv, UserConfigExport, defineConfig, loadEnv } from "vite";
-
 import { VitePWA } from "vite-plugin-pwa";
-import { resolve } from "path";
+import { URL, fileURLToPath } from "node:url";
 import vue from "@vitejs/plugin-vue";
 
 // https://vitejs.dev/config/
@@ -64,22 +63,13 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
             port: env.VITE_PORT ? parseInt(env.VITE_PORT) : 3000
         },
         build: {
-            target: "modules",
-            outDir: "dist",
-            manifest: false,
-            minify: "esbuild",
-            emptyOutDir: true,
-            sourcemap: false,
             cssCodeSplit: false,
             chunkSizeWarningLimit: 2 << 19
         },
         resolve: {
-            alias: [
-                {
-                    find: "@",
-                    replacement: resolve(__dirname, "src")
-                }
-            ]
+            alias: {
+                "@": fileURLToPath(new URL("./src", import.meta.url)),
+            },
         }
     });
 };
